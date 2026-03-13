@@ -287,8 +287,8 @@ function setAngCalcFmt(fmt){
   angCalcFmt=fmt;
   document.getElementById('atog_dms').classList.toggle('active',fmt==='dms');
   document.getElementById('atog_dd').classList.toggle('active',fmt==='dd');
-  var hDMS="DMS: 12.3432 or 12°34'32" or 12d34m32s or 12 34 32";
-  var hDD='Decimal degrees: e.g. 12.575000°';
+  var hDMS = 'DMS: 12.3432  or  12d34m32s  or  12 34 32'32" or 12d34m32s or 12 34 32";
+  var hDD  = 'Decimal degrees: e.g. 12.575000';
   document.getElementById('hint_a').textContent=fmt==='dms'?hDMS:hDD;
   document.getElementById('hint_b').textContent=fmt==='dms'?hDMS:hDD;
   document.getElementById('a_val').placeholder=fmt==='dms'?'0.0000':'0.000000';
