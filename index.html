@@ -100,8 +100,8 @@
 </head>
 <body>
 <div class="tab-bar">
-  <div class="tab active" onclick="showPage('angles', this)">Angle Calc</div>
-  <div class="tab" onclick="showPage('triangle', this)">Triangle Solver</div>
+  <div class="tab active" id="tab_angles">Angle Calc</div>
+  <div class="tab" id="tab_triangle">Triangle Solver</div>
 </div>
 
 <!-- ANGLE CALCULATOR PAGE -->
@@ -120,8 +120,8 @@
       <div class="input-row">
         <label>Input A</label>
         <input class="dms-input" id="a_val" type="text" inputmode="decimal" placeholder="0.0000">
-        <button class="btn btn-secondary" onclick="clearField('a')">&#x2715;</button>
-        <button class="btn btn-secondary" onclick="flip('a')">&#8597; 180&#xb0;</button>
+        <button class="btn btn-secondary" id="clearA_btn">&#x2715;</button>
+        <button class="btn btn-secondary" id="flipA_btn">&#8597; 180&#xb0;</button>
       </div>
       <div class="input-hint" id="hint_a"></div>
     </div>
@@ -136,8 +136,8 @@
       <div class="input-row">
         <label>Input B</label>
         <input class="dms-input" id="b_val" type="text" inputmode="decimal" placeholder="0.0000">
-        <button class="btn btn-secondary" onclick="clearField('b')">&#x2715;</button>
-        <button class="btn btn-secondary" onclick="flip('b')">&#8597; 180&#xb0;</button>
+        <button class="btn btn-secondary" id="clearB_btn">&#x2715;</button>
+        <button class="btn btn-secondary" id="flipB_btn">&#8597; 180&#xb0;</button>
       </div>
       <div class="input-hint" id="hint_b"></div>
     </div>
@@ -438,18 +438,24 @@ function clearAll(){
   setEnabled(false);
 }
 
-document.getElementById('a_val').addEventListener('input',calculate);
-document.getElementById('b_val').addEventListener('input',calculate);
-document.getElementById('atog_dms').addEventListener('click',function(){ setAngCalcFmt('dms'); });
-document.getElementById('atog_dd').addEventListener('click',function(){ setAngCalcFmt('dd'); });
-document.getElementById('op_add').addEventListener('click',function(){ setOp('add'); });
-document.getElementById('op_sub').addEventListener('click',function(){ setOp('sub'); });
-document.getElementById('flip_res_btn').addEventListener('click',flipResult);
-document.getElementById('copyA_btn').addEventListener('click',function(){ copyTo('a'); });
-document.getElementById('copyB_btn').addEventListener('click',function(){ copyTo('b'); });
-document.getElementById('log_btn').addEventListener('click',logResult);
-document.getElementById('clear_btn').addEventListener('click',clearAll);
-document.getElementById('clear_log_btn').addEventListener('click',clearLog);
+document.getElementById('a_val').addEventListener('input', calculate);
+document.getElementById('b_val').addEventListener('input', calculate);
+document.getElementById('clearA_btn').addEventListener('click', function(){ clearField('a'); });
+document.getElementById('clearB_btn').addEventListener('click', function(){ clearField('b'); });
+document.getElementById('flipA_btn').addEventListener('click', function(){ flip('a'); });
+document.getElementById('flipB_btn').addEventListener('click', function(){ flip('b'); });
+document.getElementById('atog_dms').addEventListener('click', function(){ setAngCalcFmt('dms'); });
+document.getElementById('atog_dd').addEventListener('click', function(){ setAngCalcFmt('dd'); });
+document.getElementById('op_add').addEventListener('click', function(){ setOp('add'); });
+document.getElementById('op_sub').addEventListener('click', function(){ setOp('sub'); });
+document.getElementById('flip_res_btn').addEventListener('click', flipResult);
+document.getElementById('copyA_btn').addEventListener('click', function(){ copyTo('a'); });
+document.getElementById('copyB_btn').addEventListener('click', function(){ copyTo('b'); });
+document.getElementById('log_btn').addEventListener('click', logResult);
+document.getElementById('clear_btn').addEventListener('click', clearAll);
+document.getElementById('clear_log_btn').addEventListener('click', clearLog);
+document.getElementById('tab_angles').addEventListener('click', function(){ showPage('angles', this); });
+document.getElementById('tab_triangle').addEventListener('click', function(){ showPage('triangle', this); });
 setAngCalcFmt('dms');
 
 // ── TRIANGLE SOLVER ───────────────────────────────────────────────
