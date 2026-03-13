@@ -575,7 +575,67 @@ function clearAll() {
 
 document.getElementById('a_val').addEventListener('input', calculate);
 document.getElementById('b_val').addEventListener('input', calculate);
-document.getElementById('atog_dms').addEventListener('click', function(){ setAngCalcFmt('dms'); });
+document.getElementById('atog_dms').addEventListener('click', function(){ setAngCalcFmt('dms');
+
+// prevent all buttons receiving tab focus
+document.querySelectorAll('button').forEach(function(b){ b.setAttribute('tabindex','-1'); });
+document.getElementById('a_val').setAttribute('tabindex','1');
+document.getElementById('b_val').setAttribute('tabindex','2');
+
+// FOCUS MANAGEMENT
+var _lastFocus = 'a';
+function focusField(which) {
+  _lastFocus = which;
+  var el = document.getElementById(which + '_val');
+  el.focus();
+  var len = el.value.length;
+  el.setSelectionRange(len, len);
+}
+function keepFocus() { setTimeout(function(){ focusField(_lastFocus); }, 0); }
+
+// Tab: alternate a/b only, capture phase to block browser default
+document.addEventListener('keydown', function(e) {
+  if (!document.getElementById('page-angles').classList.contains('active')) return;
+  if (e.key === 'Tab') { e.preventDefault(); e.stopPropagation(); focusField(_lastFocus === 'a' ? 'b' : 'a'); }
+}, true);
+
+document.getElementById('a_val').addEventListener('focus', function(){ _lastFocus = 'a'; });
+document.getElementById('b_val').addEventListener('focus', function(){ _lastFocus = 'b'; });
+
+// Return focus after any click in angles page
+document.getElementById('page-angles').addEventListener('mouseup', function(e) {
+  var a = document.getElementById('a_val'), b = document.getElementById('b_val');
+  if (e.target !== a && e.target !== b) setTimeout(function(){ focusField(_lastFocus); }, 0);
+});
+
+// Update all button listeners with correct focus behaviour
+document.getElementById('atog_dms').addEventListener('click', function(){ setAngCalcFmt('dms'); keepFocus(); });
+document.getElementById('atog_dd').addEventListener('click', function(){ setAngCalcFmt('dd'); keepFocus(); });
+document.getElementById('op_add').addEventListener('click', function(){ setOp('add'); keepFocus(); });
+document.getElementById('op_sub').addEventListener('click', function(){ setOp('sub'); keepFocus(); });
+document.getElementById('flipA_btn') && document.getElementById('flipA_btn').addEventListener('click', function(){ flip('a'); focusField('a'); });
+document.getElementById('flipB_btn') && document.getElementById('flipB_btn').addEventListener('click', function(){ flip('b'); focusField('b'); });
+document.getElementById('clearA_btn') && document.getElementById('clearA_btn').addEventListener('click', function(){ clearField('a'); focusField('a'); });
+document.getElementById('clearB_btn') && document.getElementById('clearB_btn').addEventListener('click', function(){ clearField('b'); focusField('b'); });
+document.getElementById('flip_res_btn').addEventListener('click', function(){ flipResult(); keepFocus(); });
+document.getElementById('copy_result_btn').addEventListener('click', function(){ copyResult(this); keepFocus(); });
+document.getElementById('copyA_btn').addEventListener('click', function(){ copyTo('a'); focusField('b'); });
+document.getElementById('copyB_btn').addEventListener('click', function(){ copyTo('b'); focusField('a'); });
+document.getElementById('log_btn').addEventListener('click', function(){ logResult(); keepFocus(); });
+document.getElementById('clear_log_btn').addEventListener('click', function(){ clearLog(); keepFocus(); });
+
+// find warn buttons by text since they may lack IDs
+document.querySelectorAll('.btn-warn').forEach(function(btn) {
+  if (btn.textContent.trim() === 'Clear') btn.addEventListener('click', function(){ clearAll(); focusField('a'); });
+  if (btn.textContent.trim() === 'Clear history') btn.addEventListener('click', function(){ clearLog(); keepFocus(); });
+});
+
+// Tab switch focus
+document.getElementById('tab_angles').addEventListener('click', function(){ showPage('angles', this); setTimeout(function(){ focusField('a'); }, 50); });
+
+// Initial focus
+setTimeout(function(){ focusField('a'); }, 100);
+ });
 document.getElementById('atog_dd').addEventListener('click', function(){ setAngCalcFmt('dd'); });
 setAngCalcFmt('dms'); // set initial hints
 
