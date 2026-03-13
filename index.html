@@ -42,7 +42,7 @@
     display: flex; align-items: center; gap: 10px; }
   .result-text { flex: 1; }
   .result-main { font-size: 24px; font-weight: 600; color: #4fc3f7; font-family: 'Courier New', monospace; }
-  .result-dd { font-size: 13px; color: #555; margin-top: 4px; }
+  .result-dd { font-size: 12px; color: #555; margin-top: 2px; }
   .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
   .btn { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
     cursor: pointer; border: 1px solid; transition: all 0.2s; white-space: nowrap; }
@@ -59,217 +59,25 @@
   .btn-copy:hover { border-color: #4fc3f7; color: #4fc3f7; }
   .btn-copy.copied { border-color: #66bb6a; color: #66bb6a; }
   .history-log { max-height: 260px; overflow-y: auto; }
-  .log-entry { display: flex; align-items: center; gap: 8px; padding: 8px 0;
-    border-bottom: 1px solid #1e3a5f; }
+  .log-entry { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #1e3a5f; }
   .log-entry:last-child { border-bottom: none; }
   .log-num { background: #0f3460; color: #4fc3f7; border-radius: 50%; width: 20px; height: 20px;
     display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
   .log-body { flex: 1; min-width: 0; }
-  .log-calc { font-size: 12px; color: #aaa; font-family: 'Courier New', monospace; white-space: nowrap;
-    overflow: hidden; text-overflow: ellipsis; }
-  .log-result { font-size: 14px; color: #4fc3f7; font-weight: 600; font-family: 'Courier New', monospace; margin-top: 2px; }
+  .log-calc { font-size: 12px; color: #aaa; font-family: 'Courier New', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .log-result { font-size: 13px; color: #4fc3f7; font-weight: 600; font-family: 'Courier New', monospace; margin-top: 2px; }
   .log-dd { font-size: 11px; color: #555; margin-top: 1px; }
   .log-empty { color: #555; font-size: 13px; text-align: center; padding: 16px 0; }
   .error-msg { color: #ff8a65; font-size: 12px; margin-top: 8px; display: none; }
-</style>
-</head>
-<body>
-
-<div class="tab-bar">
-  <div class="tab active" onclick="showPage('angles', this)">Angle Calc</div>
-  <div class="tab" onclick="showPage('triangle', this)">Triangle Solver</div>
-</div>
-
-<div class="page active" id="page-angles">
-  <div style="margin-top:16px;">
-    <div class="ang-tog-row">
-      <label>Angle format</label>
-      <div class="ang-tog">
-        <button id="atog_dms" class="active">DMS</button>
-        <button id="atog_dd">DD</button>
-      </div>
-    </div>
-
-    <div class="section-title">Angle A</div>
-    <div class="card">
-      <div class="input-row">
-        <label>Input A</label>
-        <input class="dms-input" id="a_val" type="text" inputmode="decimal" placeholder="0.0000">
-        <button class="btn btn-secondary" onclick="clearField('a')">&#x2715;</button>
-        <button class="btn btn-secondary" onclick="flip('a')">&#8597; 180°</button>
-      </div>
-      <div class="input-hint" id="hint_a"></div>
-    </div>
-
-    <div class="op-row">
-      <button class="op-btn active" id="op_add" onclick="setOp('add')">+</button>
-      <button class="op-btn" id="op_sub" onclick="setOp('sub')">−</button>
-    </div>
-
-    <div class="section-title">Angle B</div>
-    <div class="card">
-      <div class="input-row">
-        <label>Input B</label>
-        <input class="dms-input" id="b_val" type="text" inputmode="decimal" placeholder="0.0000">
-        <button class="btn btn-secondary" onclick="clearField('b')">&#x2715;</button>
-        <button class="btn btn-secondary" onclick="flip('b')">&#8597; 180°</button>
-      </div>
-      <div class="input-hint" id="hint_b"></div>
-    </div>
-
-    <div class="section-title">Result</div>
-    <div class="card">
-      <div class="result-box">
-        <div class="result-text">
-          <div class="result-main" id="result_expanded">&mdash;° &mdash;&mdash;′ &mdash;&mdash;″</div>
-          <div class="result-dd" id="result_dd">Enter values above</div>
-        </div>
-        <button class="btn-copy" id="copy_result_btn" onclick="copyResult(this)" disabled>Copy</button>
-      </div>
-      <div class="error-msg" id="error_msg"></div>
-      <div class="btn-row">
-        <button class="btn btn-secondary" onclick="flipResult()" id="flip_res_btn" disabled>&#8597; 180°</button>
-        <button class="btn btn-primary" onclick="copyTo('a')" id="copyA_btn" disabled>&#8594; Copy to A</button>
-        <button class="btn btn-primary" onclick="copyTo('b')" id="copyB_btn" disabled>&#8594; Copy to B</button>
-        <button class="btn btn-secondary" onclick="logResult()" id="log_btn" disabled>Log step</button>
-        <button class="btn btn-warn" onclick="clearAll()">Clear</button>
-      </div>
-    </div>
-
-    <div class="section-title">History</div>
-    <div class="card">
-      <div class="history-log" id="traverse_log">
-        <div class="log-empty">No steps logged yet</div>
-      </div>
-      <div class="btn-row" style="margin-top:10px;">
-        <button class="btn btn-warn" onclick="clearLog()">Clear history</button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-
-<!-- TRIANGLE SOLVER PAGE -->
-<div class="page" id="page-triangle">
-<div style="margin-top:16px;">
-
-  <div style="margin-bottom:14px;">
-    <div style="font-size:16px;font-weight:600;color:#e0e0e0;">Triangle Calculator</div>
-    <div style="font-size:12px;color:#666;margin-top:3px;">Enter any 3 known values to solve the triangle</div>
-  </div>
-
-  <!-- Settings Bar -->
-  <div class="card" style="margin-bottom:12px;">
-    <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;">
-      <div>
-        <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Units</div>
-        <div style="display:flex;gap:0;">
-          <button class="tog-btn active" id="tog_metric" onclick="setUnit('metric')">Metric</button>
-          <button class="tog-btn" id="tog_imperial" onclick="setUnit('imperial')">Imperial</button>
-        </div>
-      </div>
-      <div>
-        <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Angle Input</div>
-        <div style="display:flex;gap:0;">
-          <button class="tog-btn active" id="tog_dms" onclick="setAngleFmt('dms')">DMS</button>
-          <button class="tog-btn" id="tog_dd" onclick="setAngleFmt('dd')">DD</button>
-        </div>
-      </div>
-      <div>
-        <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Side precision</div>
-        <select id="prec_side" class="prec-sel" onchange="recalcIfDone()">
-          <option value="2">2 dp</option>
-          <option value="3" selected>3 dp</option>
-          <option value="4">4 dp</option>
-          <option value="5">5 dp</option>
-        </select>
-      </div>
-      <div>
-        <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Angle precision</div>
-        <select id="prec_ang" class="prec-sel" onchange="recalcIfDone()">
-          <option value="2">2 dp</option>
-          <option value="3" selected>3 dp</option>
-          <option value="4">4 dp</option>
-          <option value="5">5 dp</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- Input Card -->
-  <div class="card">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div class="tri-field">
-        <label class="tri-label" for="t_sideA">Side a <span class="unit-lbl">(m)</span></label>
-        <input class="tri-input" id="t_sideA" type="text" inputmode="decimal" placeholder="0">
-        <div class="tri-err" id="err_sideA"></div>
-      </div>
-      <div class="tri-field">
-        <label class="tri-label" for="t_angA">Angle A</label>
-        <input class="tri-input" id="t_angA" type="text" inputmode="decimal" placeholder="0.0000">
-        <div class="tri-err" id="err_angA"></div>
-      </div>
-      <div class="tri-field">
-        <label class="tri-label" for="t_sideB">Side b <span class="unit-lbl">(m)</span></label>
-        <input class="tri-input" id="t_sideB" type="text" inputmode="decimal" placeholder="0">
-        <div class="tri-err" id="err_sideB"></div>
-      </div>
-      <div class="tri-field">
-        <label class="tri-label" for="t_angB">Angle B</label>
-        <input class="tri-input" id="t_angB" type="text" inputmode="decimal" placeholder="0.0000">
-        <div class="tri-err" id="err_angB"></div>
-      </div>
-      <div class="tri-field">
-        <label class="tri-label" for="t_sideC">Side c <span class="unit-lbl">(m)</span></label>
-        <input class="tri-input" id="t_sideC" type="text" inputmode="decimal" placeholder="0">
-        <div class="tri-err" id="err_sideC"></div>
-      </div>
-      <div class="tri-field">
-        <label class="tri-label" for="t_angC">Angle C</label>
-        <input class="tri-input" id="t_angC" type="text" inputmode="decimal" placeholder="0.0000">
-        <div class="tri-err" id="err_angC"></div>
-      </div>
-    </div>
-    <div class="tri-err" id="err_global" style="margin-top:8px;font-size:13px;"></div>
-    <div style="display:flex;gap:10px;margin-top:12px;">
-      <button class="tri-btn-sec" id="tri_reset_btn">Reset</button>
-      <button class="tri-btn-pri" id="tri_calc_btn">Calculate</button>
-    </div>
-  </div>
-
-  <!-- SVG Diagram -->
-  <div id="tri_diagram" style="display:none;" class="card">
-    <svg id="tri_svg" width="100%" height="220" aria-label="Triangle diagram with vertices A (bottom-left), B (bottom-right), C (top)" style="display:block;overflow:visible;"></svg>
-  </div>
-
-  <!-- Results Card -->
-  <div id="tri_results" style="display:none;" class="card">
-    <div class="section-title" style="margin-bottom:10px;">Results</div>
-    <div id="res_rows"></div>
-    <div id="res_method" style="font-size:11px;color:#555;margin-top:10px;"></div>
-    <div style="display:flex;gap:10px;margin-top:12px;">
-      <button class="tri-btn-sec" id="copy_all_btn">Copy All</button>
-    </div>
-  </div>
-
-</div>
-</div>
-
-<div class="page" id="page-coming" style="display:none;"></div>
-
-<style>
   .tog-btn { padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid #1e3a5f;
     background:#0f1b35;color:#888;transition:all .2s; }
   .tog-btn:first-child { border-radius:6px 0 0 6px; }
   .tog-btn:last-child { border-radius:0 6px 6px 0; }
   .tog-btn.active { background:#4fc3f7;border-color:#4fc3f7;color:#0a0a1a; }
-  .prec-sel { padding:6px 8px;background:#0f1b35;border:1px solid #1e3a5f;border-radius:6px;
-    color:#e0e0e0;font-size:12px;outline:none; }
+  .prec-sel { padding:6px 8px;background:#0f1b35;border:1px solid #1e3a5f;border-radius:6px;color:#e0e0e0;font-size:12px;outline:none; }
   .tri-field { display:flex;flex-direction:column;gap:3px; }
   .tri-label { font-size:12px;color:#888; }
-  .tri-input { padding:9px 10px;background:#0f1b35;border:1px solid #1e3a5f;border-radius:8px;
-    color:#e0e0e0;font-size:15px;outline:none;width:100%; }
+  .tri-input { padding:9px 10px;background:#0f1b35;border:1px solid #1e3a5f;border-radius:8px;color:#e0e0e0;font-size:15px;outline:none;width:100%; }
   .tri-input:focus { border-color:#4fc3f7; }
   .tri-input.field-known { border-color:#4fc3f7; }
   .tri-input.field-error { border-color:#ff5252; }
@@ -289,596 +97,569 @@
   .known-tag { font-size:10px;background:#0f3460;color:#4fc3f7;border-radius:4px;padding:2px 5px;margin-left:6px; }
   .calc-tag { font-size:10px;background:#1a3020;color:#66bb6a;border-radius:4px;padding:2px 5px;margin-left:6px; }
 </style>
+</head>
+<body>
+<div class="tab-bar">
+  <div class="tab active" onclick="showPage('angles', this)">Angle Calc</div>
+  <div class="tab" onclick="showPage('triangle', this)">Triangle Solver</div>
+</div>
+
+<!-- ANGLE CALCULATOR PAGE -->
+<div class="page active" id="page-angles">
+  <div style="margin-top:16px;">
+    <div class="ang-tog-row">
+      <label>Angle format</label>
+      <div class="ang-tog">
+        <button id="atog_dms" class="active">DMS</button>
+        <button id="atog_dd">DD</button>
+      </div>
+    </div>
+
+    <div class="section-title">Angle A</div>
+    <div class="card">
+      <div class="input-row">
+        <label>Input A</label>
+        <input class="dms-input" id="a_val" type="text" inputmode="decimal" placeholder="0.0000">
+        <button class="btn btn-secondary" onclick="clearField('a')">&#x2715;</button>
+        <button class="btn btn-secondary" onclick="flip('a')">&#8597; 180&#xb0;</button>
+      </div>
+      <div class="input-hint" id="hint_a"></div>
+    </div>
+
+    <div class="op-row">
+      <button class="op-btn active" id="op_add">+</button>
+      <button class="op-btn" id="op_sub">&minus;</button>
+    </div>
+
+    <div class="section-title">Angle B</div>
+    <div class="card">
+      <div class="input-row">
+        <label>Input B</label>
+        <input class="dms-input" id="b_val" type="text" inputmode="decimal" placeholder="0.0000">
+        <button class="btn btn-secondary" onclick="clearField('b')">&#x2715;</button>
+        <button class="btn btn-secondary" onclick="flip('b')">&#8597; 180&#xb0;</button>
+      </div>
+      <div class="input-hint" id="hint_b"></div>
+    </div>
+
+    <div class="section-title">Result</div>
+    <div class="card">
+      <div class="result-box">
+        <div class="result-text">
+          <div class="result-main" id="result_expanded">&mdash;&#xb0; &mdash;&mdash;&#x2032; &mdash;&mdash;&#x2033;</div>
+          <div class="result-dd" id="result_dd">Enter values above</div>
+        </div>
+        <button class="btn-copy" id="copy_result_btn" onclick="copyResult(this)" disabled>Copy</button>
+      </div>
+      <div class="error-msg" id="error_msg"></div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="flip_res_btn" disabled>&#8597; 180&#xb0;</button>
+        <button class="btn btn-primary" id="copyA_btn" disabled>&#8594; Copy to A</button>
+        <button class="btn btn-primary" id="copyB_btn" disabled>&#8594; Copy to B</button>
+        <button class="btn btn-secondary" id="log_btn" disabled>Log step</button>
+        <button class="btn btn-warn" id="clear_btn">Clear</button>
+      </div>
+    </div>
+
+    <div class="section-title">History</div>
+    <div class="card">
+      <div class="history-log" id="traverse_log">
+        <div class="log-empty">No steps logged yet</div>
+      </div>
+      <div class="btn-row" style="margin-top:10px;">
+        <button class="btn btn-warn" id="clear_log_btn">Clear history</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRIANGLE SOLVER PAGE -->
+<div class="page" id="page-triangle">
+<div style="margin-top:16px;">
+  <div style="margin-bottom:14px;">
+    <div style="font-size:16px;font-weight:600;color:#e0e0e0;">Triangle Calculator</div>
+    <div style="font-size:12px;color:#666;margin-top:3px;">Enter any 3 known values to solve the triangle</div>
+  </div>
+  <div class="card" style="margin-bottom:12px;">
+    <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;">
+      <div>
+        <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Units</div>
+        <div style="display:flex;gap:0;">
+          <button class="tog-btn active" id="tog_metric">Metric</button>
+          <button class="tog-btn" id="tog_imperial">Imperial</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Angle Input</div>
+        <div style="display:flex;gap:0;">
+          <button class="tog-btn active" id="tog_dms">DMS</button>
+          <button class="tog-btn" id="tog_dd">DD</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Side precision</div>
+        <select id="prec_side" class="prec-sel"><option value="2">2 dp</option><option value="3" selected>3 dp</option><option value="4">4 dp</option><option value="5">5 dp</option></select>
+      </div>
+      <div>
+        <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Angle precision</div>
+        <select id="prec_ang" class="prec-sel"><option value="2">2 dp</option><option value="3" selected>3 dp</option><option value="4">4 dp</option><option value="5">5 dp</option></select>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="tri-field"><label class="tri-label" for="t_sideA">Side a <span class="unit-lbl">(m)</span></label><input class="tri-input" id="t_sideA" type="text" inputmode="decimal" placeholder="0"><div class="tri-err" id="err_sideA"></div></div>
+      <div class="tri-field"><label class="tri-label" for="t_angA">Angle A</label><input class="tri-input" id="t_angA" type="text" inputmode="decimal" placeholder="0.0000"><div class="tri-err" id="err_angA"></div></div>
+      <div class="tri-field"><label class="tri-label" for="t_sideB">Side b <span class="unit-lbl">(m)</span></label><input class="tri-input" id="t_sideB" type="text" inputmode="decimal" placeholder="0"><div class="tri-err" id="err_sideB"></div></div>
+      <div class="tri-field"><label class="tri-label" for="t_angB">Angle B</label><input class="tri-input" id="t_angB" type="text" inputmode="decimal" placeholder="0.0000"><div class="tri-err" id="err_angB"></div></div>
+      <div class="tri-field"><label class="tri-label" for="t_sideC">Side c <span class="unit-lbl">(m)</span></label><input class="tri-input" id="t_sideC" type="text" inputmode="decimal" placeholder="0"><div class="tri-err" id="err_sideC"></div></div>
+      <div class="tri-field"><label class="tri-label" for="t_angC">Angle C</label><input class="tri-input" id="t_angC" type="text" inputmode="decimal" placeholder="0.0000"><div class="tri-err" id="err_angC"></div></div>
+    </div>
+    <div class="tri-err" id="err_global" style="margin-top:8px;font-size:13px;"></div>
+    <div style="display:flex;gap:10px;margin-top:12px;">
+      <button class="tri-btn-sec" id="tri_reset_btn">Reset</button>
+      <button class="tri-btn-pri" id="tri_calc_btn">Calculate</button>
+    </div>
+  </div>
+  <div id="tri_diagram" style="display:none;" class="card">
+    <svg id="tri_svg" width="100%" height="220" aria-label="Triangle diagram" style="display:block;overflow:visible;"></svg>
+  </div>
+  <div id="tri_results" style="display:none;" class="card">
+    <div class="section-title" style="margin-bottom:10px;">Results</div>
+    <div id="res_rows"></div>
+    <div id="res_method" style="font-size:11px;color:#555;margin-top:10px;"></div>
+    <div style="display:flex;gap:10px;margin-top:12px;">
+      <button class="tri-btn-sec" id="copy_all_btn">Copy All</button>
+    </div>
+  </div>
+</div>
+</div>
 
 <script>
-var currentOp = 'add';
-var resultSec = null;
-var logEntries = [];
-var logCount = 0;
-var angCalcFmt = 'dms'; // 'dms' or 'dd'
-
-function setAngCalcFmt(fmt) {
-  angCalcFmt = fmt;
-  document.getElementById('atog_dms').classList.toggle('active', fmt === 'dms');
-  document.getElementById('atog_dd').classList.toggle('active', fmt === 'dd');
-  var hintDMS = 'DMS: 12.3432 or 12°34\'32" or 12d34m32s or 12 34 32';
-  var hintDD  = 'Decimal degrees: e.g. 12.5750°';
-  document.getElementById('hint_a').textContent = fmt === 'dms' ? hintDMS : hintDD;
-  document.getElementById('hint_b').textContent = fmt === 'dms' ? hintDMS : hintDD;
-  document.getElementById('a_val').placeholder = fmt === 'dms' ? '0.0000' : '0.000000';
-  document.getElementById('b_val').placeholder = fmt === 'dms' ? '0.0000' : '0.000000';
-  // clear fields and result on format switch
-  clearAll();
-}
-
-// Parse any DMS variant or DD → total seconds
-function parseAngleEntry(raw) {
-  raw = raw.trim();
-  if (!raw) return 0;
-
-  if (angCalcFmt === 'dd') {
-    var dd = parseFloat(raw.replace(/[°d]/gi, ''));
-    return isNaN(dd) ? null : dd * 3600;
-  }
-
-  // Try all DMS formats
-  var d = 0, m = 0, s = 0;
-
-  // Format: 12°34'56" or 12° 34' 56" or 12d34m56s or 12d 34m 56s
-  var reSymbol = /^(-?\d+(?:\.\d+)?)[°d\s]+(\d+(?:\.\d+)?)[\'m\s]+(\d+(?:\.\d+)?)[\"s]?$/i;
-  // Format: 12 34 56 (space separated)
-  var reSpace = /^(-?\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)$/;
-  // Format: condensed 12.3456
-  var reCondensed = /^(-?\d+)\.(\d{1,4})$/;
-
-  var neg = raw.startsWith('-');
-  var absRaw = neg ? raw.slice(1).trim() : raw;
-
-  var m1 = absRaw.match(reSymbol);
-  var m2 = absRaw.match(reSpace);
-  var m3 = absRaw.match(reCondensed);
-
-  if (m1) {
-    d = parseFloat(m1[1]); m = parseFloat(m1[2]); s = parseFloat(m1[3]);
-  } else if (m2) {
-    d = parseFloat(m2[1]); m = parseFloat(m2[2]); s = parseFloat(m2[3]);
-  } else if (m3) {
-    d = parseInt(m3[1], 10);
-    var frac = (m3[2] + '0000').slice(0, 4);
-    m = parseInt(frac.slice(0, 2), 10);
-    s = parseInt(frac.slice(2, 4), 10);
-  } else {
-    // fallback: try plain decimal as condensed
-    var f = parseFloat(absRaw);
-    if (!isNaN(f)) {
-      var parts = absRaw.split('.');
-      d = parseInt(parts[0], 10) || 0;
-      var fr = ((parts[1] || '') + '0000').slice(0, 4);
-      m = parseInt(fr.slice(0, 2), 10) || 0;
-      s = parseInt(fr.slice(2, 4), 10) || 0;
-    } else {
-      return null;
-    }
-  }
-
-  if (m > 59 || s >= 60) return null;
-  var total = d * 3600 + m * 60 + s;
-  return neg ? -total : total;
-}
-
-function validateEntry(raw) {
-  if (!raw.trim()) return true;
-  return parseAngleEntry(raw) !== null;
-}
-
+// ── SHARED ────────────────────────────────────────────────────────
 function showPage(id, el) {
-  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('page-'+id).classList.add('active');
   el.classList.add('active');
 }
 
-function setOp(op) {
-  currentOp = op;
-  document.getElementById('op_add').classList.toggle('active', op === 'add');
-  document.getElementById('op_sub').classList.toggle('active', op === 'sub');
+function copyToClipboard(text, btn) {
+  function doFallback(){
+    var ta=document.createElement('textarea'); ta.value=text;
+    ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+  }
+  function flash(){
+    if(!btn) return;
+    var orig=btn.textContent; btn.textContent='Copied!'; btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent=orig; btn.classList.remove('copied'); },1500);
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(flash,function(){ doFallback(); flash(); });
+  } else { doFallback(); flash(); }
+}
+
+function pad2(n){ return n<10?'0'+n:''+n; }
+
+function toExpanded(totalSec){
+  totalSec=((totalSec%1296000)+1296000)%1296000;
+  var d=Math.floor(totalSec/3600),rem=totalSec-d*3600,m=Math.floor(rem/60),s=Math.round(rem-m*60);
+  if(s>=60){s-=60;m++;} if(m>=60){m-=60;d++;} if(d>=360)d-=360;
+  return d+'° '+pad2(m)+'′ '+pad2(s)+'″';
+}
+
+function toCondensed(totalSec){
+  totalSec=((totalSec%1296000)+1296000)%1296000;
+  var d=Math.floor(totalSec/3600),rem=totalSec-d*3600,m=Math.floor(rem/60),s=Math.round(rem-m*60);
+  if(s>=60){s-=60;m++;} if(m>=60){m-=60;d++;} if(d>=360)d-=360;
+  return d+'.'+pad2(m)+pad2(s);
+}
+
+function toDD(totalSec){ return (totalSec/3600).toFixed(6)+'° decimal'; }
+
+// ── ANGLE CALCULATOR ─────────────────────────────────────────────
+var currentOp='add', resultSec=null, logEntries=[], logCount=0, angCalcFmt='dms';
+
+function setAngCalcFmt(fmt){
+  angCalcFmt=fmt;
+  document.getElementById('atog_dms').classList.toggle('active',fmt==='dms');
+  document.getElementById('atog_dd').classList.toggle('active',fmt==='dd');
+  var hDMS="DMS: 12.3432 or 12°34'32" or 12d34m32s or 12 34 32";
+  var hDD='Decimal degrees: e.g. 12.575000°';
+  document.getElementById('hint_a').textContent=fmt==='dms'?hDMS:hDD;
+  document.getElementById('hint_b').textContent=fmt==='dms'?hDMS:hDD;
+  document.getElementById('a_val').placeholder=fmt==='dms'?'0.0000':'0.000000';
+  document.getElementById('b_val').placeholder=fmt==='dms'?'0.0000':'0.000000';
+  clearAll();
+}
+
+function parseAngleEntry(raw){
+  raw=raw.trim(); if(!raw) return 0;
+  if(angCalcFmt==='dd'){
+    var dd=parseFloat(raw.replace(/[°d]/gi,''));
+    return isNaN(dd)?null:dd*3600;
+  }
+  var neg=raw.startsWith('-'); var absRaw=neg?raw.slice(1).trim():raw;
+  var d=0,m=0,s=0;
+  var reSymbol=/^(d+(?:.d+)?)[^d]+(d+(?:.d+)?)[^d]+(d+(?:.d+)?)[^d]*$/;
+  var reSpace=/^(d+(?:.d+)?)s+(d+(?:.d+)?)s+(d+(?:.d+)?)$/;
+  var reCondensed=/^(d+).(d{1,4})$/;
+  var m1=absRaw.match(reSymbol),m2=absRaw.match(reSpace),m3=absRaw.match(reCondensed);
+  if(m1){ d=parseFloat(m1[1]);m=parseFloat(m1[2]);s=parseFloat(m1[3]); }
+  else if(m2){ d=parseFloat(m2[1]);m=parseFloat(m2[2]);s=parseFloat(m2[3]); }
+  else if(m3){
+    d=parseInt(m3[1],10);
+    var frac=(m3[2]+'0000').slice(0,4);
+    m=parseInt(frac.slice(0,2),10); s=parseInt(frac.slice(2,4),10);
+  } else {
+    var f=parseFloat(absRaw); if(isNaN(f)) return null;
+    var parts=absRaw.split('.');
+    d=parseInt(parts[0],10)||0;
+    var fr=((parts[1]||'')+'0000').slice(0,4);
+    m=parseInt(fr.slice(0,2),10)||0; s=parseInt(fr.slice(2,4),10)||0;
+  }
+  if(m>59||s>=60) return null;
+  var total=d*3600+m*60+s;
+  return neg?-total:total;
+}
+
+function parseDMS(val){ var r=parseAngleEntry(val); return r===null?0:r; }
+function validateCondensed(val){ return !val.trim()||parseAngleEntry(val)!==null; }
+
+function setOp(op){
+  currentOp=op;
+  document.getElementById('op_add').classList.toggle('active',op==='add');
+  document.getElementById('op_sub').classList.toggle('active',op==='sub');
   calculate();
 }
 
-function parseDMS(val) {
-  var result = parseAngleEntry(val);
-  return result === null ? 0 : result;
+function setDisplay(expanded,dd){
+  document.getElementById('result_expanded').textContent=expanded;
+  document.getElementById('result_dd').textContent=dd;
 }
 
-function validateCondensed(val) {
-  return validateEntry(val);
-}
-
-function toCondensed(totalSec) {
-  totalSec = ((totalSec % 1296000) + 1296000) % 1296000;
-  var d = Math.floor(totalSec / 3600);
-  var rem = totalSec - d * 3600;
-  var m = Math.floor(rem / 60);
-  var s = Math.round(rem - m * 60);
-  if (s >= 60) { s -= 60; m++; }
-  if (m >= 60) { m -= 60; d++; }
-  if (d >= 360) d -= 360;
-  return d + '.' + pad2(m) + pad2(s);
-}
-
-function toExpanded(totalSec) {
-  totalSec = ((totalSec % 1296000) + 1296000) % 1296000;
-  var d = Math.floor(totalSec / 3600);
-  var rem = totalSec - d * 3600;
-  var m = Math.floor(rem / 60);
-  var s = Math.round(rem - m * 60);
-  if (s >= 60) { s -= 60; m++; }
-  if (m >= 60) { m -= 60; d++; }
-  if (d >= 360) d -= 360;
-  return d + '\u00b0 ' + pad2(m) + '\u2032 ' + pad2(s) + '\u2033';
-}
-
-function toDD(totalSec) {
-  return (totalSec / 3600).toFixed(6) + '\u00b0 decimal';
-}
-
-function pad2(n) { return n < 10 ? '0' + n : '' + n; }
-
-function setDisplay(expanded, dd) {
-  document.getElementById('result_expanded').textContent = expanded;
-  document.getElementById('result_dd').textContent = dd;
-}
-
-function setEnabled(on) {
-  ['copyA_btn', 'copyB_btn', 'log_btn', 'flip_res_btn', 'copy_result_btn'].forEach(function(id) {
-    document.getElementById(id).disabled = !on;
+function setEnabled(on){
+  ['copyA_btn','copyB_btn','log_btn','flip_res_btn','copy_result_btn'].forEach(function(id){
+    document.getElementById(id).disabled=!on;
   });
 }
 
-function calculate() {
-  var aRaw = document.getElementById('a_val').value || '';
-  var bRaw = document.getElementById('b_val').value || '';
-  var err = document.getElementById('error_msg');
-
-  if (aRaw === '' && bRaw === '') {
-    err.style.display = 'none';
-    resultSec = null;
-    setDisplay('\u2014\u00b0 \u2014\u2014\u2032 \u2014\u2014\u2033', 'Enter values above');
-    setEnabled(false);
-    return;
+function calculate(){
+  var aRaw=document.getElementById('a_val').value||'';
+  var bRaw=document.getElementById('b_val').value||'';
+  var err=document.getElementById('error_msg');
+  if(aRaw===''&&bRaw===''){
+    err.style.display='none'; resultSec=null;
+    setDisplay('—° ——′ ——″','Enter values above');
+    setEnabled(false); return;
   }
-
-  if (!validateCondensed(aRaw) || !validateCondensed(bRaw)) {
-    err.style.display = 'block';
-    err.textContent = 'Minutes or seconds exceed 59 \u2014 check your input.';
-    resultSec = null;
-    setDisplay('\u2014\u00b0 \u2014\u2014\u2032 \u2014\u2014\u2033', '');
-    setEnabled(false);
-    return;
+  if(!validateCondensed(aRaw)||!validateCondensed(bRaw)){
+    err.style.display='block'; err.textContent='Invalid format — check your input.';
+    resultSec=null; setDisplay('—° ——′ ——″','');
+    setEnabled(false); return;
   }
-
-  var aS = parseDMS(aRaw);
-  var bS = parseDMS(bRaw);
-  var res = currentOp === 'add' ? aS + bS : aS - bS;
-
-  err.style.display = 'none';
-  res = ((res % 1296000) + 1296000) % 1296000;
-  resultSec = res;
-  setDisplay(toExpanded(res), toDD(res));
+  var aS=parseDMS(aRaw),bS=parseDMS(bRaw);
+  var res=currentOp==='add'?aS+bS:aS-bS;
+  err.style.display='none';
+  res=((res%1296000)+1296000)%1296000;
+  resultSec=res;
+  setDisplay(toExpanded(res),toDD(res));
   setEnabled(true);
 }
 
-function copyToClipboard(text, btn) {
-  navigator.clipboard.writeText(text).then(function() {
-    var orig = btn.textContent;
-    btn.textContent = 'Copied!';
-    btn.classList.add('copied');
-    setTimeout(function() {
-      btn.textContent = orig;
-      btn.classList.remove('copied');
-    }, 1500);
-  });
+function copyResult(btn){ if(resultSec===null)return; copyToClipboard(toExpanded(resultSec),btn); }
+
+function clearField(prefix){
+  document.getElementById(prefix+'_val').value=''; calculate();
 }
 
-function copyResult(btn) {
-  if (resultSec === null) return;
-  copyToClipboard(toExpanded(resultSec), btn);
-}
-
-function clearField(prefix) {
-  document.getElementById(prefix + '_val').value = '';
+function flip(prefix){
+  var cur=parseDMS(document.getElementById(prefix+'_val').value);
+  var flipped=((cur+648000)%1296000+1296000)%1296000;
+  document.getElementById(prefix+'_val').value=toCondensed(flipped);
   calculate();
 }
 
-function flip(prefix) {
-  var cur = parseDMS(document.getElementById(prefix + '_val').value);
-  var flipped = ((cur + 648000) % 1296000 + 1296000) % 1296000;
-  document.getElementById(prefix + '_val').value = toCondensed(flipped);
+function flipResult(){
+  if(resultSec===null)return;
+  resultSec=((resultSec+648000)%1296000+1296000)%1296000;
+  setDisplay(toExpanded(resultSec),toDD(resultSec));
+}
+
+function copyTo(prefix){
+  if(resultSec===null)return;
+  document.getElementById(prefix+'_val').value=toCondensed(resultSec);
   calculate();
 }
 
-function flipResult() {
-  if (resultSec === null) return;
-  resultSec = ((resultSec + 648000) % 1296000 + 1296000) % 1296000;
-  setDisplay(toExpanded(resultSec), toDD(resultSec));
-}
-
-function copyTo(prefix) {
-  if (resultSec === null) return;
-  document.getElementById(prefix + '_val').value = toCondensed(resultSec);
-  calculate();
-}
-
-function logResult() {
-  if (resultSec === null) return;
+function logResult(){
+  if(resultSec===null)return;
   logCount++;
-  var aRaw = document.getElementById('a_val').value || '0.0000';
-  var bRaw = document.getElementById('b_val').value || '0.0000';
-  var opSym = currentOp === 'add' ? '+' : '\u2212';
-  logEntries.push({
-    num: logCount,
-    a: aRaw,
-    b: bRaw,
-    op: opSym,
-    expanded: toExpanded(resultSec),
-    dd: toDD(resultSec)
-  });
+  var aRaw=document.getElementById('a_val').value||'0.0000';
+  var bRaw=document.getElementById('b_val').value||'0.0000';
+  var opSym=currentOp==='add'?'+':'−';
+  logEntries.push({num:logCount,a:aRaw,b:bRaw,op:opSym,expanded:toExpanded(resultSec),dd:toDD(resultSec)});
   renderLog();
 }
 
-function renderLog() {
-  var el = document.getElementById('traverse_log');
-  if (!logEntries.length) {
-    el.innerHTML = '<div class="log-empty">No steps logged yet</div>';
-    el.onclick = null;
-    return;
-  }
-
-  window._logCopyVals = logEntries.map(function(e){ return e.expanded; });
-
-  el.innerHTML = logEntries.map(function(e, i) {
-    return '<div class="log-entry">' +
-      '<div class="log-num">' + e.num + '</div>' +
-      '<div class="log-body">' +
-        '<div class="log-calc">' + e.a + ' <span style="color:#4fc3f7">' + e.op + '</span> ' + e.b + '</div>' +
-        '<div class="log-result">= ' + e.expanded + '</div>' +
-        '<div class="log-dd">' + e.dd + '</div>' +
-      '</div>' +
-      '<button class="btn-copy" data-idx="'+i+'">Copy</button>' +
+function renderLog(){
+  var el=document.getElementById('traverse_log');
+  if(!logEntries.length){ el.innerHTML='<div class="log-empty">No steps logged yet</div>'; el.onclick=null; return; }
+  window._logCopyVals=logEntries.map(function(e){ return e.expanded; });
+  el.innerHTML=logEntries.map(function(e,i){
+    return '<div class="log-entry">'+
+      '<div class="log-num">'+e.num+'</div>'+
+      '<div class="log-body">'+
+        '<div class="log-calc">'+e.a+' <span style="color:#4fc3f7">'+e.op+'</span> '+e.b+'</div>'+
+        '<div class="log-result">= '+e.expanded+'</div>'+
+        '<div class="log-dd">'+e.dd+'</div>'+
+      '</div>'+
+      '<button class="btn-copy" data-idx="'+i+'">Copy</button>'+
       '</div>';
   }).join('');
-
-  el.onclick = function(e) {
-    var btn = e.target.closest('.btn-copy');
-    if (!btn) return;
-    var idx = parseInt(btn.getAttribute('data-idx'), 10);
-    copyToClipboard(window._logCopyVals[idx], btn);
+  el.onclick=function(e){
+    var btn=e.target.closest('.btn-copy'); if(!btn)return;
+    copyToClipboard(window._logCopyVals[parseInt(btn.getAttribute('data-idx'),10)],btn);
   };
-
-  el.scrollTop = el.scrollHeight;
+  el.scrollTop=el.scrollHeight;
 }
 
-function clearLog() {
-  logEntries = [];
-  logCount = 0;
-  renderLog();
-}
+function clearLog(){ logEntries=[]; logCount=0; renderLog(); }
 
-function clearAll() {
-  document.getElementById('a_val').value = '';
-  document.getElementById('b_val').value = '';
-  resultSec = null;
-  document.getElementById('error_msg').style.display = 'none';
-  setDisplay('\u2014\u00b0 \u2014\u2014\u2032 \u2014\u2014\u2033', 'Enter values above');
+function clearAll(){
+  document.getElementById('a_val').value='';
+  document.getElementById('b_val').value='';
+  resultSec=null;
+  document.getElementById('error_msg').style.display='none';
+  setDisplay('—° ——′ ——″','Enter values above');
   setEnabled(false);
 }
 
-document.getElementById('a_val').addEventListener('input', calculate);
-document.getElementById('b_val').addEventListener('input', calculate);
-document.getElementById('atog_dms').addEventListener('click', function(){ setAngCalcFmt('dms'); });
-document.getElementById('atog_dd').addEventListener('click', function(){ setAngCalcFmt('dd'); });
-setAngCalcFmt('dms'); // set initial hints
+document.getElementById('a_val').addEventListener('input',calculate);
+document.getElementById('b_val').addEventListener('input',calculate);
+document.getElementById('atog_dms').addEventListener('click',function(){ setAngCalcFmt('dms'); });
+document.getElementById('atog_dd').addEventListener('click',function(){ setAngCalcFmt('dd'); });
+document.getElementById('op_add').addEventListener('click',function(){ setOp('add'); });
+document.getElementById('op_sub').addEventListener('click',function(){ setOp('sub'); });
+document.getElementById('flip_res_btn').addEventListener('click',flipResult);
+document.getElementById('copyA_btn').addEventListener('click',function(){ copyTo('a'); });
+document.getElementById('copyB_btn').addEventListener('click',function(){ copyTo('b'); });
+document.getElementById('log_btn').addEventListener('click',logResult);
+document.getElementById('clear_btn').addEventListener('click',clearAll);
+document.getElementById('clear_log_btn').addEventListener('click',clearLog);
+setAngCalcFmt('dms');
 
-// ── TRIANGLE SOLVER ──────────────────────────────────────────────
-var triUnit = 'metric';
-var triAngleFmt = 'dms';
-var triLastResult = null;
+// ── TRIANGLE SOLVER ───────────────────────────────────────────────
+var triUnit='metric', triAngleFmt='dms', triLastResult=null;
 
-function setUnit(u) {
-  triUnit = u;
-  document.getElementById('tog_metric').classList.toggle('active', u==='metric');
-  document.getElementById('tog_imperial').classList.toggle('active', u==='imperial');
-  var lbl = u==='metric' ? 'm' : 'ft';
+function setUnit(u){
+  triUnit=u;
+  document.getElementById('tog_metric').classList.toggle('active',u==='metric');
+  document.getElementById('tog_imperial').classList.toggle('active',u==='imperial');
+  var lbl=u==='metric'?'m':'ft';
   document.querySelectorAll('.unit-lbl').forEach(function(el){ el.textContent='('+lbl+')'; });
   recalcIfDone();
 }
 
-function setAngleFmt(f) {
-  triAngleFmt = f;
-  document.getElementById('tog_dms').classList.toggle('active', f==='dms');
-  document.getElementById('tog_dd').classList.toggle('active', f==='dd');
-  var ph = f==='dms' ? '0.0000' : '0.000000';
+function setAngleFmt(f){
+  triAngleFmt=f;
+  document.getElementById('tog_dms').classList.toggle('active',f==='dms');
+  document.getElementById('tog_dd').classList.toggle('active',f==='dd');
+  var ph=f==='dms'?'0.0000':'0.000000';
   ['t_angA','t_angB','t_angC'].forEach(function(id){ document.getElementById(id).placeholder=ph; });
   recalcIfDone();
 }
 
-function recalcIfDone() { if(triLastResult) renderResults(triLastResult); }
+function recalcIfDone(){ if(triLastResult) renderResults(triLastResult); }
 
-// Parse angle input → decimal degrees
-function parseAngleInput(val) {
-  val = val.trim();
-  if (!val) return null;
-  if (triAngleFmt === 'dd') {
-    var n = parseFloat(val);
-    return isNaN(n) ? null : n;
-  }
-  // condensed DMS: D.MMSS
-  var neg = val.charAt(0)==='-'; if(neg) val=val.slice(1);
-  var parts = val.split('.');
-  var d = parseInt(parts[0],10)||0;
-  var frac = ((parts[1]||'')+'0000').slice(0,4);
-  var m = parseInt(frac.slice(0,2),10)||0;
-  var s = parseFloat(frac.slice(2,4))||0;
+function parseAngleInput(val){
+  val=val.trim(); if(!val) return null;
+  if(triAngleFmt==='dd'){ var n=parseFloat(val); return isNaN(n)?null:n; }
+  var neg=val.charAt(0)==='-'; if(neg) val=val.slice(1);
+  var parts=val.split('.');
+  var d=parseInt(parts[0],10)||0;
+  var frac=((parts[1]||'')+'0000').slice(0,4);
+  var m=parseInt(frac.slice(0,2),10)||0;
+  var s=parseFloat(frac.slice(2,4))||0;
   if(m>59||s>=60) return null;
-  var dd = d + m/60 + s/3600;
-  return neg ? -dd : dd;
+  var dd=d+m/60+s/3600;
+  return neg?-dd:dd;
 }
 
-// Format decimal degrees → display string
-function fmtAngle(dd) {
-  var prec = parseInt(document.getElementById('prec_ang').value,10);
-  var d = Math.floor(dd);
-  var mTotal = (dd - d)*60;
-  var m = Math.floor(mTotal);
-  var s = (mTotal - m)*60;
-  // round seconds
-  var factor = Math.pow(10,prec);
-  s = Math.round(s*factor)/factor;
-  if(s>=60){s=0;m++;} if(m>=60){m=0;d++;}
-  return d+'\u00b0 '+pad2(m)+'\u2032 '+s.toFixed(prec)+'\u2033';
-}
-
-function fmtAngleCopy(dd) {
-  var prec = parseInt(document.getElementById('prec_ang').value,10);
-  var d = Math.floor(dd); var mT=(dd-d)*60; var m=Math.floor(mT); var s=(mT-m)*60;
+function fmtAngle(dd){
+  var prec=parseInt(document.getElementById('prec_ang').value,10);
+  var d=Math.floor(dd),mT=(dd-d)*60,m=Math.floor(mT),s=(mT-m)*60;
   var f=Math.pow(10,prec); s=Math.round(s*f)/f;
   if(s>=60){s=0;m++;} if(m>=60){m=0;d++;}
-  return d+'\u00b0 '+pad2(m)+"' "+s.toFixed(prec)+'"';
+  return d+'° '+pad2(m)+'′ '+s.toFixed(prec)+'″';
 }
 
-function fmtSide(v) {
-  var prec = parseInt(document.getElementById('prec_side').value,10);
-  var lbl = triUnit==='metric'?'m':'ft';
-  return v.toFixed(prec)+' '+lbl;
+function fmtAngleCopy(dd){
+  var prec=parseInt(document.getElementById('prec_ang').value,10);
+  var d=Math.floor(dd),mT=(dd-d)*60,m=Math.floor(mT),s=(mT-m)*60;
+  var f=Math.pow(10,prec); s=Math.round(s*f)/f;
+  if(s>=60){s=0;m++;} if(m>=60){m=0;d++;}
+  return d+'° '+pad2(m)+"' "+s.toFixed(prec)+'"';
 }
 
-function clr(id){ document.getElementById(id).textContent=''; document.getElementById(id.replace('err_','')||id).classList&&document.getElementById(id.replace('err_','')||id).classList.remove('field-error'); }
+function fmtSide(v){ var prec=parseInt(document.getElementById('prec_side').value,10); return v.toFixed(prec)+' '+(triUnit==='metric'?'m':'ft'); }
+
+function clearAllErr(){
+  ['sideA','sideB','sideC','angA','angB','angC'].forEach(function(f){
+    document.getElementById('err_'+f).textContent='';
+    document.getElementById('t_'+f).classList.remove('field-error','field-known');
+  });
+  document.getElementById('err_global').textContent='';
+}
+
 function setErr(fid,msg){ document.getElementById('err_'+fid).textContent=msg; document.getElementById('t_'+fid).classList.add('field-error'); }
-function clearAllErr(){ ['sideA','sideB','sideC','angA','angB','angC'].forEach(function(f){ document.getElementById('err_'+f).textContent=''; document.getElementById('t_'+f).classList.remove('field-error','field-known'); }); document.getElementById('err_global').textContent=''; }
 function globalErr(msg){ document.getElementById('err_global').textContent=msg; }
 
-function getTriInputs() {
-  var fields = ['sideA','sideB','sideC','angA','angB','angC'];
-  var vals = {}; var known = [];
-  fields.forEach(function(f) {
-    var raw = document.getElementById('t_'+f).value.trim();
-    if(raw==='') { vals[f]=null; return; }
+function getTriInputs(){
+  var fields=['sideA','sideB','sideC','angA','angB','angC'],vals={},known=[];
+  fields.forEach(function(f){
+    var raw=document.getElementById('t_'+f).value.trim();
+    if(raw===''){ vals[f]=null; return; }
     var n;
-    if(f.startsWith('ang')) { n=parseAngleInput(raw); }
+    if(f.startsWith('ang')){ n=parseAngleInput(raw); }
     else { n=parseFloat(raw); }
-    if(n===null||isNaN(n)) { setErr(f,'Must be a number'); vals[f]=null; }
-    else if(n<=0 && !f.startsWith('ang')) { setErr(f,'Must be positive'); vals[f]=null; }
-    else if(f.startsWith('ang') && (n<=0||n>=180)) { setErr(f,'Must be 0–180°'); vals[f]=null; }
+    if(n===null||isNaN(n)){ setErr(f,'Must be a number'); vals[f]=null; }
+    else if(n<=0&&!f.startsWith('ang')){ setErr(f,'Must be positive'); vals[f]=null; }
+    else if(f.startsWith('ang')&&(n<=0||n>=180)){ setErr(f,'Must be 0-180°'); vals[f]=null; }
     else { vals[f]=n; known.push(f); document.getElementById('t_'+f).classList.add('field-known'); }
   });
-  return {vals:vals, known:known};
+  return {vals:vals,known:known};
 }
 
-function solveTriangle() {
+function solveTriangle(){
   clearAllErr();
   document.getElementById('tri_results').style.display='none';
   document.getElementById('tri_diagram').style.display='none';
   triLastResult=null;
-
-  var inp = getTriInputs();
-  var v=inp.vals, k=inp.known;
-
+  var inp=getTriInputs(),v=inp.vals,k=inp.known;
   if(k.length<3){ globalErr('Please enter at least 3 values'); return; }
-
   var sides={a:v.sideA,b:v.sideB,c:v.sideC};
   var angs={A:v.angA,B:v.angB,C:v.angC};
-  var sCount = [sides.a,sides.b,sides.c].filter(function(x){return x!==null;}).length;
-  var aCount = [angs.A,angs.B,angs.C].filter(function(x){return x!==null;}).length;
-
+  var sCount=[sides.a,sides.b,sides.c].filter(function(x){return x!==null;}).length;
   if(sCount===0){ globalErr('Cannot solve with only angles — need at least one side.'); return; }
-
   var method='';
-  var R=function(deg){return deg*Math.PI/180;};
-  var D=function(rad){return rad*180/Math.PI;};
+  var Rf=function(d){return d*Math.PI/180;};
+  var D=function(r){return r*180/Math.PI;};
   var clamp=function(x,lo,hi){return Math.max(lo,Math.min(hi,x));};
   var a=sides.a,b=sides.b,c=sides.c,A=angs.A,B=angs.B,C=angs.C;
-
-  try {
-    if(sCount===3 && aCount===0) {
-      // SSS
+  var aCount=[A,B,C].filter(function(x){return x!==null;}).length;
+  try{
+    if(sCount===3&&aCount===0){
       method='SSS (Side-Side-Side)';
       A=D(Math.acos(clamp((b*b+c*c-a*a)/(2*b*c),-1,1)));
       B=D(Math.acos(clamp((a*a+c*c-b*b)/(2*a*c),-1,1)));
       C=180-A-B;
-    } else if(sCount===2 && aCount===1) {
-      if(a!==null&&b!==null&&C!==null) {
-        // SAS
-        method='SAS (Side-Angle-Side)';
-        c=Math.sqrt(a*a+b*b-2*a*b*Math.cos(R(C)));
-        A=D(Math.asin(clamp(a*Math.sin(R(C))/c,-1,1)));
-        B=180-A-C;
-      } else if(a!==null&&c!==null&&B!==null) {
-        method='SAS (Side-Angle-Side)';
-        b=Math.sqrt(a*a+c*c-2*a*c*Math.cos(R(B)));
-        A=D(Math.asin(clamp(a*Math.sin(R(B))/b,-1,1)));
-        C=180-A-B;
-      } else if(b!==null&&c!==null&&A!==null) {
-        method='SAS (Side-Angle-Side)';
-        a=Math.sqrt(b*b+c*c-2*b*c*Math.cos(R(A)));
-        B=D(Math.asin(clamp(b*Math.sin(R(A))/a,-1,1)));
-        C=180-A-B;
-      } else {
-        // SSA
+    } else if(sCount===2&&aCount===1){
+      if(a!==null&&b!==null&&C!==null){ method='SAS'; c=Math.sqrt(a*a+b*b-2*a*b*Math.cos(Rf(C))); A=D(Math.asin(clamp(a*Math.sin(Rf(C))/c,-1,1))); B=180-A-C; }
+      else if(a!==null&&c!==null&&B!==null){ method='SAS'; b=Math.sqrt(a*a+c*c-2*a*c*Math.cos(Rf(B))); A=D(Math.asin(clamp(a*Math.sin(Rf(B))/b,-1,1))); C=180-A-B; }
+      else if(b!==null&&c!==null&&A!==null){ method='SAS'; a=Math.sqrt(b*b+c*c-2*b*c*Math.cos(Rf(A))); B=D(Math.asin(clamp(b*Math.sin(Rf(A))/a,-1,1))); C=180-A-B; }
+      else {
         method='SSA (ambiguous case)';
-        var ambig=false;
-        if(a!==null&&b!==null&&A!==null){
-          var sinB=clamp(b*Math.sin(R(A))/a,-1,1); B=D(Math.asin(sinB)); C=180-A-B; c=a*Math.sin(R(C))/Math.sin(R(A)); ambig=true;
-        } else if(a!==null&&c!==null&&A!==null){
-          var sinC=clamp(c*Math.sin(R(A))/a,-1,1); C=D(Math.asin(sinC)); B=180-A-C; b=a*Math.sin(R(B))/Math.sin(R(A)); ambig=true;
-        } else if(b!==null&&a!==null&&B!==null){
-          var sinA=clamp(a*Math.sin(R(B))/b,-1,1); A=D(Math.asin(sinA)); C=180-A-B; c=b*Math.sin(R(C))/Math.sin(R(B)); ambig=true;
-        } else if(b!==null&&c!==null&&B!==null){
-          var sinC2=clamp(c*Math.sin(R(B))/b,-1,1); C=D(Math.asin(sinC2)); A=180-B-C; a=b*Math.sin(R(A))/Math.sin(R(B)); ambig=true;
-        } else if(c!==null&&a!==null&&C!==null){
-          var sinA2=clamp(a*Math.sin(R(C))/c,-1,1); A=D(Math.asin(sinA2)); B=180-A-C; b=c*Math.sin(R(B))/Math.sin(R(C)); ambig=true;
-        } else if(c!==null&&b!==null&&C!==null){
-          var sinB2=clamp(b*Math.sin(R(C))/c,-1,1); B=D(Math.asin(sinB2)); A=180-B-C; a=c*Math.sin(R(A))/Math.sin(R(C)); ambig=true;
-        }
-        if(!ambig){ globalErr('Could not determine solve case — check inputs.'); return; }
-        method+=' — Note: may have two solutions';
+        if(a!==null&&b!==null&&A!==null){ B=D(Math.asin(clamp(b*Math.sin(Rf(A))/a,-1,1))); C=180-A-B; c=a*Math.sin(Rf(C))/Math.sin(Rf(A)); }
+        else if(a!==null&&c!==null&&A!==null){ C=D(Math.asin(clamp(c*Math.sin(Rf(A))/a,-1,1))); B=180-A-C; b=a*Math.sin(Rf(B))/Math.sin(Rf(A)); }
+        else if(b!==null&&a!==null&&B!==null){ A=D(Math.asin(clamp(a*Math.sin(Rf(B))/b,-1,1))); C=180-A-B; c=b*Math.sin(Rf(C))/Math.sin(Rf(B)); }
+        else if(b!==null&&c!==null&&B!==null){ C=D(Math.asin(clamp(c*Math.sin(Rf(B))/b,-1,1))); A=180-B-C; a=b*Math.sin(Rf(A))/Math.sin(Rf(B)); }
+        else if(c!==null&&a!==null&&C!==null){ A=D(Math.asin(clamp(a*Math.sin(Rf(C))/c,-1,1))); B=180-A-C; b=c*Math.sin(Rf(B))/Math.sin(Rf(C)); }
+        else if(c!==null&&b!==null&&C!==null){ B=D(Math.asin(clamp(b*Math.sin(Rf(C))/c,-1,1))); A=180-B-C; a=c*Math.sin(Rf(A))/Math.sin(Rf(C)); }
+        else { globalErr('Could not determine solve case.'); return; }
+        method+=' — may have two solutions';
       }
-    } else if(sCount===1 && aCount===2) {
-      // ASA / AAS — find third angle first
-      if(A!==null&&B!==null){ C=180-A-B; }
-      else if(A!==null&&C!==null){ B=180-A-C; }
-      else if(B!==null&&C!==null){ A=180-B-C; }
+    } else if(sCount===1&&aCount===2){
+      if(A!==null&&B!==null) C=180-A-B;
+      else if(A!==null&&C!==null) B=180-A-C;
+      else if(B!==null&&C!==null) A=180-B-C;
       method='AAS/ASA (Angle-Angle-Side)';
-      if(a!==null){ b=a*Math.sin(R(B))/Math.sin(R(A)); c=a*Math.sin(R(C))/Math.sin(R(A)); }
-      else if(b!==null){ a=b*Math.sin(R(A))/Math.sin(R(B)); c=b*Math.sin(R(C))/Math.sin(R(B)); }
-      else if(c!==null){ a=c*Math.sin(R(A))/Math.sin(R(C)); b=c*Math.sin(R(B))/Math.sin(R(C)); }
-    } else {
-      globalErr('Please enter exactly 3 values (at least one must be a side).'); return;
-    }
-  } catch(e){ globalErr('Calculation error — check your inputs.'); return; }
-
-  // Validate
+      if(a!==null){ b=a*Math.sin(Rf(B))/Math.sin(Rf(A)); c=a*Math.sin(Rf(C))/Math.sin(Rf(A)); }
+      else if(b!==null){ a=b*Math.sin(Rf(A))/Math.sin(Rf(B)); c=b*Math.sin(Rf(C))/Math.sin(Rf(B)); }
+      else if(c!==null){ a=c*Math.sin(Rf(A))/Math.sin(Rf(C)); b=c*Math.sin(Rf(B))/Math.sin(Rf(C)); }
+    } else { globalErr('Please enter exactly 3 values (at least one side).'); return; }
+  } catch(e){ globalErr('Calculation error — check inputs.'); return; }
   if([a,b,c,A,B,C].some(function(x){return !isFinite(x)||x<=0;})){ globalErr('Invalid triangle: all values must be positive.'); return; }
-  if(Math.abs(A+B+C-180)>0.01){ globalErr('Invalid triangle: angles must sum to 180°. Got '+(A+B+C).toFixed(4)+'°'); return; }
+  if(Math.abs(A+B+C-180)>0.01){ globalErr('Invalid triangle: angles must sum to 180°.'); return; }
   if(a>=b+c||b>=a+c||c>=a+b){ globalErr('Invalid triangle: sides do not satisfy triangle inequality.'); return; }
-
   var result={a:a,b:b,c:c,A:A,B:B,C:C,method:method,knownFields:inp.known};
   triLastResult=result;
   renderResults(result);
   drawDiagram(result);
 }
 
-function renderResults(r) {
-  var sp = parseInt(document.getElementById('prec_side').value, 10);
-  var u = triUnit === 'metric' ? 'm' : 'ft';
-  var rows = [
-    { label:'Side a',  val:fmtSide(r.a), copy:r.a.toFixed(sp)+' '+u, known:r.knownFields.indexOf('sideA')>=0 },
-    { label:'Side b',  val:fmtSide(r.b), copy:r.b.toFixed(sp)+' '+u, known:r.knownFields.indexOf('sideB')>=0 },
-    { label:'Side c',  val:fmtSide(r.c), copy:r.c.toFixed(sp)+' '+u, known:r.knownFields.indexOf('sideC')>=0 },
-    { label:'Angle A', val:fmtAngle(r.A), copy:fmtAngleCopy(r.A), known:r.knownFields.indexOf('angA')>=0 },
-    { label:'Angle B', val:fmtAngle(r.B), copy:fmtAngleCopy(r.B), known:r.knownFields.indexOf('angB')>=0 },
-    { label:'Angle C', val:fmtAngle(r.C), copy:fmtAngleCopy(r.C), known:r.knownFields.indexOf('angC')>=0 },
-  ];
-
-  // Store copy values on a global so event delegation can access them safely
-  window._triCopyVals = rows.map(function(row){ return row.copy; });
-
-  var html = rows.map(function(row, i) {
-    var tag = row.known
-      ? '<span class="known-tag">Known</span>'
-      : '<span class="calc-tag">Calc</span>';
-    return '<div class="res-row" data-idx="'+i+'">' +
-      '<span class="res-row-label">'+row.label+tag+'</span>' +
-      '<span class="res-row-val">'+row.val+'</span>' +
-      '</div>';
-  }).join('');
-
-  var el = document.getElementById('res_rows');
-  el.innerHTML = html;
-
-  // Attach click via event delegation — no inline onclick needed
-  el.onclick = function(e) {
-    var row = e.target.closest('.res-row');
-    if (!row) return;
-    var idx = parseInt(row.getAttribute('data-idx'), 10);
-    var text = window._triCopyVals[idx];
-    if (text) copyToClipboard(text, null);
-  };
-
-  document.getElementById('res_method').textContent = 'Solved using: ' + r.method;
-  document.getElementById('tri_results').style.display = 'block';
-}
-
-function copyPlain(text) {
-  navigator.clipboard.writeText(text);
-}
-
-function copyAllResults() {
-  if(!triLastResult) return;
-  var r=triLastResult;
+function renderResults(r){
   var sp=parseInt(document.getElementById('prec_side').value,10);
   var u=triUnit==='metric'?'m':'ft';
-  var lines=[
-    'Triangle Calculation',
-    'Side a: '+r.a.toFixed(sp)+' '+u,
-    'Side b: '+r.b.toFixed(sp)+' '+u,
-    'Side c: '+r.c.toFixed(sp)+' '+u,
-    'Angle A: '+fmtAngleCopy(r.A),
-    'Angle B: '+fmtAngleCopy(r.B),
-    'Angle C: '+fmtAngleCopy(r.C),
+  var rows=[
+    {label:'Side a',val:fmtSide(r.a),copy:r.a.toFixed(sp)+' '+u,known:r.knownFields.indexOf('sideA')>=0},
+    {label:'Side b',val:fmtSide(r.b),copy:r.b.toFixed(sp)+' '+u,known:r.knownFields.indexOf('sideB')>=0},
+    {label:'Side c',val:fmtSide(r.c),copy:r.c.toFixed(sp)+' '+u,known:r.knownFields.indexOf('sideC')>=0},
+    {label:'Angle A',val:fmtAngle(r.A),copy:fmtAngleCopy(r.A),known:r.knownFields.indexOf('angA')>=0},
+    {label:'Angle B',val:fmtAngle(r.B),copy:fmtAngleCopy(r.B),known:r.knownFields.indexOf('angB')>=0},
+    {label:'Angle C',val:fmtAngle(r.C),copy:fmtAngleCopy(r.C),known:r.knownFields.indexOf('angC')>=0},
   ];
-  copyToClipboard(lines.join('\r\n'), document.getElementById('copy_all_btn'));
+  window._triCopyVals=rows.map(function(row){ return row.copy; });
+  var html=rows.map(function(row,i){
+    var tag=row.known?'<span class="known-tag">Known</span>':'<span class="calc-tag">Calc</span>';
+    return '<div class="res-row" data-idx="'+i+'"><span class="res-row-label">'+row.label+tag+'</span><span class="res-row-val">'+row.val+'</span></div>';
+  }).join('');
+  var el=document.getElementById('res_rows');
+  el.innerHTML=html;
+  el.onclick=function(e){
+    var row=e.target.closest('.res-row'); if(!row)return;
+    copyToClipboard(window._triCopyVals[parseInt(row.getAttribute('data-idx'),10)],null);
+  };
+  document.getElementById('res_method').textContent='Solved using: '+r.method;
+  document.getElementById('tri_results').style.display='block';
 }
 
-function drawDiagram(r) {
-  var svg=document.getElementById('tri_svg');
-  var W=320,H=190,pad=36;
-  var scale=(W-pad*2)/Math.max(r.a,r.b,r.c);
-  var R=function(d){return d*Math.PI/180;};
-  var Ax=pad, Ay=H-pad;
-  var Bx=Ax+r.c*scale, By=Ay;
-  var Cx=Ax+r.b*scale*Math.cos(R(r.A));
-  var Cy=Ay-r.b*scale*Math.sin(R(r.A));
-  // nudge to fit
+function copyAllResults(){
+  if(!triLastResult)return;
+  var r=triLastResult,sp=parseInt(document.getElementById('prec_side').value,10),u=triUnit==='metric'?'m':'ft';
+  var lines=['Triangle Calculation','Side a: '+r.a.toFixed(sp)+' '+u,'Side b: '+r.b.toFixed(sp)+' '+u,'Side c: '+r.c.toFixed(sp)+' '+u,'Angle A: '+fmtAngleCopy(r.A),'Angle B: '+fmtAngleCopy(r.B),'Angle C: '+fmtAngleCopy(r.C)];
+  copyToClipboard(lines.join('
+'),document.getElementById('copy_all_btn'));
+}
+
+function drawDiagram(r){
+  var svgEl=document.getElementById('tri_svg');
+  var W=svgEl.parentElement.clientWidth-32; if(W<200)W=200;
+  var H=220,pad=50;
+  var Rf=function(d){return d*Math.PI/180;};
+  var Ax=0,Ay=0,Bx=r.c,By=0,Cx=r.b*Math.cos(Rf(r.A)),Cy=r.b*Math.sin(Rf(r.A));
   var minX=Math.min(Ax,Bx,Cx),maxX=Math.max(Ax,Bx,Cx),minY=Math.min(Ay,By,Cy),maxY=Math.max(Ay,By,Cy);
-  var ox=(W-(maxX-minX))/2-minX, oy=(H-(maxY-minY))/2-minY;
-  Ax+=ox;Bx+=ox;Cx+=ox; Ay+=oy;By+=oy;Cy+=oy;
-
-  function midOffset(x1,y1,x2,y2,d){
-    var mx=(x1+x2)/2,my=(y1+y2)/2;
-    var dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy);
-    return {x:mx+(-dy/len)*d,y:my+(dx/len)*d};
-  }
-  function bisector(vx,vy,ax,ay,bx,by,d){
-    var da=Math.sqrt((ax-vx)*(ax-vx)+(ay-vy)*(ay-vy));
-    var db=Math.sqrt((bx-vx)*(bx-vx)+(by-vy)*(by-vy));
-    var ux=(ax-vx)/da+(bx-vx)/db, uy=(ay-vy)/da+(by-vy)/db;
-    var ul=Math.sqrt(ux*ux+uy*uy);
-    return {x:vx+ux/ul*d,y:vy+uy/ul*d};
-  }
-
-  var sA=midOffset(Bx,By,Cx,Cy,14);
-  var sB=midOffset(Ax,Ay,Cx,Cy,-14);
-  var sC=midOffset(Ax,Ay,Bx,By,14);
-  var bisA=bisector(Ax,Ay,Bx,By,Cx,Cy,22);
-  var bisB=bisector(Bx,By,Ax,Ay,Cx,Cy,22);
-  var bisC=bisector(Cx,Cy,Ax,Ay,Bx,By,22);
-
-  svg.innerHTML=
-    '<polygon points="'+Ax+','+Ay+' '+Bx+','+By+' '+Cx+','+Cy+'" fill="none" stroke="#1e4a7a" stroke-width="1.5"/>'+
-    '<text x="'+(Ax-12)+'" y="'+(Ay+5)+'" fill="#e0e0e0" font-size="16" font-weight="bold">A</text>'+
-    '<text x="'+(Bx+5)+'" y="'+(By+5)+'" fill="#e0e0e0" font-size="16" font-weight="bold">B</text>'+
-    '<text x="'+(Cx-4)+'" y="'+(Cy-8)+'" fill="#e0e0e0" font-size="16" font-weight="bold">C</text>'+
-    '<text x="'+sA.x+'" y="'+sA.y+'" fill="#4a9ab5" font-size="14" font-style="italic" text-anchor="middle" dominant-baseline="middle">a</text>'+
-    '<text x="'+sB.x+'" y="'+sB.y+'" fill="#4a9ab5" font-size="14" font-style="italic" text-anchor="middle" dominant-baseline="middle">b</text>'+
-    '<text x="'+sC.x+'" y="'+sC.y+'" fill="#4a9ab5" font-size="14" font-style="italic" text-anchor="middle" dominant-baseline="middle">c</text>'+
-    '<text x="'+bisA.x+'" y="'+bisA.y+'" fill="#7abcd4" font-size="12" font-style="italic" text-anchor="middle" dominant-baseline="middle">\u03b1</text>'+
-    '<text x="'+bisB.x+'" y="'+bisB.y+'" fill="#7abcd4" font-size="12" font-style="italic" text-anchor="middle" dominant-baseline="middle">\u03b2</text>'+
-    '<text x="'+bisC.x+'" y="'+bisC.y+'" fill="#7abcd4" font-size="12" font-style="italic" text-anchor="middle" dominant-baseline="middle">\u03b3</text>';
-
+  var triW=maxX-minX||1,triH=maxY-minY||1;
+  var scale=Math.min((W-pad*2)/triW,(H-pad*2)/triH);
+  function tx(x){return pad+(x-minX)*scale;}
+  function ty(y){return H-pad-(y-minY)*scale;}
+  var pAx=tx(Ax),pAy=ty(Ay),pBx=tx(Bx),pBy=ty(By),pCx=tx(Cx),pCy=ty(Cy);
+  svgEl.setAttribute('viewBox','0 0 '+W+' '+H);
+  svgEl.setAttribute('width',W); svgEl.setAttribute('height',H);
+  var centX=(pAx+pBx+pCx)/3,centY=(pAy+pBy+pCy)/3;
+  function outward(mx,my,d){var dx=mx-centX,dy=my-centY,len=Math.sqrt(dx*dx+dy*dy)||1;return{x:mx+dx/len*d,y:my+dy/len*d};}
+  function bisector(vx,vy,ax,ay,bx,by,d){var da=Math.sqrt((ax-vx)*(ax-vx)+(ay-vy)*(ay-vy))||1,db=Math.sqrt((bx-vx)*(bx-vx)+(by-vy)*(by-vy))||1;var ux=(ax-vx)/da+(bx-vx)/db,uy=(ay-vy)/da+(by-vy)/db;var ul=Math.sqrt(ux*ux+uy*uy)||1;return{x:vx+ux/ul*d,y:vy+uy/ul*d};}
+  var lA=outward(pAx,pAy,18),lB=outward(pBx,pBy,18),lC=outward(pCx,pCy,18);
+  var mA=outward((pBx+pCx)/2,(pBy+pCy)/2,16),mB=outward((pAx+pCx)/2,(pAy+pCy)/2,16),mC=outward((pAx+pBx)/2,(pAy+pBy)/2,16);
+  var bisA=bisector(pAx,pAy,pBx,pBy,pCx,pCy,26),bisB=bisector(pBx,pBy,pAx,pAy,pCx,pCy,26),bisC=bisector(pCx,pCy,pAx,pAy,pBx,pBy,26);
+  svgEl.innerHTML=
+    '<polygon points="'+pAx+','+pAy+' '+pBx+','+pBy+' '+pCx+','+pCy+'" fill="rgba(30,74,122,0.2)" stroke="#2a6aaa" stroke-width="2" stroke-linejoin="round"/>'+
+    '<text x="'+lA.x+'" y="'+lA.y+'" fill="#e0e0e0" font-size="15" font-weight="bold" text-anchor="middle" dominant-baseline="middle">A</text>'+
+    '<text x="'+lB.x+'" y="'+lB.y+'" fill="#e0e0e0" font-size="15" font-weight="bold" text-anchor="middle" dominant-baseline="middle">B</text>'+
+    '<text x="'+lC.x+'" y="'+lC.y+'" fill="#e0e0e0" font-size="15" font-weight="bold" text-anchor="middle" dominant-baseline="middle">C</text>'+
+    '<text x="'+mA.x+'" y="'+mA.y+'" fill="#4fc3f7" font-size="13" font-style="italic" text-anchor="middle" dominant-baseline="middle">a</text>'+
+    '<text x="'+mB.x+'" y="'+mB.y+'" fill="#4fc3f7" font-size="13" font-style="italic" text-anchor="middle" dominant-baseline="middle">b</text>'+
+    '<text x="'+mC.x+'" y="'+mC.y+'" fill="#4fc3f7" font-size="13" font-style="italic" text-anchor="middle" dominant-baseline="middle">c</text>'+
+    '<text x="'+bisA.x+'" y="'+bisA.y+'" fill="#7abcd4" font-size="12" font-style="italic" text-anchor="middle" dominant-baseline="middle">α</text>'+
+    '<text x="'+bisB.x+'" y="'+bisB.y+'" fill="#7abcd4" font-size="12" font-style="italic" text-anchor="middle" dominant-baseline="middle">β</text>'+
+    '<text x="'+bisC.x+'" y="'+bisC.y+'" fill="#7abcd4" font-size="12" font-style="italic" text-anchor="middle" dominant-baseline="middle">γ</text>';
   document.getElementById('tri_diagram').style.display='block';
 }
 
-function resetTriangle() {
+function resetTriangle(){
   ['t_sideA','t_sideB','t_sideC','t_angA','t_angB','t_angC'].forEach(function(id){
     document.getElementById(id).value='';
     document.getElementById(id).classList.remove('field-known','field-error');
@@ -889,15 +670,15 @@ function resetTriangle() {
   triLastResult=null;
 }
 
-document.getElementById('tri_reset_btn').addEventListener('click', resetTriangle);
-document.getElementById('tri_calc_btn').addEventListener('click', solveTriangle);
-document.getElementById('tog_metric').addEventListener('click', function(){ setUnit('metric'); });
-document.getElementById('tog_imperial').addEventListener('click', function(){ setUnit('imperial'); });
-document.getElementById('tog_dms').addEventListener('click', function(){ setAngleFmt('dms'); });
-document.getElementById('tog_dd').addEventListener('click', function(){ setAngleFmt('dd'); });
-document.getElementById('prec_side').addEventListener('change', recalcIfDone);
-document.getElementById('prec_ang').addEventListener('change', recalcIfDone);
-document.getElementById('copy_all_btn').addEventListener('click', copyAllResults);
+document.getElementById('tri_reset_btn').addEventListener('click',resetTriangle);
+document.getElementById('tri_calc_btn').addEventListener('click',solveTriangle);
+document.getElementById('tog_metric').addEventListener('click',function(){ setUnit('metric'); });
+document.getElementById('tog_imperial').addEventListener('click',function(){ setUnit('imperial'); });
+document.getElementById('tog_dms').addEventListener('click',function(){ setAngleFmt('dms'); });
+document.getElementById('tog_dd').addEventListener('click',function(){ setAngleFmt('dd'); });
+document.getElementById('prec_side').addEventListener('change',recalcIfDone);
+document.getElementById('prec_ang').addEventListener('change',recalcIfDone);
+document.getElementById('copy_all_btn').addEventListener('click',copyAllResults);
 </script>
 </body>
 </html>
