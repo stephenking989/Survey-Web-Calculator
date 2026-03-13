@@ -25,6 +25,14 @@
   .dms-input:focus { border-color: #4fc3f7; }
   .dms-input::placeholder { color: #3a4a60; }
   .input-hint { font-size: 11px; color: #3a5070; margin-top: 5px; margin-left: 62px; }
+  .ang-tog-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .ang-tog-row label { font-size: 12px; color: #666; }
+  .ang-tog { display: flex; }
+  .ang-tog button { padding: 4px 12px; font-size: 12px; font-weight: 500; cursor: pointer;
+    border: 1px solid #1e3a5f; background: #0f1b35; color: #888; transition: all .2s; }
+  .ang-tog button:first-child { border-radius: 6px 0 0 6px; }
+  .ang-tog button:last-child { border-radius: 0 6px 6px 0; }
+  .ang-tog button.active { background: #4fc3f7; border-color: #4fc3f7; color: #0a0a1a; }
   .op-row { display: flex; gap: 8px; margin: 8px 0; }
   .op-btn { flex: 1; padding: 10px; border: 1px solid #1e3a5f; border-radius: 8px;
     background: #0f1b35; color: #888; font-size: 20px; cursor: pointer; transition: all 0.2s; }
@@ -74,6 +82,13 @@
 
 <div class="page active" id="page-angles">
   <div style="margin-top:16px;">
+    <div class="ang-tog-row">
+      <label>Angle format</label>
+      <div class="ang-tog">
+        <button id="atog_dms" class="active">DMS</button>
+        <button id="atog_dd">DD</button>
+      </div>
+    </div>
 
     <div class="section-title">Angle A</div>
     <div class="card">
@@ -83,7 +98,7 @@
         <button class="btn btn-secondary" onclick="clearField('a')">&#x2715;</button>
         <button class="btn btn-secondary" onclick="flip('a')">&#8597; 180°</button>
       </div>
-      <div class="input-hint">Format: DD.MMSS &mdash; e.g. 12.3432 = 12° 34′ 32″</div>
+      <div class="input-hint" id="hint_a"></div>
     </div>
 
     <div class="op-row">
@@ -99,7 +114,7 @@
         <button class="btn btn-secondary" onclick="clearField('b')">&#x2715;</button>
         <button class="btn btn-secondary" onclick="flip('b')">&#8597; 180°</button>
       </div>
-      <div class="input-hint">Format: DD.MMSS &mdash; e.g. 12.3432 = 12° 34′ 32″</div>
+      <div class="input-hint" id="hint_b"></div>
     </div>
 
     <div class="section-title">Result</div>
@@ -280,6 +295,81 @@ var currentOp = 'add';
 var resultSec = null;
 var logEntries = [];
 var logCount = 0;
+var angCalcFmt = 'dms'; // 'dms' or 'dd'
+
+function setAngCalcFmt(fmt) {
+  angCalcFmt = fmt;
+  document.getElementById('atog_dms').classList.toggle('active', fmt === 'dms');
+  document.getElementById('atog_dd').classList.toggle('active', fmt === 'dd');
+  var hintDMS = 'DMS: 12.3432 or 12°34\'32" or 12d34m32s or 12 34 32';
+  var hintDD  = 'Decimal degrees: e.g. 12.5750°';
+  document.getElementById('hint_a').textContent = fmt === 'dms' ? hintDMS : hintDD;
+  document.getElementById('hint_b').textContent = fmt === 'dms' ? hintDMS : hintDD;
+  document.getElementById('a_val').placeholder = fmt === 'dms' ? '0.0000' : '0.000000';
+  document.getElementById('b_val').placeholder = fmt === 'dms' ? '0.0000' : '0.000000';
+  // clear fields and result on format switch
+  clearAll();
+}
+
+// Parse any DMS variant or DD → total seconds
+function parseAngleEntry(raw) {
+  raw = raw.trim();
+  if (!raw) return 0;
+
+  if (angCalcFmt === 'dd') {
+    var dd = parseFloat(raw.replace(/[°d]/gi, ''));
+    return isNaN(dd) ? null : dd * 3600;
+  }
+
+  // Try all DMS formats
+  var d = 0, m = 0, s = 0;
+
+  // Format: 12°34'56" or 12° 34' 56" or 12d34m56s or 12d 34m 56s
+  var reSymbol = /^(-?\d+(?:\.\d+)?)[°d\s]+(\d+(?:\.\d+)?)[\'m\s]+(\d+(?:\.\d+)?)[\"s]?$/i;
+  // Format: 12 34 56 (space separated)
+  var reSpace = /^(-?\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)$/;
+  // Format: condensed 12.3456
+  var reCondensed = /^(-?\d+)\.(\d{1,4})$/;
+
+  var neg = raw.startsWith('-');
+  var absRaw = neg ? raw.slice(1).trim() : raw;
+
+  var m1 = absRaw.match(reSymbol);
+  var m2 = absRaw.match(reSpace);
+  var m3 = absRaw.match(reCondensed);
+
+  if (m1) {
+    d = parseFloat(m1[1]); m = parseFloat(m1[2]); s = parseFloat(m1[3]);
+  } else if (m2) {
+    d = parseFloat(m2[1]); m = parseFloat(m2[2]); s = parseFloat(m2[3]);
+  } else if (m3) {
+    d = parseInt(m3[1], 10);
+    var frac = (m3[2] + '0000').slice(0, 4);
+    m = parseInt(frac.slice(0, 2), 10);
+    s = parseInt(frac.slice(2, 4), 10);
+  } else {
+    // fallback: try plain decimal as condensed
+    var f = parseFloat(absRaw);
+    if (!isNaN(f)) {
+      var parts = absRaw.split('.');
+      d = parseInt(parts[0], 10) || 0;
+      var fr = ((parts[1] || '') + '0000').slice(0, 4);
+      m = parseInt(fr.slice(0, 2), 10) || 0;
+      s = parseInt(fr.slice(2, 4), 10) || 0;
+    } else {
+      return null;
+    }
+  }
+
+  if (m > 59 || s >= 60) return null;
+  var total = d * 3600 + m * 60 + s;
+  return neg ? -total : total;
+}
+
+function validateEntry(raw) {
+  if (!raw.trim()) return true;
+  return parseAngleEntry(raw) !== null;
+}
 
 function showPage(id, el) {
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
@@ -296,27 +386,12 @@ function setOp(op) {
 }
 
 function parseDMS(val) {
-  val = String(val).trim();
-  if (!val || val === '.') return 0;
-  var neg = val.charAt(0) === '-';
-  if (neg) val = val.slice(1);
-  var parts = val.split('.');
-  var d = parseInt(parts[0], 10) || 0;
-  var frac = ((parts[1] || '') + '0000').slice(0, 4);
-  var m = parseInt(frac.slice(0, 2), 10) || 0;
-  var s = parseInt(frac.slice(2, 4), 10) || 0;
-  var total = d * 3600 + m * 60 + s;
-  return neg ? -total : total;
+  var result = parseAngleEntry(val);
+  return result === null ? 0 : result;
 }
 
 function validateCondensed(val) {
-  val = String(val).trim().replace('-', '');
-  if (!val || val === '.') return true;
-  var parts = val.split('.');
-  var frac = ((parts[1] || '') + '0000').slice(0, 4);
-  var m = parseInt(frac.slice(0, 2), 10) || 0;
-  var s = parseInt(frac.slice(2, 4), 10) || 0;
-  return m <= 59 && s <= 59;
+  return validateEntry(val);
 }
 
 function toCondensed(totalSec) {
@@ -500,6 +575,9 @@ function clearAll() {
 
 document.getElementById('a_val').addEventListener('input', calculate);
 document.getElementById('b_val').addEventListener('input', calculate);
+document.getElementById('atog_dms').addEventListener('click', function(){ setAngCalcFmt('dms'); });
+document.getElementById('atog_dd').addEventListener('click', function(){ setAngCalcFmt('dd'); });
+setAngCalcFmt('dms'); // set initial hints
 
 // ── TRIANGLE SOLVER ──────────────────────────────────────────────
 var triUnit = 'metric';
