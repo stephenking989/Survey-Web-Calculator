@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angle Calculator — SurveyCalc</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh}
+.top-bar{display:flex;align-items:center;gap:12px;background:#16213e;border-bottom:1px solid #0f3460;padding:10px 16px}
+.back-btn{display:flex;align-items:center;gap:6px;color:#4fc3f7;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid #1e3a5f;background:transparent;transition:all .2s;tabindex:-1}
+.back-btn:hover{border-color:#4fc3f7;background:rgba(79,195,247,.08)}
+.top-bar-title{font-size:15px;font-weight:600;color:#e0e0e0}
+.page{padding:16px;max-width:480px;margin:0 auto}
+.section-title{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#4fc3f7;margin:0 0 10px}
+.card{background:#16213e;border:1px solid #0f3460;border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.input-row{display:flex;align-items:center;gap:8px}
+.input-row label{font-size:13px;color:#888;width:52px;flex-shrink:0}
+.dms-input{flex:1;padding:10px 12px;background:#0f1b35;border:1px solid #1e3a5f;border-radius:8px;color:#e0e0e0;font-size:17px;outline:none;font-family:'Courier New',monospace}
+.dms-input:focus{border-color:#4fc3f7}
+.dms-input::placeholder{color:#3a4a60}
+.input-hint{font-size:11px;color:#3a5070;margin-top:5px;margin-left:62px}
+.ang-tog-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ang-tog-row label{font-size:12px;color:#666}
+.ang-tog{display:flex}
+.ang-tog button{padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid #1e3a5f;background:#0f1b35;color:#888;transition:all .2s}
+.ang-tog button:first-child{border-radius:6px 0 0 6px}
+.ang-tog button:last-child{border-radius:0 6px 6px 0}
+.ang-tog button.active{background:#4fc3f7;border-color:#4fc3f7;color:#0a0a1a}
+.op-row{display:flex;gap:8px;margin:8px 0}
+.op-btn{flex:1;padding:10px;border:1px solid #1e3a5f;border-radius:8px;background:#0f1b35;color:#888;font-size:20px;cursor:pointer;transition:all .2s}
+.op-btn.active{background:#4fc3f7;border-color:#4fc3f7;color:#0a0a1a}
+.op-btn:hover:not(.active){border-color:#4fc3f7;color:#4fc3f7}
+.result-box{background:#0a0a1a;border:1px solid #1e3a5f;border-radius:8px;padding:14px;display:flex;align-items:center;gap:10px}
+.result-text{flex:1}
+.result-main{font-size:24px;font-weight:600;color:#4fc3f7;font-family:'Courier New',monospace}
+.result-dd{font-size:12px;color:#555;margin-top:2px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid;transition:all .2s;white-space:nowrap}
+.btn-primary{background:#4fc3f7;border-color:#4fc3f7;color:#0a0a1a}
+.btn-primary:hover{background:#81d4fa}
+.btn-secondary{background:transparent;border-color:#1e3a5f;color:#aaa}
+.btn-secondary:hover{border-color:#4fc3f7;color:#4fc3f7}
+.btn-warn{background:transparent;border-color:#ff8a65;color:#ff8a65}
+.btn-warn:hover{background:rgba(255,138,101,.1)}
+.btn:disabled{opacity:.35;cursor:default;pointer-events:none}
+.btn-copy{padding:6px 10px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid #1e3a5f;background:transparent;color:#888;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.btn-copy:hover{border-color:#4fc3f7;color:#4fc3f7}
+.btn-copy.copied{border-color:#66bb6a;color:#66bb6a}
+.history-log{max-height:260px;overflow-y:auto}
+.log-entry{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #1e3a5f}
+.log-entry:last-child{border-bottom:none}
+.log-num{background:#0f3460;color:#4fc3f7;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.log-body{flex:1;min-width:0}
+.log-calc{font-size:12px;color:#aaa;font-family:'Courier New',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log-result{font-size:13px;color:#4fc3f7;font-weight:600;font-family:'Courier New',monospace;margin-top:2px}
+.log-dd{font-size:11px;color:#555;margin-top:1px}
+.log-empty{color:#555;font-size:13px;text-align:center;padding:16px 0}
+.error-msg{color:#ff8a65;font-size:12px;margin-top:8px;display:none}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="index.html" class="back-btn">&#8592; Home</a>
+  <div class="top-bar-title">Angle Calculator</div>
+</div>
+
+<div class="page">
+  <div style="margin-top:16px">
+    <div class="ang-tog-row">
+      <label>Angle format</label>
+      <div class="ang-tog">
+        <button id="atog_dms" class="active">DMS</button>
+        <button id="atog_dd">DD</button>
+      </div>
+    </div>
+
+    <div class="section-title">Angle A</div>
+    <div class="card">
+      <div class="input-row">
+        <label>Input A</label>
+        <input class="dms-input" id="a_val" type="text" inputmode="decimal" placeholder="0.0000">
+        <button class="btn btn-secondary" id="clearA_btn">&#x2715;</button>
+        <button class="btn btn-secondary" id="flipA_btn">&#8597; 180&#xb0;</button>
+      </div>
+      <div class="input-hint" id="hint_a"></div>
+    </div>
+
+    <div class="op-row">
+      <button class="op-btn active" id="op_add">+</button>
+      <button class="op-btn" id="op_sub">&minus;</button>
+    </div>
+
+    <div class="section-title">Angle B</div>
+    <div class="card">
+      <div class="input-row">
+        <label>Input B</label>
+        <input class="dms-input" id="b_val" type="text" inputmode="decimal" placeholder="0.0000">
+        <button class="btn btn-secondary" id="clearB_btn">&#x2715;</button>
+        <button class="btn btn-secondary" id="flipB_btn">&#8597; 180&#xb0;</button>
+      </div>
+      <div class="input-hint" id="hint_b"></div>
+    </div>
+
+    <div class="section-title">Result</div>
+    <div class="card">
+      <div class="result-box">
+        <div class="result-text">
+          <div class="result-main" id="result_expanded">&#x2014;&#xb0; &#x2014;&#x2014;&#x2032; &#x2014;&#x2014;&#x2033;</div>
+          <div class="result-dd" id="result_dd">Enter values above</div>
+        </div>
+        <button class="btn-copy" id="copy_result_btn" disabled>Copy</button>
+      </div>
+      <div class="error-msg" id="error_msg"></div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="flip_res_btn" disabled>&#8597; 180&#xb0;</button>
+        <button class="btn btn-primary" id="copyA_btn" disabled>&#8594; Copy to A</button>
+        <button class="btn btn-primary" id="copyB_btn" disabled>&#8594; Copy to B</button>
+        <button class="btn btn-secondary" id="log_btn" disabled>Log step</button>
+        <button class="btn btn-warn" id="clear_btn">Clear</button>
+      </div>
+    </div>
+
+    <div class="section-title">History</div>
+    <div class="card">
+      <div class="history-log" id="traverse_log"><div class="log-empty">No steps logged yet</div></div>
+      <div class="btn-row" style="margin-top:10px">
+        <button class="btn btn-warn" id="clear_log_btn">Clear history</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var currentOp='add',resultSec=null,logEntries=[],logCount=0,angCalcFmt='dms';
+
+function pad2(n){return n<10?'0'+n:''+n}
+
+function copyToClipboard(text,btn){
+  function fb(){var t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.focus();t.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(t)}
+  function flash(){if(!btn)return;var o=btn.textContent;btn.textContent='Copied!';btn.classList.add('copied');setTimeout(function(){btn.textContent=o;btn.classList.remove('copied')},1500)}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(flash,function(){fb();flash()})}else{fb();flash()}
+}
+
+function toExpanded(s){
+  s=((s%1296000)+1296000)%1296000;
+  var d=Math.floor(s/3600),r=s-d*3600,m=Math.floor(r/60),sec=Math.round(r-m*60);
+  if(sec>=60){sec-=60;m++}if(m>=60){m-=60;d++}if(d>=360)d-=360;
+  return d+'\u00b0 '+pad2(m)+'\u2032 '+pad2(sec)+'\u2033';
+}
+function toCondensed(s){
+  s=((s%1296000)+1296000)%1296000;
+  var d=Math.floor(s/3600),r=s-d*3600,m=Math.floor(r/60),sec=Math.round(r-m*60);
+  if(sec>=60){sec-=60;m++}if(m>=60){m-=60;d++}if(d>=360)d-=360;
+  return d+'.'+pad2(m)+pad2(sec);
+}
+function toDD(s){return (s/3600).toFixed(6)+'\u00b0 decimal'}
+
+function setAngCalcFmt(fmt){
+  angCalcFmt=fmt;
+  document.getElementById('atog_dms').classList.toggle('active',fmt==='dms');
+  document.getElementById('atog_dd').classList.toggle('active',fmt==='dd');
+  var hd='DMS: 12.3432  or  12d34m32s  or  12 34 32';
+  var hdd='Decimal degrees: e.g. 12.575000';
+  document.getElementById('hint_a').textContent=fmt==='dms'?hd:hdd;
+  document.getElementById('hint_b').textContent=fmt==='dms'?hd:hdd;
+  document.getElementById('a_val').placeholder=fmt==='dms'?'0.0000':'0.000000';
+  document.getElementById('b_val').placeholder=fmt==='dms'?'0.0000':'0.000000';
+  clearAll();
+}
+
+function parseAngleEntry(raw){
+  raw=raw.trim();if(!raw)return 0;
+  if(angCalcFmt==='dd'){var dd=parseFloat(raw.replace(/[^\d.-]/g,''));return isNaN(dd)?null:dd*3600}
+  var neg=raw.startsWith('-');var abs=neg?raw.slice(1).trim():raw;
+  var d=0,m=0,s=0;
+  var reSym=/^(\d+(?:\.\d+)?)[^\d]+(\d+(?:\.\d+)?)[^\d]+(\d+(?:\.\d+)?)[^\d]*$/;
+  var reSpc=/^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)$/;
+  var reCon=/^(\d+)\.(\d{1,4})$/;
+  var m1=abs.match(reSym),m2=abs.match(reSpc),m3=abs.match(reCon);
+  if(m1){d=parseFloat(m1[1]);m=parseFloat(m1[2]);s=parseFloat(m1[3])}
+  else if(m2){d=parseFloat(m2[1]);m=parseFloat(m2[2]);s=parseFloat(m2[3])}
+  else if(m3){d=parseInt(m3[1],10);var fr=(m3[2]+'0000').slice(0,4);m=parseInt(fr.slice(0,2),10);s=parseInt(fr.slice(2,4),10)}
+  else{var f=parseFloat(abs);if(isNaN(f))return null;var pts=abs.split('.');d=parseInt(pts[0],10)||0;var fr2=((pts[1]||'')+'0000').slice(0,4);m=parseInt(fr2.slice(0,2),10)||0;s=parseInt(fr2.slice(2,4),10)||0}
+  if(m>59||s>=60)return null;
+  var tot=d*3600+m*60+s;return neg?-tot:tot;
+}
+function parseDMS(v){var r=parseAngleEntry(v);return r===null?0:r}
+function validateEntry(v){return !v.trim()||parseAngleEntry(v)!==null}
+
+function setOp(op){
+  currentOp=op;
+  document.getElementById('op_add').classList.toggle('active',op==='add');
+  document.getElementById('op_sub').classList.toggle('active',op==='sub');
+  calculate();
+}
+
+function setDisplay(exp,dd){
+  document.getElementById('result_expanded').textContent=exp;
+  document.getElementById('result_dd').textContent=dd;
+}
+function setEnabled(on){
+  ['copyA_btn','copyB_btn','log_btn','flip_res_btn','copy_result_btn'].forEach(function(id){document.getElementById(id).disabled=!on});
+}
+
+function calculate(){
+  var aRaw=document.getElementById('a_val').value||'';
+  var bRaw=document.getElementById('b_val').value||'';
+  var err=document.getElementById('error_msg');
+  if(!aRaw&&!bRaw){err.style.display='none';resultSec=null;setDisplay('\u2014\u00b0 \u2014\u2014\u2032 \u2014\u2014\u2033','Enter values above');setEnabled(false);return}
+  if(!validateEntry(aRaw)||!validateEntry(bRaw)){err.style.display='block';err.textContent='Invalid format \u2014 check your input.';resultSec=null;setDisplay('\u2014\u00b0 \u2014\u2014\u2032 \u2014\u2014\u2033','');setEnabled(false);return}
+  var aS=parseDMS(aRaw),bS=parseDMS(bRaw);
+  var res=currentOp==='add'?aS+bS:aS-bS;
+  err.style.display='none';
+  res=((res%1296000)+1296000)%1296000;
+  resultSec=res;
+  setDisplay(toExpanded(res),toDD(res));
+  setEnabled(true);
+}
+
+function clearField(p){document.getElementById(p+'_val').value='';calculate()}
+function flip(p){var c=parseDMS(document.getElementById(p+'_val').value);document.getElementById(p+'_val').value=toCondensed(((c+648000)%1296000+1296000)%1296000);calculate()}
+function flipResult(){if(resultSec===null)return;resultSec=((resultSec+648000)%1296000+1296000)%1296000;setDisplay(toExpanded(resultSec),toDD(resultSec))}
+function copyResult(btn){if(resultSec===null)return;copyToClipboard(toExpanded(resultSec),btn)}
+function copyTo(p){if(resultSec===null)return;document.getElementById(p+'_val').value=toCondensed(resultSec);calculate()}
+
+function logResult(){
+  if(resultSec===null)return;
+  logCount++;
+  var a=document.getElementById('a_val').value||'0.0000';
+  var b=document.getElementById('b_val').value||'0.0000';
+  logEntries.push({num:logCount,a:a,b:b,op:currentOp==='add'?'+':'\u2212',expanded:toExpanded(resultSec),dd:toDD(resultSec)});
+  renderLog();
+}
+
+function renderLog(){
+  var el=document.getElementById('traverse_log');
+  if(!logEntries.length){el.innerHTML='<div class="log-empty">No steps logged yet</div>';el.onclick=null;return}
+  window._lc=logEntries.map(function(e){return e.expanded});
+  el.innerHTML=logEntries.map(function(e,i){
+    return '<div class="log-entry"><div class="log-num">'+e.num+'</div><div class="log-body"><div class="log-calc">'+e.a+' <span style="color:#4fc3f7">'+e.op+'</span> '+e.b+'</div><div class="log-result">= '+e.expanded+'</div><div class="log-dd">'+e.dd+'</div></div><button class="btn-copy" data-i="'+i+'">Copy</button></div>';
+  }).join('');
+  el.onclick=function(e){var b=e.target.closest('.btn-copy');if(!b)return;copyToClipboard(window._lc[+b.dataset.i],b)};
+  el.scrollTop=el.scrollHeight;
+}
+
+function clearLog(){logEntries=[];logCount=0;renderLog();keepFocus()}
+
+function clearAll(){
+  document.getElementById('a_val').value='';
+  document.getElementById('b_val').value='';
+  resultSec=null;
+  document.getElementById('error_msg').style.display='none';
+  setDisplay('\u2014\u00b0 \u2014\u2014\u2032 \u2014\u2014\u2033','Enter values above');
+  setEnabled(false);
+}
+
+// ── FOCUS MANAGEMENT ─────────────────────────────────────────────
+var _lastFocus='a';
+function focusField(which){_lastFocus=which;var el=document.getElementById(which+'_val');el.focus();var l=el.value.length;el.setSelectionRange(l,l)}
+function keepFocus(){setTimeout(function(){focusField(_lastFocus)},0)}
+
+document.querySelectorAll('button').forEach(function(b){b.setAttribute('tabindex','-1')});
+document.getElementById('a_val').setAttribute('tabindex','1');
+document.getElementById('b_val').setAttribute('tabindex','2');
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Tab'){e.preventDefault();e.stopPropagation();focusField(_lastFocus==='a'?'b':'a')}
+},true);
+
+document.getElementById('a_val').addEventListener('focus',function(){_lastFocus='a'});
+document.getElementById('b_val').addEventListener('focus',function(){_lastFocus='b'});
+document.getElementById('page-angles') && document.getElementById('page-angles').addEventListener('mouseup',function(e){
+  var a=document.getElementById('a_val'),b=document.getElementById('b_val');
+  if(e.target!==a&&e.target!==b)setTimeout(function(){keepFocus()},0);
+});
+document.querySelector('.page').addEventListener('mouseup',function(e){
+  var a=document.getElementById('a_val'),b=document.getElementById('b_val');
+  if(e.target!==a&&e.target!==b)setTimeout(function(){keepFocus()},0);
+});
+
+// ── WIRE UP EVENTS ────────────────────────────────────────────────
+document.getElementById('a_val').addEventListener('input',calculate);
+document.getElementById('b_val').addEventListener('input',calculate);
+document.getElementById('atog_dms').addEventListener('click',function(){setAngCalcFmt('dms');keepFocus()});
+document.getElementById('atog_dd').addEventListener('click',function(){setAngCalcFmt('dd');keepFocus()});
+document.getElementById('op_add').addEventListener('click',function(){setOp('add');keepFocus()});
+document.getElementById('op_sub').addEventListener('click',function(){setOp('sub');keepFocus()});
+document.getElementById('flipA_btn').addEventListener('click',function(){flip('a');focusField('a')});
+document.getElementById('flipB_btn').addEventListener('click',function(){flip('b');focusField('b')});
+document.getElementById('clearA_btn').addEventListener('click',function(){clearField('a');focusField('a')});
+document.getElementById('clearB_btn').addEventListener('click',function(){clearField('b');focusField('b')});
+document.getElementById('flip_res_btn').addEventListener('click',function(){flipResult();keepFocus()});
+document.getElementById('copy_result_btn').addEventListener('click',function(){copyResult(this);keepFocus()});
+document.getElementById('copyA_btn').addEventListener('click',function(){copyTo('a');focusField('b')});
+document.getElementById('copyB_btn').addEventListener('click',function(){copyTo('b');focusField('a')});
+document.getElementById('log_btn').addEventListener('click',function(){logResult();keepFocus()});
+document.getElementById('clear_log_btn').addEventListener('click',function(){clearLog();keepFocus()});
+document.getElementById('clear_btn').addEventListener('click',function(){clearAll();focusField('a')});
+
+setAngCalcFmt('dms');
+setTimeout(function(){focusField('a')},100);
+</script>
+</body>
+</html>
