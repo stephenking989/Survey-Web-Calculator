@@ -127,6 +127,7 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
       <div class="history-log" id="traverse_log"><div class="log-empty">No steps logged yet</div></div>
       <div class="btn-row" style="margin-top:10px">
         <button class="btn btn-warn" id="clear_log_btn">Clear history</button>
+        <button class="btn btn-secondary" id="copy_log_btn" disabled>Copy all</button>
       </div>
     </div>
   </div>
@@ -235,6 +236,7 @@ function logResult(){
 }
 
 function renderLog(){
+  document.getElementById('copy_log_btn').disabled=!logEntries.length;
   var el=document.getElementById('traverse_log');
   if(!logEntries.length){el.innerHTML='<div class="log-empty">No steps logged yet</div>';el.onclick=null;return}
   window._lc=logEntries.map(function(e){return e.expanded});
@@ -245,7 +247,17 @@ function renderLog(){
   el.scrollTop=el.scrollHeight;
 }
 
-function clearLog(){logEntries=[];logCount=0;renderLog();keepFocus()}
+function clearLog(){logEntries=[];logCount=0;document.getElementById('copy_log_btn').disabled=true;renderLog();keepFocus()}
+
+function copyLog(){
+  if(!logEntries.length)return;
+  var now=new Date();
+  var dt=pad2(now.getDate())+'/'+pad2(now.getMonth()+1)+'/'+now.getFullYear()+' '+pad2(now.getHours())+':'+pad2(now.getMinutes())+':'+pad2(now.getSeconds());
+  var lines=['History - '+dt];
+  logEntries.forEach(function(e){lines.push(e.a+' '+e.op+' '+e.b+' = '+e.expanded)});
+  copyToClipboard(lines.join('
+'),document.getElementById('copy_log_btn'));
+}
 
 function clearAll(){
   document.getElementById('a_val').value='';
@@ -297,6 +309,7 @@ document.getElementById('copyA_btn').addEventListener('click',function(){copyTo(
 document.getElementById('copyB_btn').addEventListener('click',function(){copyTo('b');focusField('a')});
 document.getElementById('log_btn').addEventListener('click',function(){logResult();keepFocus()});
 document.getElementById('clear_log_btn').addEventListener('click',function(){clearLog();keepFocus()});
+document.getElementById('copy_log_btn').addEventListener('click',function(){copyLog();keepFocus()});
 document.getElementById('clear_btn').addEventListener('click',function(){clearAll();focusField('a')});
 
 setAngCalcFmt('dms');
