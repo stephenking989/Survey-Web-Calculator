@@ -37,100 +37,73 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
 .res-row:hover{background:#0f2440;border-color:#1e3a5f}
 .res-row:hover .res-val{color:#4fc3f7}
 .res-label{font-size:13px;color:#888}
-.res-val{font-size:14px;font-weight:600;color:#e0e0e0;font-family:'Courier New',monospace}
+.res-val{font-size:14px;font-weight:600;color:#e0e0e0;font-family:Courier New,monospace}
 .known-tag{font-size:10px;background:#0f3460;color:#4fc3f7;border-radius:4px;padding:2px 5px;margin-left:6px}
 .divider{border:none;border-top:1px solid #0f3460;margin:8px 0}
 .btn-copy-sm{padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid #1e3a5f;background:transparent;color:#888;transition:all .2s}
 .btn-copy-sm:hover{border-color:#4fc3f7;color:#4fc3f7}
 .btn-copy-sm.copied{border-color:#66bb6a;color:#66bb6a}
+.stk-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px}
+.stk-tbl{border-collapse:collapse;width:100%;min-width:580px}
+.stk-tbl th{padding:7px 8px;text-align:right;color:#4fc3f7;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid #1e3a5f;white-space:nowrap}
+.stk-tbl th:first-child{text-align:left}
+.stk-tbl td{padding:6px 8px;text-align:right;color:#e0e0e0;font-family:Courier New,monospace;font-size:12px;border-bottom:1px solid #0a1428;white-space:nowrap}
+.stk-tbl td:first-child{text-align:left;color:#aaa;font-family:system-ui,sans-serif;font-size:12px}
+.stk-tbl tr:last-child td{border-bottom:none}
+.stk-ep td{background:rgba(79,195,247,.05)}
+.stk-ep td:first-child{color:#4fc3f7;font-weight:600}
 </style>
 </head>
 <body>
-
 <div class="top-bar">
   <a href="index.html" class="back-btn">&#8592; Home</a>
   <div class="top-bar-title">Curve Calculator</div>
 </div>
-
 <div class="page">
   <div style="margin-top:16px">
     <div style="font-size:12px;color:#666;margin-bottom:14px">Solve all curve parameters from any 2&#8202;&#8211;&#8202;3 known values</div>
-
-    <!-- Settings -->
     <div class="card" style="margin-bottom:12px">
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">
-          <div>
-            <div class="set-lbl">Units</div>
-            <div style="display:flex"><button class="tog-btn active" id="tog_metric">Metric</button><button class="tog-btn" id="tog_imperial">Imperial</button></div>
-          </div>
-          <div>
-            <div class="set-lbl">Angle Input</div>
-            <div style="display:flex"><button class="tog-btn active" id="tog_dms">DMS</button><button class="tog-btn" id="tog_dd">DD</button></div>
-          </div>
+          <div><div class="set-lbl">Units</div><div style="display:flex"><button class="tog-btn active" id="tog_metric">Metric</button><button class="tog-btn" id="tog_imperial">Imperial</button></div></div>
+          <div><div class="set-lbl">Angle Input</div><div style="display:flex"><button class="tog-btn active" id="tog_dms">DMS</button><button class="tog-btn" id="tog_dd">DD</button></div></div>
         </div>
         <div style="display:flex;gap:14px;align-items:flex-start">
-          <div>
-            <div class="set-lbl">Distance precision</div>
-            <select id="prec_val" class="prec-sel"><option value="0">0 dp</option><option value="1">1 dp</option><option value="2">2 dp</option><option value="3" selected>3 dp</option><option value="4">4 dp</option><option value="5">5 dp</option><option value="6">6 dp</option><option value="7">7 dp</option><option value="8">8 dp</option></select>
-          </div>
-          <div>
-            <div class="set-lbl">Angle precision</div>
-            <select id="prec_ang" class="prec-sel"><option value="0" selected>0 dp</option><option value="1">1 dp</option><option value="2">2 dp</option><option value="3">3 dp</option><option value="4">4 dp</option><option value="5">5 dp</option><option value="6">6 dp</option><option value="7">7 dp</option><option value="8">8 dp</option></select>
-          </div>
+          <div><div class="set-lbl">Distance Precision</div><select id="prec_val" class="prec-sel"><option value="0">0 dp</option><option value="1">1 dp</option><option value="2">2 dp</option><option value="3" selected>3 dp</option><option value="4">4 dp</option><option value="5">5 dp</option><option value="6">6 dp</option><option value="7">7 dp</option><option value="8">8 dp</option></select></div>
+          <div><div class="set-lbl">Angle Precision</div><select id="prec_ang" class="prec-sel"><option value="0" selected>0 dp</option><option value="1">1 dp</option><option value="2">2 dp</option><option value="3">3 dp</option><option value="4">4 dp</option><option value="5">5 dp</option><option value="6">6 dp</option><option value="7">7 dp</option><option value="8">8 dp</option></select></div>
         </div>
       </div>
     </div>
-
-    <!-- Inputs -->
     <div class="card" style="margin-bottom:12px">
       <div class="section-title">Curve Parameters</div>
       <div style="font-size:12px;color:#666;margin-bottom:12px">Enter any 2 or 3 known values</div>
       <div class="inp-grid">
-        <div class="inp-field">
-          <div class="inp-label">Radius <span class="inp-sym">R</span></div>
-          <input class="inp-input" id="inp_R" type="text" inputmode="decimal" placeholder="0.000">
-        </div>
-        <div class="inp-field">
-          <div class="inp-label">Delta Angle <span class="inp-sym">&Delta;</span></div>
-          <input class="inp-input" id="inp_D" type="text" inputmode="decimal" placeholder="0.0000" data-angle="1">
-        </div>
-        <div class="inp-field">
-          <div class="inp-label">Delta/2 <span class="inp-sym">&Delta;/2</span></div>
-          <input class="inp-input" id="inp_HD" type="text" inputmode="decimal" placeholder="0.0000" data-angle="1">
-        </div>
-        <div class="inp-field">
-          <div class="inp-label">Arc Length <span class="inp-sym">L</span></div>
-          <input class="inp-input" id="inp_L" type="text" inputmode="decimal" placeholder="0.000">
-        </div>
-        <div class="inp-field">
-          <div class="inp-label">Chord <span class="inp-sym">C</span></div>
-          <input class="inp-input" id="inp_C" type="text" inputmode="decimal" placeholder="0.000">
-        </div>
-        <div class="inp-field">
-          <div class="inp-label">Sub Tangent <span class="inp-sym">T</span></div>
-          <input class="inp-input" id="inp_T" type="text" inputmode="decimal" placeholder="0.000">
-        </div>
-        <div class="inp-field">
-          <div class="inp-label">External <span class="inp-sym">E</span></div>
-          <input class="inp-input" id="inp_E" type="text" inputmode="decimal" placeholder="0.000">
-        </div>
-        <div class="inp-field">
-          <div class="inp-label">Midordinate <span class="inp-sym">M</span></div>
-          <input class="inp-input" id="inp_M" type="text" inputmode="decimal" placeholder="0.000">
-        </div>
+        <div class="inp-field"><div class="inp-label">Radius <span class="inp-sym">R</span></div><input class="inp-input" id="inp_R" type="text" inputmode="decimal" placeholder="0.000"></div>
+        <div class="inp-field"><div class="inp-label">Delta Angle <span class="inp-sym">&Delta;</span></div><input class="inp-input" id="inp_D" type="text" inputmode="decimal" placeholder="0.0000" data-angle="1"></div>
+        <div class="inp-field"><div class="inp-label">Delta/2 <span class="inp-sym">&Delta;/2</span></div><input class="inp-input" id="inp_HD" type="text" inputmode="decimal" placeholder="0.0000" data-angle="1"></div>
+        <div class="inp-field"><div class="inp-label">Arc Length <span class="inp-sym">L</span></div><input class="inp-input" id="inp_L" type="text" inputmode="decimal" placeholder="0.000"></div>
+        <div class="inp-field"><div class="inp-label">Chord <span class="inp-sym">C</span></div><input class="inp-input" id="inp_C" type="text" inputmode="decimal" placeholder="0.000"></div>
+        <div class="inp-field"><div class="inp-label">Sub Tangent <span class="inp-sym">T</span></div><input class="inp-input" id="inp_T" type="text" inputmode="decimal" placeholder="0.000"></div>
+        <div class="inp-field"><div class="inp-label">External <span class="inp-sym">E</span></div><input class="inp-input" id="inp_E" type="text" inputmode="decimal" placeholder="0.000"></div>
+        <div class="inp-field"><div class="inp-label">Midordinate <span class="inp-sym">M</span></div><input class="inp-input" id="inp_M" type="text" inputmode="decimal" placeholder="0.000"></div>
       </div>
-      <div class="inp-err" id="err_global"></div>
-      <div style="display:flex;gap:10px;margin-top:12px">
-        <button class="btn-sec" id="reset_btn">Reset</button>
-        <button class="btn-pri" id="calc_btn">Calculate</button>
+      <div class="inp-err" id="err_global" style="margin-top:8px"></div>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="section-title">Stakeout Parameters</div>
+      <div style="font-size:12px;color:#666;margin-bottom:12px">Optional &mdash; fill both fields to generate a stakeout table</div>
+      <div class="inp-grid">
+        <div class="inp-field"><div class="inp-label">PC Station</div><input class="inp-input" id="inp_pc" type="text" inputmode="decimal" placeholder="0.000"><div class="inp-err" id="err_pc"></div></div>
+        <div class="inp-field"><div class="inp-label">Station Interval</div><input class="inp-input" id="inp_interval" type="text" inputmode="decimal" placeholder="25"><div class="inp-err" id="err_interval"></div></div>
       </div>
     </div>
-
-    <!-- Results -->
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <button class="btn-sec" id="reset_btn">Reset</button>
+      <button class="btn-pri" id="calc_btn">Calculate</button>
+    </div>
     <div id="results_section" style="display:none">
       <div class="card">
-        <div class="section-title" style="margin-bottom:10px">Results</div>
+        <div class="section-title" style="margin-bottom:10px">Curve Results</div>
         <div id="res_rows"></div>
         <hr class="divider">
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
@@ -138,290 +111,408 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
         </div>
       </div>
     </div>
-
+    <div id="stakeout_section" style="display:none">
+      <div class="card">
+        <div class="section-title" style="margin-bottom:4px">Stakeout</div>
+        <div id="stk_summary" style="font-size:12px;color:#666;margin-bottom:12px"></div>
+        <div class="stk-wrap">
+          <table class="stk-tbl">
+            <thead><tr><th>Station</th><th>Arc Len</th><th>Chord</th><th>Deflection</th><th>Acc Arc</th><th>Acc Chord</th><th>Acc Defl</th></tr></thead>
+            <tbody id="stk_body"></tbody>
+          </table>
+        </div>
+        <hr class="divider">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+          <button class="btn-copy-sm" id="copy_stk_btn">Copy Stakeout</button>
+          <button class="btn-copy-sm" id="export_csv_btn">Export CSV</button>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+</div><script>
+// ── Settings state ─────────────────────────────────────────────────────────
+var _unit = 'metric';   // 'metric' | 'imperial'
+var _afmt = 'dms';      // 'dms' | 'dd' | 'dm'
+var _pdist = 3;
+var _pang  = 0;
+var _lastR = null, _lastDelta = null, _lastL = null;
+var stakeoutLastRows = null;
+var stakeoutPcStation = null;
 
-<script>
-var curveUnit='metric', curveAngleFmt='dms', curveLastResult=null, curveKnownKeys=[];
-
-function pad2(n){return n<10?'0'+n:''+n}
-
-function copyToClipboard(text,btn){
-  function fb(){var t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.focus();t.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(t)}
-  function flash(){if(!btn)return;var o=btn.textContent;btn.textContent='Copied!';btn.classList.add('copied');setTimeout(function(){btn.textContent=o;btn.classList.remove('copied')},1500)}
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(flash,function(){fb();flash()})}else{fb();flash()}
-}
-
-function getPrec(){return parseInt(document.getElementById('prec_val').value,10)}
-function getAngPrec(){return parseInt(document.getElementById('prec_ang').value,10)}
-
-function fmtVal(v){return v.toFixed(getPrec())}
-
-function _dms(dd,sep){
-  var p=getAngPrec(),neg=dd<0;
-  dd=Math.abs(dd);
-  var d=Math.floor(dd),mt=(dd-d)*60,m=Math.floor(mt),s=(mt-m)*60;
-  var f=Math.pow(10,p);s=Math.round(s*f)/f;
-  if(s>=60){s=0;m++}if(m>=60){m=0;d++}
-  var sq=sep?'"':'\u2033',mq=sep?"'":'\u2032';
-  return(neg?'-':'')+d+'\u00b0 '+pad2(m)+mq+' '+s.toFixed(p)+sq;
-}
-function fmtDMS(dd){return _dms(dd,false)}
-function fmtDMSCopy(dd){return _dms(dd,true)}
-
-/* ---- Angle parser ---- */
-function parseAngle(val){
-  val=val.trim();if(!val)return null;
-  if(curveAngleFmt==='dd'){var n=parseFloat(val);return isNaN(n)?null:n}
-  /* Strip symbols then split */
-  var s=val.replace(/[°d\u00b0]/g,' ').replace(/['\u2032m]/g,' ').replace(/["\u2033s]/g,' ').trim();
-  var pts=s.split(/\s+/);
-  if(pts.length===1){
-    /* Compact DMS: DD.MMSS */
-    var n=parseFloat(pts[0]);if(isNaN(n))return null;
-    var neg=n<0;n=Math.abs(n);
-    var d=Math.floor(n),frac=Math.round((n-d)*10000);
-    var m=Math.floor(frac/100),sc=frac%100;
-    if(m>59||sc>59)return null;
-    var dd=d+m/60+sc/3600;return neg?-dd:dd;
+// ── Angle parsing ──────────────────────────────────────────────────────────
+function parseAngle(s){
+  if(!s) return null;
+  s = s.trim()
+    .replace(/[\u00b0\u00ba]/g,'d')
+    .replace(/[\u2032']/g,'m')
+    .replace(/[\u2033"]/g,'s');
+  if(_afmt === 'dd'){
+    var v = parseFloat(s); return isNaN(v) ? null : v;
   }
-  var d=parseFloat(pts[0])||0,m=parseFloat(pts[1])||0,sc=parseFloat(pts[2])||0;
-  if(m<0||m>=60||sc<0||sc>=60)return null;
-  var neg=d<0;d=Math.abs(d);
-  return (neg?-1:1)*(d+m/60+sc/3600);
-}
-
-/* ---- g-functions: param = R * g(Delta_degrees) ---- */
-var gF={
-  L:function(d){return d*Math.PI/180},
-  C:function(d){return 2*Math.sin(d/2*Math.PI/180)},
-  T:function(d){return Math.tan(d/2*Math.PI/180)},
-  E:function(d){return 1/Math.cos(d/2*Math.PI/180)-1},
-  M:function(d){return 1-Math.cos(d/2*Math.PI/180)}
-};
-
-/* Bisect monotone increasing g(D)=target, D in (lo,hi) */
-function bisectMono(g,target,lo,hi){
-  if(g(lo)>target||g(hi)<target)return null;
-  for(var i=0;i<120;i++){var m=(lo+hi)/2;if(g(m)<target)lo=m;else hi=m;if(hi-lo<1e-13)break}
-  return(lo+hi)/2;
-}
-
-/* Bisect for ratio g1(D)/g2(D)=ratio — scan for sign change first */
-function bisectRatio(ratio,g1,g2){
-  var f=function(D){var v2=g2(D);return Math.abs(v2)<1e-15?Infinity:g1(D)/v2-ratio};
-  var lo=1e-6,hi=180-1e-6,N=600,step=(hi-lo)/N;
-  var pD=lo,pF=f(lo);
-  for(var i=1;i<=N;i++){
-    var D=lo+i*step,fD=f(D);
-    if(isFinite(pF)&&isFinite(fD)&&pF*fD<0){
-      var a=pD,b=D;
-      for(var j=0;j<120;j++){var m=(a+b)/2;if(f(a)*f(m)<0)b=m;else a=m;if(b-a<1e-13)break}
-      return(a+b)/2;
+  if(_afmt === 'dm'){
+    var parts = s.split(/[dm\s]+/).filter(function(x){return x.length>0;});
+    if(parts.length >= 2){
+      var d=parseFloat(parts[0]), m=parseFloat(parts[1]);
+      return (isNaN(d)||isNaN(m)) ? null : d+m/60;
     }
-    pD=D;pF=fD;
+    var v2=parseFloat(s); return isNaN(v2)?null:v2;
   }
-  return null;
+  // DMS: try D.MMSS shorthand (e.g. 23.4512 = 23d 45m 12s)
+  var plain = s.match(/^(\d+)\.(\d+)$/);
+  if(plain){
+    var frac = plain[2];
+    while(frac.length < 4) frac += '0';
+    var dd=parseInt(plain[1],10), mm=parseInt(frac.substring(0,2),10), ss=parseFloat(frac.substring(2))||0;
+    if(mm<60 && ss<60) return dd + mm/60 + ss/3600;
+  }
+  var parts2 = s.split(/[dms\s]+/).filter(function(x){return x.length>0;});
+  if(parts2.length>=3){
+    var d3=parseFloat(parts2[0]),m3=parseFloat(parts2[1]),s3=parseFloat(parts2[2]);
+    return (isNaN(d3)||isNaN(m3)||isNaN(s3))?null:d3+m3/60+s3/3600;
+  }
+  if(parts2.length===2){
+    var d4=parseFloat(parts2[0]),m4=parseFloat(parts2[1]);
+    return (isNaN(d4)||isNaN(m4))?null:d4+m4/60;
+  }
+  var v3=parseFloat(s); return isNaN(v3)?null:v3;
 }
 
-var PNAME={R:'Radius',D:'Delta angle',HD:'Delta/2',L:'Arc length',C:'Chord',T:'Sub tangent',E:'External',M:'Midordinate'};
+// ── Angle formatting ───────────────────────────────────────────────────────
+function p2(n){return n<10?'0'+n:''+n;}
+function pSec(s){var parts=s.split('.');if(parts[0].length<2)parts[0]='0'+parts[0];return parts.join('.');}
 
-function solveCurve(inp){
-  /* Validate positivity */
-  ['R','L','C','T','E','M'].forEach(function(k){if(inp[k]!==null&&inp[k]<=0)throw PNAME[k]+' must be positive'});
-  if(inp.D!==null&&inp.D<=0)throw 'Delta angle must be positive';
-  if(inp.HD!==null&&inp.HD<=0)throw 'Delta/2 must be positive';
-
-  var R=inp.R, D=inp.D;
-
-  /* Incorporate HD */
-  if(inp.HD!==null){
-    var Dfh=inp.HD*2;
-    if(D!==null&&Math.abs(D-Dfh)>1e-4)throw 'Delta angle and Delta/2 are inconsistent';
-    D=Dfh;
+function fmtAngle(deg){
+  if(deg===null||isNaN(deg)) return '';
+  if(_afmt==='dd') return deg.toFixed(_pang)+'\u00b0';
+  if(_afmt==='dm'){
+    var d=Math.floor(deg),m=(deg-d)*60;
+    return d+'\u00b0 '+m.toFixed(_pang)+'\u2032';
   }
-  if(D!==null&&(D<=0||D>=180))throw 'Delta angle must be between 0° and 180°';
-
-  var dk=['L','C','T','E','M'].filter(function(k){return inp[k]!==null});
-
-  if(R!==null&&D!==null){
-    /* Both known */
-  }else if(R!==null&&D===null){
-    if(dk.length===0)throw 'Need at least one more value to solve';
-    var target=inp[dk[0]]/R;
-    D=bisectMono(gF[dk[0]],target,1e-9,180-1e-9);
-    if(D===null)throw 'Could not solve for Delta — check input values';
-  }else if(D!==null&&R===null){
-    if(dk.length===0)throw 'Need at least one distance value to solve';
-    R=inp[dk[0]]/gF[dk[0]](D);
-    if(!isFinite(R)||R<=0)throw 'Invalid result — check input values';
-  }else{
-    /* No R, no D — need 2 distance params */
-    if(dk.length<2)throw 'Please enter at least 2 known values';
-    var p1=dk[0],p2=dk[1],v1=inp[p1],v2=inp[p2];
-    var pair=p1+p2;
-
-    /* C + T: direct formula (from spec §3.5) */
-    if(pair==='CT'||pair==='TC'){
-      var cv=inp.C,tv=inp.T,cosHD=cv/(2*tv);
-      if(cosHD<=-1||cosHD>=1)throw 'Chord and Sub Tangent values are inconsistent';
-      D=2*Math.acos(cosHD)*180/Math.PI;
-      R=(cv/2)/Math.sin(D/2*Math.PI/180);
-    }
-    /* E + M: direct formula (E/M = sec(D/2), so cos(D/2)=M/E) */
-    else if(pair==='EM'||pair==='ME'){
-      var ev=inp.E,mv=inp.M,cosHD=mv/ev;
-      if(cosHD<=0||cosHD>=1)throw 'External and Midordinate values are inconsistent';
-      D=2*Math.acos(cosHD)*180/Math.PI;
-      R=mv/(1-Math.cos(D/2*Math.PI/180));
-    }
-    /* General: ratio bisection */
-    else{
-      D=bisectRatio(v1/v2,gF[p1],gF[p2]);
-      if(D===null)throw 'Solver did not converge — try adding a third known value';
-      R=v1/gF[p1](D);
-    }
-  }
-
-  if(!isFinite(D)||D<=0||D>=180)throw 'Delta angle must be between 0° and 180°';
-  if(!isFinite(R)||R<=0)throw 'Radius must be positive';
-
-  /* Compute all parameters */
-  var Dr=D*Math.PI/180;
-  var L=R*Dr;
-  var C=2*R*Math.sin(Dr/2);
-  var T=R*Math.tan(Dr/2);
-  var E=R*(1/Math.cos(Dr/2)-1);
-  var M=R*(1-Math.cos(Dr/2));
-  var HD=D/2;
-  var Da=(100/R)*(180/Math.PI);
-  var Dc=R>=50?2*Math.asin(50/R)*180/Math.PI:null;
-
-  /* Final validation */
-  if(C>2*R+1e-4)throw 'Chord cannot be greater than diameter (2R)';
-  if(M>R+1e-4)throw 'Midordinate cannot be greater than radius';
-  if(L>Math.PI*R+1e-4)throw 'Arc length cannot exceed a semi-circle (\u03c0 \u00d7 R)';
-  if(C>L+1e-4)throw 'Chord cannot be greater than arc length';
-
-  return{R:R,D:D,HD:HD,L:L,C:C,T:T,E:E,M:M,Da:Da,Dc:Dc};
+  var d=Math.floor(deg),rem=(deg-d)*60,m=Math.floor(rem),s=(rem-m)*60;
+  var ss=s.toFixed(_pang);
+  if(parseFloat(ss)>=60){ss=(0).toFixed(_pang);m++;if(m>=60){m=0;d++;}}
+  return d+'\u00b0 '+p2(m)+'\u2032 '+pSec(ss)+'\u2033';
 }
 
-function getInputs(){
-  var map={R:'inp_R',D:'inp_D',HD:'inp_HD',L:'inp_L',C:'inp_C',T:'inp_T',E:'inp_E',M:'inp_M'};
-  var inp={},kk=[],count=0;
-  Object.keys(map).forEach(function(k){
-    var raw=document.getElementById(map[k]).value.trim();
-    if(!raw){inp[k]=null;return}
-    var n=(k==='D'||k==='HD')?parseAngle(raw):parseFloat(raw);
-    if(n===null||isNaN(n)){inp[k]=null}else{inp[k]=n;kk.push(k);count++}
+function fmtAngleDMS(deg){
+  // always DMS, no symbols – for copy output
+  if(deg===null||isNaN(deg)) return '';
+  var d=Math.floor(deg),rem=(deg-d)*60,m=Math.floor(rem),s=(rem-m)*60;
+  var ss=s.toFixed(0);
+  if(parseFloat(ss)>=60){ss='0';m++;if(m>=60){m=0;d++;}}
+  return d+'d '+p2(m)+'m '+pSec(ss)+'s';
+}
+
+// ── Distance formatting ────────────────────────────────────────────────────
+function fmtD(v){return v.toFixed(_pdist);}
+
+// ── Station formatting ─────────────────────────────────────────────────────
+function fmtSta(sta){
+  var i=Math.floor(sta), f=sta-i;
+  var fStr = f>0 ? ('.'+f.toFixed(3).substring(2)) : '';
+  if(_unit==='metric'){
+    var k=Math.floor(i/1000), m=i%1000;
+    return k+'+'+(m<100?(m<10?'00'+m:'0'+m):''+m)+fStr;
+  } else {
+    var h=Math.floor(i/100), r=i%100;
+    return h+'+'+(r<10?'0'+r:''+r)+fStr;
+  }
+}
+
+// ── Stakeout ────────────────────────────────────────────────────────────────
+function buildStakeout(pc, interval, R, L){
+  var pt=pc+L, rows=[], pi=Math.PI;
+  var firstEven=Math.ceil(pc/interval)*interval;
+  if(Math.abs(firstEven-pc)<1e-9) firstEven+=interval;
+  var stations=[pc];
+  for(var s=firstEven; s<pt-1e-9; s+=interval) stations.push(s);
+  stations.push(pt);
+  var prevArc=0;
+  for(var i=0;i<stations.length;i++){
+    var sta=stations[i];
+    var cumArc=sta-pc;
+    var cumChord=2*R*Math.sin(cumArc/(2*R));
+    var cumDefl=(cumArc*90)/(pi*R);
+    var indivArc=cumArc-prevArc;
+    var indivChord=2*R*Math.sin(indivArc/(2*R));
+    var indivDefl=(indivArc*90)/(pi*R);
+    rows.push({sta:sta,isPC:i===0,isPT:i===stations.length-1,
+      indivArc:indivArc,indivChord:indivChord,indivDefl:indivDefl,
+      cumArc:cumArc,cumChord:cumChord,cumDefl:cumDefl});
+    prevArc=cumArc;
+  }
+  return rows;
+}
+
+function renderStakeout(rows,pc,L){
+  var html='';
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    var ep=(r.isPC||r.isPT)?' class="stk-ep"':'';
+    var lbl=fmtSta(r.sta)+(r.isPC?' (PC)':r.isPT?' (PT)':'');
+    html+='<tr'+ep+'>';
+    html+='<td>'+lbl+'</td>';
+    html+='<td>'+(r.isPC?'&mdash;':fmtD(r.indivArc))+'</td>';
+    html+='<td>'+(r.isPC?'&mdash;':fmtD(r.indivChord))+'</td>';
+    html+='<td>'+(r.isPC?'&mdash;':fmtAngle(r.indivDefl))+'</td>';
+    html+='<td>'+fmtD(r.cumArc)+'</td>';
+    html+='<td>'+fmtD(r.cumChord)+'</td>';
+    html+='<td>'+fmtAngle(r.cumDefl)+'</td>';
+    html+='</tr>';
+  }
+  document.getElementById('stk_body').innerHTML=html;
+  document.getElementById('stk_summary').textContent=
+    rows.length+' stations  \u2022  PC: '+fmtSta(pc)+'  \u2022  PT: '+fmtSta(pc+L);
+  document.getElementById('stakeout_section').style.display='';
+}
+
+function copyStakeout(){
+  if(!stakeoutLastRows) return;
+  var lines=['--- STAKEOUT ---',
+    ['Station','Arc Len','Chord','Deflection','Acc Arc','Acc Chord','Acc Defl'].join('\t')];
+  for(var i=0;i<stakeoutLastRows.length;i++){
+    var r=stakeoutLastRows[i];
+    var lbl=fmtSta(r.sta)+(r.isPC?' (PC)':r.isPT?' (PT)':'');
+    lines.push([lbl,
+      r.isPC?'':fmtD(r.indivArc),
+      r.isPC?'':fmtD(r.indivChord),
+      r.isPC?'':fmtAngleDMS(r.indivDefl),
+      fmtD(r.cumArc), fmtD(r.cumChord), fmtAngleDMS(r.cumDefl)
+    ].join('\t'));
+  }
+  navigator.clipboard.writeText(lines.join('\r\n')).then(function(){
+    var btn=document.getElementById('copy_stk_btn');
+    btn.textContent='Copied!';
+    setTimeout(function(){btn.textContent='Copy Stakeout';},1500);
   });
-  return{inp:inp,known:kk,count:count};
 }
 
-function clearStates(){
-  ['inp_R','inp_D','inp_HD','inp_L','inp_C','inp_T','inp_E','inp_M'].forEach(function(id){
-    document.getElementById(id).classList.remove('field-known','field-error');
-  });
-  document.getElementById('err_global').textContent='';
+function exportCSV(){
+  if(!stakeoutLastRows) return;
+  var lines=['Station,Arc Len,Chord,Deflection (dd),Acc Arc,Acc Chord,Acc Defl (dd)'];
+  for(var i=0;i<stakeoutLastRows.length;i++){
+    var r=stakeoutLastRows[i];
+    var lbl=fmtSta(r.sta)+(r.isPC?' (PC)':r.isPT?' (PT)':'');
+    lines.push([lbl,
+      r.isPC?'':r.indivArc.toFixed(_pdist),
+      r.isPC?'':r.indivChord.toFixed(_pdist),
+      r.isPC?'':r.indivDefl.toFixed(6),
+      r.cumArc.toFixed(_pdist), r.cumChord.toFixed(_pdist), r.cumDefl.toFixed(6)
+    ].join(','));
+  }
+  var blob=new Blob([lines.join('\r\n')],{type:'text/csv'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download='stakeout.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
 }
 
+// ── Helpers ─────────────────────────────────────────────────────────────────
+function getVal(id){var el=document.getElementById(id);if(!el)return null;var s=el.value.trim();if(!s)return null;var v=parseFloat(s);return isNaN(v)?null:v;}
+function getAng(id){var el=document.getElementById(id);if(!el)return null;var s=el.value.trim();if(!s)return null;return parseAngle(s);}
+function setInpD(id,v){var el=document.getElementById(id);if(el) el.value=v===null?'':fmtD(v);}
+function setInpA(id,v){var el=document.getElementById(id);if(el) el.value=v===null?'':fmtAngle(v);}
+function clrErr(){document.getElementById('err_global').textContent='';}
+function showErr(m){document.getElementById('err_global').textContent=m;}
+
+// ── Calculate ───────────────────────────────────────────────────────────────
 function calculate(){
-  clearStates();
-  document.getElementById('results_section').style.display='none';
-  curveLastResult=null;curveKnownKeys=[];
+  clrErr();
+  var R=getVal('inp_R');
+  var Delta=getAng('inp_D');   // inp_D = central angle Delta
+  var HD=getAng('inp_HD');     // inp_HD = Delta/2
+  var L=getVal('inp_L');
+  var C=getVal('inp_C');
+  var T=getVal('inp_T');
+  var E=getVal('inp_E');
+  var M=getVal('inp_M');
 
-  var data=getInputs();
-  if(data.count<2){document.getElementById('err_global').textContent='Please enter at least 2 known values';return}
-  if(data.count>3){document.getElementById('err_global').textContent='Please enter no more than 3 known values';return}
+  // Resolve HD <-> Delta
+  if(HD!==null && Delta===null) Delta=HD*2;
+  if(Delta!==null && HD===null) HD=Delta/2;
 
-  var map={R:'inp_R',D:'inp_D',HD:'inp_HD',L:'inp_L',C:'inp_C',T:'inp_T',E:'inp_E',M:'inp_M'};
-  data.known.forEach(function(k){document.getElementById(map[k]).classList.add('field-known')});
+  var PI=Math.PI, DEG=PI/180, RAD=180/PI;
+  var solved=false, err=null;
 
-  try{
-    var r=solveCurve(data.inp);
-    curveLastResult=r;curveKnownKeys=data.known;
-    renderResults(r);
-  }catch(e){
-    document.getElementById('err_global').textContent=typeof e==='string'?e:'Calculation error — check inputs';
+  if(R!==null && Delta!==null){ solved=true; }
+  else if(R!==null && L!==null){ Delta=L/R*RAD; solved=true; }
+  else if(R!==null && C!==null){
+    var ratio=C/(2*R);
+    if(Math.abs(ratio)>1) err='Chord exceeds 2R';
+    else{ Delta=2*Math.asin(ratio)*RAD; solved=true; }
+  }
+  else if(R!==null && T!==null){ Delta=2*Math.atan(T/R)*RAD; solved=true; }
+  else if(R!==null && E!==null){ Delta=2*Math.acos(R/(R+E))*RAD; solved=true; }
+  else if(R!==null && M!==null){ Delta=2*Math.acos(1-M/R)*RAD; solved=true; }
+  else if(Delta!==null && L!==null){ R=L/(Delta*DEG); solved=true; }
+  else if(Delta!==null && C!==null){
+    var sinHD=Math.sin(Delta/2*DEG);
+    if(Math.abs(sinHD)<1e-12) err='Delta too small';
+    else{ R=C/(2*sinHD); solved=true; }
+  }
+  else if(Delta!==null && T!==null){
+    var tanHD=Math.tan(Delta/2*DEG);
+    if(Math.abs(tanHD)<1e-12) err='Delta too small';
+    else{ R=T/tanHD; solved=true; }
+  }
+  else if(Delta!==null && E!==null){ R=E/(1/Math.cos(Delta/2*DEG)-1); solved=true; }
+  else if(Delta!==null && M!==null){ R=M/(1-Math.cos(Delta/2*DEG)); solved=true; }
+
+  if(err){showErr(err); document.getElementById('results_section').style.display='none'; return;}
+  if(!solved){showErr('Enter at least two independent curve parameters.'); document.getElementById('results_section').style.display='none'; return;}
+  if(R<=0||Delta<=0||Delta>=360){showErr('Invalid curve parameters.'); document.getElementById('results_section').style.display='none'; return;}
+
+  var dRad=Delta*DEG;
+  L=R*dRad; C=2*R*Math.sin(dRad/2); T=R*Math.tan(dRad/2);
+  E=R*(1/Math.cos(dRad/2)-1); M=R*(1-Math.cos(dRad/2)); HD=Delta/2;
+
+  setInpD('inp_R',R); setInpA('inp_D',Delta); setInpA('inp_HD',HD);
+  setInpD('inp_L',L); setInpD('inp_C',C); setInpD('inp_T',T);
+  setInpD('inp_E',E); setInpD('inp_M',M);
+
+  _lastR=R; _lastDelta=Delta; _lastL=L;
+
+  var du=_unit==='metric'?'m':'ft';
+  var rows=[
+    ['Radius (R)', fmtD(R)+' '+du],
+    ['Delta (\u0394)', fmtAngle(Delta)],
+    ['Delta/2 (\u0394/2)', fmtAngle(HD)],
+    ['Arc Length (L)', fmtD(L)+' '+du],
+    ['Chord (C)', fmtD(C)+' '+du],
+    ['Tangent (T)', fmtD(T)+' '+du],
+    ['External (E)', fmtD(E)+' '+du],
+    ['Mid-ordinate (M)', fmtD(M)+' '+du]
+  ];
+  var html='';
+  for(var i=0;i<rows.length;i++)
+    html+='<div class="res-row"><div class="res-label">'+rows[i][0]+'</div><div class="res-val">'+rows[i][1]+'</div></div>';
+  document.getElementById('res_rows').innerHTML=html;
+  document.getElementById('results_section').style.display='';
+
+  window._lastRes={R:R,Delta:Delta,HD:HD,L:L,C:C,T:T,E:E,M:M};
+
+  // Stakeout
+  var pcEl=document.getElementById('inp_pc'), intEl=document.getElementById('inp_interval');
+  var pcStr=pcEl?pcEl.value.trim():'', intStr=intEl?intEl.value.trim():'';
+  var pcErr=document.getElementById('err_pc'), intErr=document.getElementById('err_interval');
+  if(pcErr) pcErr.textContent=''; if(intErr) intErr.textContent='';
+  var hasPc=pcStr!=='', hasInt=intStr!=='';
+  if(hasPc&&hasInt){
+    var pcV=parseFloat(pcStr), intV=parseFloat(intStr), ok=true;
+    if(isNaN(pcV)||pcV<0){if(pcErr)pcErr.textContent='Valid PC station required';ok=false;}
+    if(isNaN(intV)||intV<=0){if(intErr)intErr.textContent='Positive interval required';ok=false;}
+    if(ok){
+      var rows2=buildStakeout(pcV,intV,R,L);
+      stakeoutLastRows=rows2; stakeoutPcStation=pcV;
+      renderStakeout(rows2,pcV,L);
+    } else { document.getElementById('stakeout_section').style.display='none'; }
+  } else if(hasPc&&!hasInt){
+    if(intErr) intErr.textContent='Also enter a station interval';
+    document.getElementById('stakeout_section').style.display='none';
+  } else if(!hasPc&&hasInt){
+    if(pcErr) pcErr.textContent='Also enter the PC station';
+    document.getElementById('stakeout_section').style.display='none';
+  } else {
+    document.getElementById('stakeout_section').style.display='none';
+    stakeoutLastRows=null;
   }
 }
 
-function renderResults(r){
-  var u=curveUnit==='metric'?'m':'ft';
-  var p=getPrec();
-  var rows=[
-    {label:'Delta Angle (\u0394)',       val:fmtDMS(r.D),                          copy:r.D.toFixed(10),  key:'D'},
-    {label:'Arc Length',                 val:fmtVal(r.L)+'\u2006'+u,               copy:r.L.toFixed(p),   key:'L'},
-    {label:'Radius',                     val:fmtVal(r.R)+'\u2006'+u,               copy:r.R.toFixed(p),   key:'R'},
-    {label:'Sub Tangent',                val:fmtVal(r.T)+'\u2006'+u,               copy:r.T.toFixed(p),   key:'T'},
-    {label:'Chord',                      val:fmtVal(r.C)+'\u2006'+u,               copy:r.C.toFixed(p),   key:'C'},
-    {label:'External',                   val:fmtVal(r.E)+'\u2006'+u,               copy:r.E.toFixed(p),   key:'E'},
-    {label:'Midordinate',                val:fmtVal(r.M)+'\u2006'+u,               copy:r.M.toFixed(p),   key:'M'},
-    {label:'Delta/2 (\u0394/2)',         val:fmtDMS(r.HD),                         copy:r.HD.toFixed(10), key:'HD'},
-    {label:'Degree of Curve (Arc)',      val:fmtDMS(r.Da),                         copy:r.Da.toFixed(10), key:null},
-    {label:'Degree of Curve (Chord)',    val:r.Dc!==null?fmtDMS(r.Dc):'N/A (R\u226450)', copy:r.Dc!==null?r.Dc.toFixed(10):'', key:null},
-  ];
-  window._cc=rows.map(function(row){return row.copy});
-  var el=document.getElementById('res_rows');
-  el.innerHTML=rows.map(function(row,i){
-    var tag=row.key&&curveKnownKeys.indexOf(row.key)>=0?'<span class="known-tag">Known</span>':'';
-    return '<div class="res-row" data-i="'+i+'"><span class="res-label">'+row.label+tag+'</span><span class="res-val">'+row.val+'</span></div>';
-  }).join('');
-  el.onclick=function(e){var rw=e.target.closest('.res-row');if(!rw)return;var v=window._cc[+rw.dataset.i];if(v)copyToClipboard(v,null)};
-  document.getElementById('results_section').style.display='block';
+function resetCalc(){
+  document.querySelectorAll('.inp-input').forEach(function(el){el.value='';});
+  document.querySelectorAll('.inp-err').forEach(function(el){el.textContent='';});
+  clrErr();
+  document.getElementById('results_section').style.display='none';
+  document.getElementById('stakeout_section').style.display='none';
+  stakeoutLastRows=null; stakeoutPcStation=null;
+  window._lastRes=null; _lastR=null; _lastDelta=null; _lastL=null;
 }
 
-function copyAllResults(){
-  if(!curveLastResult)return;
-  var r=curveLastResult,u=curveUnit==='metric'?'m':'ft',p=getPrec();
-  var lines=[
-    'Curve Calculator Results','',
-    'Delta Angle (\u0394): '+fmtDMSCopy(r.D),
-    'Arc Length: '+r.L.toFixed(p)+' '+u,
-    'Radius: '+r.R.toFixed(p)+' '+u,
-    'Sub Tangent: '+r.T.toFixed(p)+' '+u,
-    'Chord: '+r.C.toFixed(p)+' '+u,
-    'External: '+r.E.toFixed(p)+' '+u,
-    'Midordinate: '+r.M.toFixed(p)+' '+u,
-    'Delta/2 (\u0394/2): '+fmtDMSCopy(r.HD),
-    'Degree of Curve (Arc): '+fmtDMSCopy(r.Da),
-    'Degree of Curve (Chord): '+(r.Dc!==null?fmtDMSCopy(r.Dc):'N/A'),
+function copyResults(){
+  if(!window._lastRes) return;
+  var r=window._lastRes, du=_unit==='metric'?'m':'ft';
+  var lines=['--- CURVE RESULTS ---',
+    'Radius (R)\t'+fmtD(r.R)+' '+du,
+    'Delta\t'+fmtAngleDMS(r.Delta),
+    'Delta/2\t'+fmtAngleDMS(r.HD),
+    'Arc Length (L)\t'+fmtD(r.L)+' '+du,
+    'Chord (C)\t'+fmtD(r.C)+' '+du,
+    'Tangent (T)\t'+fmtD(r.T)+' '+du,
+    'External (E)\t'+fmtD(r.E)+' '+du,
+    'Mid-ordinate (M)\t'+fmtD(r.M)+' '+du
   ];
-  copyToClipboard(lines.join('\r\n'),document.getElementById('copy_btn'));
+  navigator.clipboard.writeText(lines.join('\r\n')).then(function(){
+    var btn=document.getElementById('copy_btn');
+    btn.textContent='Copied!';
+    setTimeout(function(){btn.textContent='Copy Results';},1500);
+  });
 }
 
+// ── Settings ────────────────────────────────────────────────────────────────
 function setUnit(u){
-  curveUnit=u;
+  _unit=u;
   document.getElementById('tog_metric').classList.toggle('active',u==='metric');
   document.getElementById('tog_imperial').classList.toggle('active',u==='imperial');
-  if(curveLastResult)renderResults(curveLastResult);
-}
-function setAngleFmt(f){
-  curveAngleFmt=f;
-  document.getElementById('tog_dms').classList.toggle('active',f==='dms');
-  document.getElementById('tog_dd').classList.toggle('active',f==='dd');
-  var ph=f==='dms'?'0.0000':'0.000000';
-  ['inp_D','inp_HD'].forEach(function(id){document.getElementById(id).placeholder=ph});
-}
-function resetCalc(){
-  ['inp_R','inp_D','inp_HD','inp_L','inp_C','inp_T','inp_E','inp_M'].forEach(function(id){
-    var el=document.getElementById(id);el.value='';el.classList.remove('field-known','field-error');
-  });
-  document.getElementById('err_global').textContent='';
-  document.getElementById('results_section').style.display='none';
-  curveLastResult=null;curveKnownKeys=[];
+  if(window._lastRes) rerender();
 }
 
-document.getElementById('calc_btn').addEventListener('click',calculate);
-document.getElementById('reset_btn').addEventListener('click',resetCalc);
-document.getElementById('tog_metric').addEventListener('click',function(){setUnit('metric')});
-document.getElementById('tog_imperial').addEventListener('click',function(){setUnit('imperial')});
-document.getElementById('tog_dms').addEventListener('click',function(){setAngleFmt('dms')});
-document.getElementById('tog_dd').addEventListener('click',function(){setAngleFmt('dd')});
-document.getElementById('prec_val').addEventListener('change',function(){if(curveLastResult)renderResults(curveLastResult)});
-document.getElementById('prec_ang').addEventListener('change',function(){if(curveLastResult)renderResults(curveLastResult)});
-document.getElementById('copy_btn').addEventListener('click',copyAllResults);
+function setAfmt(f){
+  _afmt=f;
+  document.getElementById('tog_dms').classList.toggle('active',f==='dms');
+  document.getElementById('tog_dd').classList.toggle('active',f==='dd');
+  if(window._lastRes){
+    setInpA('inp_D',window._lastRes.Delta);
+    setInpA('inp_HD',window._lastRes.HD);
+    rerender();
+  }
+}
+
+function rerender(){
+  // re-run calculate with stored values to refresh display units/precision
+  if(!window._lastRes) return;
+  var r=window._lastRes, du=_unit==='metric'?'m':'ft';
+  var rows=[
+    ['Radius (R)', fmtD(r.R)+' '+du],
+    ['Delta (\u0394)', fmtAngle(r.Delta)],
+    ['Delta/2 (\u0394/2)', fmtAngle(r.HD)],
+    ['Arc Length (L)', fmtD(r.L)+' '+du],
+    ['Chord (C)', fmtD(r.C)+' '+du],
+    ['Tangent (T)', fmtD(r.T)+' '+du],
+    ['External (E)', fmtD(r.E)+' '+du],
+    ['Mid-ordinate (M)', fmtD(r.M)+' '+du]
+  ];
+  var html='';
+  for(var i=0;i<rows.length;i++)
+    html+='<div class="res-row"><div class="res-label">'+rows[i][0]+'</div><div class="res-val">'+rows[i][1]+'</div></div>';
+  document.getElementById('res_rows').innerHTML=html;
+  if(stakeoutLastRows&&stakeoutPcStation!==null)
+    renderStakeout(stakeoutLastRows,stakeoutPcStation,r.L);
+}
+
+function updatePrec(){
+  _pdist=parseInt(document.getElementById('prec_val').value,10);
+  _pang=parseInt(document.getElementById('prec_ang').value,10);
+  rerender();
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('calc_btn').addEventListener('click',calculate);
+  document.getElementById('reset_btn').addEventListener('click',resetCalc);
+  document.getElementById('copy_btn').addEventListener('click',copyResults);
+  document.getElementById('copy_stk_btn').addEventListener('click',copyStakeout);
+  document.getElementById('export_csv_btn').addEventListener('click',exportCSV);
+  document.getElementById('tog_metric').addEventListener('click',function(){setUnit('metric');});
+  document.getElementById('tog_imperial').addEventListener('click',function(){setUnit('imperial');});
+  document.getElementById('tog_dms').addEventListener('click',function(){setAfmt('dms');});
+  document.getElementById('tog_dd').addEventListener('click',function(){setAfmt('dd');});
+  document.getElementById('prec_val').addEventListener('change',updatePrec);
+  document.getElementById('prec_ang').addEventListener('change',updatePrec);
+  document.querySelectorAll('.inp-input').forEach(function(el){
+    el.addEventListener('keydown',function(e){if(e.key==='Enter') calculate();});
+  });
+});
 </script>
 </body>
 </html>
