@@ -269,10 +269,10 @@ function clearAll(){
 
 // ── FOCUS MANAGEMENT ─────────────────────────────────────────────
 var _lastFocus='a';
-function focusField(which){_lastFocus=which;var el=document.getElementById(which+'_val');el.focus();var l=el.value.length;el.setSelectionRange(l,l)}
+function focusField(which,moveEnd){_lastFocus=which;var el=document.getElementById(which+'_val');var wasFocused=(document.activeElement===el);el.focus();if(moveEnd||\!wasFocused){var l=el.value.length;el.setSelectionRange(l,l)}}
 function keepFocus(){setTimeout(function(){focusField(_lastFocus)},0)}
 
-document.querySelectorAll('button').forEach(function(b){b.setAttribute('tabindex','-1')});
+document.querySelectorAll('button').forEach(function(b){b.setAttribute('tabindex','-1');b.addEventListener('mousedown',function(e){e.preventDefault()})});
 document.getElementById('a_val').setAttribute('tabindex','1');
 document.getElementById('b_val').setAttribute('tabindex','2');
 
@@ -298,21 +298,21 @@ document.getElementById('atog_dms').addEventListener('click',function(){setAngCa
 document.getElementById('atog_dd').addEventListener('click',function(){setAngCalcFmt('dd');keepFocus()});
 document.getElementById('op_add').addEventListener('click',function(){setOp('add');keepFocus()});
 document.getElementById('op_sub').addEventListener('click',function(){setOp('sub');keepFocus()});
-document.getElementById('flipA_btn').addEventListener('click',function(){flip('a');focusField('a')});
-document.getElementById('flipB_btn').addEventListener('click',function(){flip('b');focusField('b')});
-document.getElementById('clearA_btn').addEventListener('click',function(){clearField('a');focusField('a')});
-document.getElementById('clearB_btn').addEventListener('click',function(){clearField('b');focusField('b')});
+document.getElementById('flipA_btn').addEventListener('click',function(){flip('a');focusField('a',true)});
+document.getElementById('flipB_btn').addEventListener('click',function(){flip('b');focusField('b',true)});
+document.getElementById('clearA_btn').addEventListener('click',function(){clearField('a');focusField('a',true)});
+document.getElementById('clearB_btn').addEventListener('click',function(){clearField('b');focusField('b',true)});
 document.getElementById('flip_res_btn').addEventListener('click',function(){flipResult();keepFocus()});
 document.getElementById('copy_result_btn').addEventListener('click',function(){copyResult(this);keepFocus()});
-document.getElementById('copyA_btn').addEventListener('click',function(){copyTo('a');focusField('b')});
-document.getElementById('copyB_btn').addEventListener('click',function(){copyTo('b');focusField('a')});
+document.getElementById('copyA_btn').addEventListener('click',function(){copyTo('a');focusField('b',true)});
+document.getElementById('copyB_btn').addEventListener('click',function(){copyTo('b');focusField('a',true)});
 document.getElementById('log_btn').addEventListener('click',function(){logResult();keepFocus()});
 document.getElementById('clear_log_btn').addEventListener('click',function(){clearLog();keepFocus()});
 document.getElementById('copy_log_btn').addEventListener('click',function(){copyLog();keepFocus()});
-document.getElementById('clear_btn').addEventListener('click',function(){clearAll();focusField('a')});
+document.getElementById('clear_btn').addEventListener('click',function(){clearAll();focusField('a',true)});
 
 setAngCalcFmt('dms');
-setTimeout(function(){focusField('a')},100);
+setTimeout(function(){focusField('a',true)},100);
 </script>
 </body>
 </html>
