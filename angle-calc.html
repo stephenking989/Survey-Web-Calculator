@@ -255,8 +255,7 @@ function copyLog(){
   var dt=pad2(now.getDate())+'/'+pad2(now.getMonth()+1)+'/'+now.getFullYear()+' '+pad2(now.getHours())+':'+pad2(now.getMinutes())+':'+pad2(now.getSeconds());
   var lines=['History - '+dt];
   logEntries.forEach(function(e){lines.push(e.a+' '+e.op+' '+e.b+' = '+e.expanded)});
-  copyToClipboard(lines.join('
-'),document.getElementById('copy_log_btn'));
+  copyToClipboard(lines.join('\r\n'),document.getElementById('copy_log_btn'));
 }
 
 function clearAll(){
