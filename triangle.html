@@ -54,22 +54,26 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
     <div style="font-size:12px;color:#666;margin-bottom:14px">Enter any 3 known values to solve the triangle</div>
 
     <div class="card" style="margin-bottom:12px">
-      <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">
-        <div>
-          <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Units</div>
-          <div style="display:flex"><button class="tog-btn active" id="tog_metric">Metric</button><button class="tog-btn" id="tog_imperial">Imperial</button></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">
+          <div>
+            <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Units</div>
+            <div style="display:flex"><button class="tog-btn active" id="tog_metric">Metric</button><button class="tog-btn" id="tog_imperial">Imperial</button></div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Angle Input</div>
+            <div style="display:flex"><button class="tog-btn active" id="tog_dms">DMS</button><button class="tog-btn" id="tog_dd">DD</button></div>
+          </div>
         </div>
-        <div>
-          <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Angle Input</div>
-          <div style="display:flex"><button class="tog-btn active" id="tog_dms">DMS</button><button class="tog-btn" id="tog_dd">DD</button></div>
-        </div>
-        <div>
-          <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Side precision</div>
-          <select id="prec_side" class="prec-sel"><option value="2">2 dp</option><option value="3" selected>3 dp</option><option value="4">4 dp</option><option value="5">5 dp</option></select>
-        </div>
-        <div>
-          <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Angle precision</div>
-          <select id="prec_ang" class="prec-sel"><option value="2">2 dp</option><option value="3" selected>3 dp</option><option value="4">4 dp</option><option value="5">5 dp</option></select>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div>
+            <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Side precision</div>
+            <select id="prec_side" class="prec-sel"><option value="0">0 dp</option><option value="1">1 dp</option><option value="2">2 dp</option><option value="3" selected>3 dp</option><option value="4">4 dp</option><option value="5">5 dp</option><option value="6">6 dp</option><option value="7">7 dp</option><option value="8">8 dp</option></select>
+          </div>
+          <div>
+            <div style="font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Angle precision</div>
+            <select id="prec_ang" class="prec-sel"><option value="0">0 dp</option><option value="1">1 dp</option><option value="2">2 dp</option><option value="3" selected>3 dp</option><option value="4">4 dp</option><option value="5">5 dp</option><option value="6">6 dp</option><option value="7">7 dp</option><option value="8">8 dp</option></select>
+          </div>
         </div>
       </div>
     </div>
