@@ -269,7 +269,7 @@ function clearAll(){
 
 // ── FOCUS MANAGEMENT ─────────────────────────────────────────────
 var _lastFocus='a';
-function focusField(which,moveEnd){_lastFocus=which;var el=document.getElementById(which+'_val');var wasFocused=(document.activeElement===el);el.focus();if(moveEnd||\!wasFocused){var l=el.value.length;el.setSelectionRange(l,l)}}
+function focusField(which,moveEnd){_lastFocus=which;var el=document.getElementById(which+'_val');var wasFocused=(document.activeElement===el);el.focus();if(moveEnd||!wasFocused){var l=el.value.length;el.setSelectionRange(l,l)}}
 function keepFocus(){setTimeout(function(){focusField(_lastFocus)},0)}
 
 document.querySelectorAll('button').forEach(function(b){b.setAttribute('tabindex','-1');b.addEventListener('mousedown',function(e){e.preventDefault()})});
