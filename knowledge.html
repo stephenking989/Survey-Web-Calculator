@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knowledge — SurveyCalc</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh}
+.top-bar{display:flex;align-items:center;gap:12px;background:#16213e;border-bottom:1px solid #0f3460;padding:10px 16px}
+.back-btn{display:flex;align-items:center;gap:6px;color:#4fc3f7;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid #1e3a5f;background:transparent;transition:all .2s}
+.back-btn:hover{border-color:#4fc3f7;background:rgba(79,195,247,.08)}
+.top-bar-title{font-size:15px;font-weight:600;color:#e0e0e0}
+.page{padding:16px;max-width:480px;margin:0 auto}
+.page-intro{font-size:12px;color:#666;margin-bottom:14px}
+
+/* Accordion */
+.acc-block{background:#16213e;border:1px solid #0f3460;border-radius:12px;margin-bottom:10px;overflow:hidden}
+.acc-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;user-select:none;transition:background .2s}
+.acc-header:hover{background:rgba(79,195,247,.05)}
+.acc-header-left{display:flex;align-items:center;gap:10px}
+.acc-num{font-size:10px;font-weight:700;color:#4fc3f7;background:rgba(79,195,247,.12);border:1px solid rgba(79,195,247,.25);border-radius:5px;padding:2px 7px;letter-spacing:.06em}
+.acc-title{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4fc3f7}
+.acc-chevron{font-size:11px;color:#4fc3f7;transition:transform .25s;line-height:1}
+.acc-block.open .acc-chevron{transform:rotate(180deg)}
+.acc-body{display:none;padding:0 16px 14px;border-top:1px solid #0f3460}
+.acc-block.open .acc-body{display:block}
+
+/* Parameter table (Section 1) */
+.param-table{width:100%;border-collapse:collapse;margin-top:10px}
+.param-table th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#4a7a9b;padding:6px 8px;border-bottom:1px solid #1e3a5f}
+.param-table td{padding:8px 8px;font-size:13px;border-bottom:1px solid #0a1428;vertical-align:top}
+.param-table tr:last-child td{border-bottom:none}
+.param-sym{font-family:'Courier New',monospace;font-size:13px;font-weight:700;color:#4fc3f7;white-space:nowrap}
+.param-name{color:#e0e0e0;font-weight:500}
+.param-unit{font-size:11px;color:#4a7a9b}
+.param-desc{color:#aaa;font-size:12px;line-height:1.45}
+
+/* Formula rows (Sections 2–6) */
+.formula-item{padding:10px 0;border-bottom:1px solid #0a1428}
+.formula-item:last-child{border-bottom:none}
+.formula-name{font-size:12px;font-weight:600;color:#e0e0e0;margin-bottom:5px}
+.formula-expr{font-family:'Courier New',monospace;font-size:13px;color:#4fc3f7;background:rgba(79,195,247,.07);border:1px solid rgba(79,195,247,.15);border-radius:6px;padding:6px 10px;margin-bottom:5px;word-break:break-all;line-height:1.5}
+.formula-desc{font-size:12px;color:#aaa;line-height:1.45}
+
+/* Sub-group heading inside a section */
+.sub-heading{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a7a9b;margin:14px 0 4px}
+
+/* Notes section */
+.note-item{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid #0a1428;font-size:12px;color:#aaa;line-height:1.45}
+.note-item:last-child{border-bottom:none}
+.note-bullet{color:#4fc3f7;font-weight:700;flex-shrink:0;margin-top:1px}
+
+/* Trig sub-group layout */
+.trig-pair{display:flex;flex-direction:column;gap:4px;margin-bottom:4px}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <a href="index.html" class="back-btn">&#8592; Home</a>
+  <div class="top-bar-title">Knowledge</div>
+</div>
+<div class="page">
+  <div class="page-intro">Surveying formulas &amp; reference — tap a section to expand.</div>
+
+  <!-- ── Section 1: Curve Parameters ── -->
+  <div class="acc-block" id="sec1">
+    <div class="acc-header" onclick="toggle('sec1')">
+      <div class="acc-header-left">
+        <span class="acc-num">01</span>
+        <span class="acc-title">Curve Parameters</span>
+      </div>
+      <span class="acc-chevron">&#9660;</span>
+    </div>
+    <div class="acc-body">
+      <table class="param-table">
+        <thead><tr><th>Symbol</th><th>Name</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="param-sym">R</span><br><span class="param-unit">ft / m</span></td>
+            <td><span class="param-name">Radius</span></td>
+            <td><span class="param-desc">Radius of the circular curve. Larger radius = gentler curve.</span></td>
+          </tr>
+          <tr>
+            <td><span class="param-sym">T</span><br><span class="param-unit">ft / m</span></td>
+            <td><span class="param-name">Sub Tangent</span></td>
+            <td><span class="param-desc">Distance from BC/PC along the tangent to the intersection point (PI).</span></td>
+          </tr>
+          <tr>
+            <td><span class="param-sym">E</span><br><span class="param-unit">ft / m</span></td>
+            <td><span class="param-name">External</span></td>
+            <td><span class="param-desc">Distance from PI to the midpoint of the curve, measured perpendicular to the chord.</span></td>
+          </tr>
+          <tr>
+            <td><span class="param-sym">M</span><br><span class="param-unit">ft / m</span></td>
+            <td><span class="param-name">Midordinate</span></td>
+            <td><span class="param-desc">Distance from the midpoint of the chord to the midpoint of the arc.</span></td>
+          </tr>
+          <tr>
+            <td><span class="param-sym">C</span><br><span class="param-unit">ft / m</span></td>
+            <td><span class="param-name">Chord</span></td>
+            <td><span class="param-desc">Straight-line distance between BC and EC.</span></td>
+          </tr>
+          <tr>
+            <td><span class="param-sym">&Delta;</span><br><span class="param-unit">degrees</span></td>
+            <td><span class="param-name">Delta Angle</span></td>
+            <td><span class="param-desc">Total deflection angle of the curve, measured at the PI.</span></td>
+          </tr>
+          <tr>
+            <td><span class="param-sym">&Delta;/2</span><br><span class="param-unit">degrees</span></td>
+            <td><span class="param-name">Delta/2 Angle</span></td>
+            <td><span class="param-desc">Half of the delta angle. Used in many curve calculations.</span></td>
+          </tr>
+          <tr>
+            <td><span class="param-sym">L</span><br><span class="param-unit">ft / m</span></td>
+            <td><span class="param-name">Arc Length</span></td>
+            <td><span class="param-desc">Length of the curve measured along the arc from BC to EC.</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Section 2: Primary Curve Formulas ── -->
+  <div class="acc-block" id="sec2">
+    <div class="acc-header" onclick="toggle('sec2')">
+      <div class="acc-header-left">
+        <span class="acc-num">02</span>
+        <span class="acc-title">Primary Curve Formulas</span>
+      </div>
+      <span class="acc-chevron">&#9660;</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding-top:10px">
+        <div class="formula-item">
+          <div class="formula-name">Chord</div>
+          <div class="formula-expr">C = 2 &times; R &times; sin(&Delta;/2)</div>
+          <div class="formula-desc">Chord length from radius and half the delta angle.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Sub Tangent (Tangent)</div>
+          <div class="formula-expr">T = R &times; tan(&Delta;/2)</div>
+          <div class="formula-desc">Distance along tangent from BC to PI (or PI to EC).</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Midordinate</div>
+          <div class="formula-expr">M = R &times; (1 &minus; cos(&Delta;/2))</div>
+          <div class="formula-desc">Distance from chord midpoint to arc midpoint.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">External</div>
+          <div class="formula-expr">E = R &times; (1/cos(&Delta;/2) &minus; 1)</div>
+          <div class="formula-desc">Distance from PI to the curve, perpendicular to the chord.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Arc Length</div>
+          <div class="formula-expr">L = (&pi; &times; R &times; &Delta;) / 180</div>
+          <div class="formula-desc">Arc length = radius &times; delta angle in radians.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Degree of Curvature (Arc)</div>
+          <div class="formula-expr">D&#8336; = 5729.58 / R</div>
+          <div class="formula-desc">Degree of curvature based on arc definition (arc length = 100).</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Degree of Curvature (Chord)</div>
+          <div class="formula-expr">D&#8338; = 2 &times; sin&#8315;&#185;(50 / R)</div>
+          <div class="formula-desc">Degree of curvature based on chord definition.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 3: Supplementary Calculations ── -->
+  <div class="acc-block" id="sec3">
+    <div class="acc-header" onclick="toggle('sec3')">
+      <div class="acc-header-left">
+        <span class="acc-num">03</span>
+        <span class="acc-title">Supplementary Calculations</span>
+      </div>
+      <span class="acc-chevron">&#9660;</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding-top:10px">
+        <div class="formula-item">
+          <div class="formula-name">Radius from Midordinate</div>
+          <div class="formula-expr">R = M / (1 &minus; cos(&Delta;/2))</div>
+          <div class="formula-desc">Calculate radius when midordinate and delta angle are known.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">External from Radius</div>
+          <div class="formula-expr">E = R &times; (1/cos(&Delta;/2) &minus; 1)</div>
+          <div class="formula-desc">Calculate external distance from radius and delta angle.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">PI to Centre Distance</div>
+          <div class="formula-expr">O&rarr;PI = &radic;(R&sup2; + T&sup2;)</div>
+          <div class="formula-desc">Distance from the curve centre to the point of intersection.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">External (Alternative)</div>
+          <div class="formula-expr">E = O&rarr;PI &minus; R</div>
+          <div class="formula-desc">External from PI-to-centre distance minus radius.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Delta in Radians</div>
+          <div class="formula-expr">&Delta; = L / R</div>
+          <div class="formula-desc">Delta angle in radians from arc length and radius.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Delta in Degrees</div>
+          <div class="formula-expr">&Delta; = (L / R) &times; (180&deg; / &pi;)</div>
+          <div class="formula-desc">Delta angle in degrees from arc length and radius.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 4: Chainage & Deflection ── -->
+  <div class="acc-block" id="sec4">
+    <div class="acc-header" onclick="toggle('sec4')">
+      <div class="acc-header-left">
+        <span class="acc-num">04</span>
+        <span class="acc-title">Chainage &amp; Deflection</span>
+      </div>
+      <span class="acc-chevron">&#9660;</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding-top:10px">
+        <div class="formula-item">
+          <div class="formula-name">Chainage Relationship</div>
+          <div class="formula-expr">PI &minus; T = BC &nbsp;&nbsp; BC + L = EC</div>
+          <div class="formula-desc">Relationship between PI, tangent, begin curve, arc length, and end curve stations.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Deflection Angle</div>
+          <div class="formula-expr">&delta;/2 = (90 &times; l) / (&pi; &times; R)</div>
+          <div class="formula-desc">Deflection angle (degrees) for a given arc length <em>l</em> measured from BC along the curve.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 5: Trigonometry Reference ── -->
+  <div class="acc-block" id="sec5">
+    <div class="acc-header" onclick="toggle('sec5')">
+      <div class="acc-header-left">
+        <span class="acc-num">05</span>
+        <span class="acc-title">Trigonometry Reference</span>
+      </div>
+      <span class="acc-chevron">&#9660;</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding-top:6px">
+
+        <div class="sub-heading">Basic Trig Ratios</div>
+        <div class="formula-item">
+          <div class="formula-expr">sin(&alpha;) = Opposite / Hypotenuse</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-expr">cos(&alpha;) = Adjacent / Hypotenuse</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-expr">tan(&alpha;) = Opposite / Adjacent</div>
+        </div>
+
+        <div class="sub-heading">Angle Conversion</div>
+        <div class="formula-item">
+          <div class="formula-name">Degrees to Radians</div>
+          <div class="formula-expr">rad = deg &times; (&pi; / 180)</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Radians to Degrees</div>
+          <div class="formula-expr">deg = rad &times; (180 / &pi;)</div>
+        </div>
+
+        <div class="sub-heading">Law of Sines</div>
+        <div class="formula-item">
+          <div class="formula-expr">sin(&alpha;)/a = sin(&beta;)/b = sin(&gamma;)/c</div>
+          <div class="formula-desc">Angle form — use to find an unknown angle.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-expr">a/sin(&alpha;) = b/sin(&beta;) = c/sin(&gamma;)</div>
+          <div class="formula-desc">Distance form — use to find an unknown side.</div>
+        </div>
+
+        <div class="sub-heading">Law of Cosines</div>
+        <div class="formula-item">
+          <div class="formula-name">Find side a</div>
+          <div class="formula-expr">a&sup2; = b&sup2; + c&sup2; &minus; 2bc &times; cos(&alpha;)</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Find side b</div>
+          <div class="formula-expr">b&sup2; = a&sup2; + c&sup2; &minus; 2ac &times; cos(&beta;)</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Find side c</div>
+          <div class="formula-expr">c&sup2; = a&sup2; + b&sup2; &minus; 2ab &times; cos(&gamma;)</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Find angle &alpha;</div>
+          <div class="formula-expr">cos(&alpha;) = (b&sup2; + c&sup2; &minus; a&sup2;) / (2bc)</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Find angle &beta;</div>
+          <div class="formula-expr">cos(&beta;) = (a&sup2; + c&sup2; &minus; b&sup2;) / (2ac)</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Find angle &gamma;</div>
+          <div class="formula-expr">cos(&gamma;) = (a&sup2; + b&sup2; &minus; c&sup2;) / (2ab)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 6: Distance Calculations ── -->
+  <div class="acc-block" id="sec6">
+    <div class="acc-header" onclick="toggle('sec6')">
+      <div class="acc-header-left">
+        <span class="acc-num">06</span>
+        <span class="acc-title">Distance Calculations</span>
+      </div>
+      <span class="acc-chevron">&#9660;</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding-top:10px">
+        <div class="formula-item">
+          <div class="formula-name">Horizontal Distance from Slope &amp; Angle</div>
+          <div class="formula-expr">HD = SD &times; sin(&alpha;)</div>
+          <div class="formula-desc">Horizontal distance from slope distance and vertical angle.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Horizontal Distance (Pythagorean)</div>
+          <div class="formula-expr">HD = &radic;(SD&sup2; &minus; VD&sup2;)</div>
+          <div class="formula-desc">Horizontal distance from slope distance and vertical distance.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Slope Distance</div>
+          <div class="formula-expr">SD = &radic;(HD&sup2; + VD&sup2;)</div>
+          <div class="formula-desc">Slope distance from horizontal and vertical distances.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Vertical Distance from Zenith</div>
+          <div class="formula-expr">VD = SD &times; cos(Z)</div>
+          <div class="formula-desc">Vertical distance from slope distance and zenith angle Z.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Pythagorean Theorem</div>
+          <div class="formula-expr">a&sup2; + b&sup2; = c&sup2;</div>
+          <div class="formula-desc">Relationship between sides of a right triangle.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Hypotenuse</div>
+          <div class="formula-expr">c = &radic;(a&sup2; + b&sup2;)</div>
+          <div class="formula-desc">Calculate hypotenuse from the two shorter sides.</div>
+        </div>
+        <div class="formula-item">
+          <div class="formula-name">Side from Hypotenuse</div>
+          <div class="formula-expr">a = &radic;(c&sup2; &minus; b&sup2;)</div>
+          <div class="formula-desc">Calculate one side when hypotenuse and other side are known.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Important Notes ── -->
+  <div class="acc-block" id="secN">
+    <div class="acc-header" onclick="toggle('secN')">
+      <div class="acc-header-left">
+        <span class="acc-num" style="background:rgba(255,138,101,.12);border-color:rgba(255,138,101,.3);color:#ff8a65">!</span>
+        <span class="acc-title" style="color:#ff8a65">Important Notes</span>
+      </div>
+      <span class="acc-chevron" style="color:#ff8a65">&#9660;</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding-top:10px">
+        <div class="note-item"><span class="note-bullet">&#8250;</span><span>All angle calculations assume degrees unless specified as radians.</span></div>
+        <div class="note-item"><span class="note-bullet">&#8250;</span><span>Ensure consistent units throughout — all feet or all metres.</span></div>
+        <div class="note-item"><span class="note-bullet">&#8250;</span><span>The curve calculator requires 2–3 known parameters to solve for the rest.</span></div>
+        <div class="note-item"><span class="note-bullet">&#8250;</span><span>PI = Point of Intersection &nbsp;|&nbsp; BC / PC = Begin Curve &nbsp;|&nbsp; EC / PT = End Curve.</span></div>
+        <div class="note-item"><span class="note-bullet">&#8250;</span><span>Use Settings in the Curve Calculator to adjust decimal precision and angle format (DMS / DD).</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+function toggle(id){
+  var el=document.getElementById(id);
+  el.classList.toggle('open');
+}
+</script>
+</body>
+</html>
