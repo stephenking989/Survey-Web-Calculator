@@ -53,6 +53,24 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
 
 /* Trig sub-group layout */
 .trig-pair{display:flex;flex-direction:column;gap:4px;margin-bottom:4px}
+
+/* ── Inline calc panels ────────────────────────────────────────── */
+.calc-toggle{display:inline-flex;align-items:center;gap:4px;margin-top:9px;padding:4px 10px;font-size:11px;font-weight:600;color:#4fc3f7;background:rgba(79,195,247,.07);border:1px solid rgba(79,195,247,.28);border-radius:5px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.calc-toggle:hover,.calc-toggle.open{background:rgba(79,195,247,.15);border-color:#4fc3f7}
+.calc-panel{display:none;margin-top:10px;padding:10px 12px 12px;background:rgba(10,20,42,.5);border:1px solid #1e3a5f;border-radius:8px}
+.calc-panel.open{display:block}
+.calc-hint{font-size:10px;color:#4a7a9b;margin-bottom:9px;line-height:1.45}
+.calc-field{margin-bottom:7px}
+.calc-field label{display:block;font-size:10px;font-family:'Courier New',monospace;color:#4a7a9b;margin-bottom:3px}
+.calc-field input{width:100%;padding:7px 10px;background:#0d1b2e;border:1px solid #1e3a5f;border-radius:6px;color:#e0e0e0;font-size:13px;font-family:'Courier New',monospace;outline:none;transition:border-color .2s}
+.calc-field input:focus{border-color:#4fc3f7}
+.calc-solve-btn{width:100%;padding:7px;margin-top:4px;background:rgba(79,195,247,.1);border:1px solid #4fc3f7;border-radius:6px;color:#4fc3f7;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.calc-solve-btn:hover{background:rgba(79,195,247,.22)}
+.calc-result{display:none;margin-top:8px;padding:7px 10px;border-radius:6px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;word-break:break-all}
+.calc-result.ok{display:block;background:rgba(102,187,106,.08);border:1px solid rgba(102,187,106,.25);color:#66bb6a}
+.calc-result.err{display:block;background:rgba(255,82,82,.08);border:1px solid rgba(255,82,82,.25);color:#ff5252}
+.tri-link{display:inline-flex;align-items:center;gap:5px;margin-top:9px;padding:4px 10px;font-size:11px;font-weight:600;color:#4fc3f7;background:rgba(79,195,247,.07);border:1px solid rgba(79,195,247,.28);border-radius:5px;text-decoration:none;transition:all .2s;letter-spacing:.04em}
+.tri-link:hover{background:rgba(79,195,247,.15);border-color:#4fc3f7}
 </style>
 </head>
 <body>
@@ -61,7 +79,7 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
   <div class="top-bar-title">Knowledge</div>
 </div>
 <div class="page">
-  <div class="page-intro">Surveying formulas &amp; reference — tap a section to expand.</div>
+  <div class="page-intro">Surveying formulas &amp; reference — tap a section to expand. Tap <strong style="color:#4fc3f7">▶ Calculate</strong> on any formula to solve for an unknown.</div>
 
   <!-- ── Section 1: Curve Parameters ── -->
   <div class="acc-block" id="sec1">
@@ -132,37 +150,37 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
     </div>
     <div class="acc-body">
       <div style="padding-top:10px">
-        <div class="formula-item">
+        <div class="formula-item" data-formula="chord">
           <div class="formula-name">Chord</div>
           <div class="formula-expr">C = 2 &times; R &times; sin(&Delta;/2)</div>
           <div class="formula-desc">Chord length from radius and half the delta angle.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="tangent">
           <div class="formula-name">Sub Tangent (Tangent)</div>
           <div class="formula-expr">T = R &times; tan(&Delta;/2)</div>
           <div class="formula-desc">Distance along tangent from BC to PI (or PI to EC).</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="midordinate">
           <div class="formula-name">Midordinate</div>
           <div class="formula-expr">M = R &times; (1 &minus; cos(&Delta;/2))</div>
           <div class="formula-desc">Distance from chord midpoint to arc midpoint.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="external">
           <div class="formula-name">External</div>
           <div class="formula-expr">E = R &times; (1/cos(&Delta;/2) &minus; 1)</div>
           <div class="formula-desc">Distance from PI to the curve, perpendicular to the chord.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="arclength">
           <div class="formula-name">Arc Length</div>
           <div class="formula-expr">L = (&pi; &times; R &times; &Delta;) / 180</div>
           <div class="formula-desc">Arc length = radius &times; delta angle in radians.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="deg-arc">
           <div class="formula-name">Degree of Curvature (Arc)</div>
           <div class="formula-expr">D&#8336; = 5729.58 / R</div>
           <div class="formula-desc">Degree of curvature based on arc definition (arc length = 100).</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="deg-chord">
           <div class="formula-name">Degree of Curvature (Chord)</div>
           <div class="formula-expr">D&#8338; = 2 &times; sin&#8315;&#185;(50 / R)</div>
           <div class="formula-desc">Degree of curvature based on chord definition.</div>
@@ -182,32 +200,32 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
     </div>
     <div class="acc-body">
       <div style="padding-top:10px">
-        <div class="formula-item">
+        <div class="formula-item" data-formula="r-from-m">
           <div class="formula-name">Radius from Midordinate</div>
           <div class="formula-expr">R = M / (1 &minus; cos(&Delta;/2))</div>
           <div class="formula-desc">Calculate radius when midordinate and delta angle are known.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="e-from-r">
           <div class="formula-name">External from Radius</div>
           <div class="formula-expr">E = R &times; (1/cos(&Delta;/2) &minus; 1)</div>
           <div class="formula-desc">Calculate external distance from radius and delta angle.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="pi-to-centre">
           <div class="formula-name">PI to Centre Distance</div>
           <div class="formula-expr">O&rarr;PI = &radic;(R&sup2; + T&sup2;)</div>
           <div class="formula-desc">Distance from the curve centre to the point of intersection.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="e-alt">
           <div class="formula-name">External (Alternative)</div>
           <div class="formula-expr">E = O&rarr;PI &minus; R</div>
           <div class="formula-desc">External from PI-to-centre distance minus radius.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="delta-rad">
           <div class="formula-name">Delta in Radians</div>
           <div class="formula-expr">&Delta; = L / R</div>
           <div class="formula-desc">Delta angle in radians from arc length and radius.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="delta-deg">
           <div class="formula-name">Delta in Degrees</div>
           <div class="formula-expr">&Delta; = (L / R) &times; (180&deg; / &pi;)</div>
           <div class="formula-desc">Delta angle in degrees from arc length and radius.</div>
@@ -227,12 +245,17 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
     </div>
     <div class="acc-body">
       <div style="padding-top:10px">
-        <div class="formula-item">
-          <div class="formula-name">Chainage Relationship</div>
-          <div class="formula-expr">PI &minus; T = BC &nbsp;&nbsp; BC + L = EC</div>
-          <div class="formula-desc">Relationship between PI, tangent, begin curve, arc length, and end curve stations.</div>
+        <div class="formula-item" data-formula="chainage-bc">
+          <div class="formula-name">Begin Curve Station</div>
+          <div class="formula-expr">BC = PI &minus; T</div>
+          <div class="formula-desc">Begin curve chainage from PI station and sub tangent.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="chainage-ec">
+          <div class="formula-name">End Curve Station</div>
+          <div class="formula-expr">EC = BC + L</div>
+          <div class="formula-desc">End curve chainage from begin curve station and arc length.</div>
+        </div>
+        <div class="formula-item" data-formula="deflection">
           <div class="formula-name">Deflection Angle</div>
           <div class="formula-expr">&delta;/2 = (90 &times; l) / (&pi; &times; R)</div>
           <div class="formula-desc">Deflection angle (degrees) for a given arc length <em>l</em> measured from BC along the curve.</div>
@@ -254,58 +277,58 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
       <div style="padding-top:6px">
 
         <div class="sub-heading">Basic Trig Ratios</div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="sin-ratio">
           <div class="formula-expr">sin(&alpha;) = Opposite / Hypotenuse</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="cos-ratio">
           <div class="formula-expr">cos(&alpha;) = Adjacent / Hypotenuse</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="tan-ratio">
           <div class="formula-expr">tan(&alpha;) = Opposite / Adjacent</div>
         </div>
 
         <div class="sub-heading">Angle Conversion</div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="angle-convert">
           <div class="formula-name">Degrees to Radians</div>
           <div class="formula-expr">rad = deg &times; (&pi; / 180)</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="angle-convert">
           <div class="formula-name">Radians to Degrees</div>
           <div class="formula-expr">deg = rad &times; (180 / &pi;)</div>
         </div>
 
         <div class="sub-heading">Law of Sines</div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="triangle-link">
           <div class="formula-expr">sin(&alpha;)/a = sin(&beta;)/b = sin(&gamma;)/c</div>
           <div class="formula-desc">Angle form — use to find an unknown angle.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="triangle-link">
           <div class="formula-expr">a/sin(&alpha;) = b/sin(&beta;) = c/sin(&gamma;)</div>
           <div class="formula-desc">Distance form — use to find an unknown side.</div>
         </div>
 
         <div class="sub-heading">Law of Cosines</div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="triangle-link">
           <div class="formula-name">Find side a</div>
           <div class="formula-expr">a&sup2; = b&sup2; + c&sup2; &minus; 2bc &times; cos(&alpha;)</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="triangle-link">
           <div class="formula-name">Find side b</div>
           <div class="formula-expr">b&sup2; = a&sup2; + c&sup2; &minus; 2ac &times; cos(&beta;)</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="triangle-link">
           <div class="formula-name">Find side c</div>
           <div class="formula-expr">c&sup2; = a&sup2; + b&sup2; &minus; 2ab &times; cos(&gamma;)</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="triangle-link">
           <div class="formula-name">Find angle &alpha;</div>
           <div class="formula-expr">cos(&alpha;) = (b&sup2; + c&sup2; &minus; a&sup2;) / (2bc)</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="triangle-link">
           <div class="formula-name">Find angle &beta;</div>
           <div class="formula-expr">cos(&beta;) = (a&sup2; + c&sup2; &minus; b&sup2;) / (2ac)</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="triangle-link">
           <div class="formula-name">Find angle &gamma;</div>
           <div class="formula-expr">cos(&gamma;) = (a&sup2; + b&sup2; &minus; c&sup2;) / (2ab)</div>
         </div>
@@ -324,41 +347,179 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
     </div>
     <div class="acc-body">
       <div style="padding-top:10px">
-        <div class="formula-item">
+        <div class="formula-item" data-formula="hd-angle">
           <div class="formula-name">Horizontal Distance from Slope &amp; Angle</div>
           <div class="formula-expr">HD = SD &times; sin(&alpha;)</div>
           <div class="formula-desc">Horizontal distance from slope distance and vertical angle.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="hd-pyth">
           <div class="formula-name">Horizontal Distance (Pythagorean)</div>
           <div class="formula-expr">HD = &radic;(SD&sup2; &minus; VD&sup2;)</div>
           <div class="formula-desc">Horizontal distance from slope distance and vertical distance.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="hd-pyth">
           <div class="formula-name">Slope Distance</div>
           <div class="formula-expr">SD = &radic;(HD&sup2; + VD&sup2;)</div>
           <div class="formula-desc">Slope distance from horizontal and vertical distances.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="vd-zenith">
           <div class="formula-name">Vertical Distance from Zenith</div>
           <div class="formula-expr">VD = SD &times; cos(Z)</div>
           <div class="formula-desc">Vertical distance from slope distance and zenith angle Z.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="pythag-abc">
           <div class="formula-name">Pythagorean Theorem</div>
           <div class="formula-expr">a&sup2; + b&sup2; = c&sup2;</div>
           <div class="formula-desc">Relationship between sides of a right triangle.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="pythag-abc">
           <div class="formula-name">Hypotenuse</div>
           <div class="formula-expr">c = &radic;(a&sup2; + b&sup2;)</div>
           <div class="formula-desc">Calculate hypotenuse from the two shorter sides.</div>
         </div>
-        <div class="formula-item">
+        <div class="formula-item" data-formula="pythag-abc">
           <div class="formula-name">Side from Hypotenuse</div>
           <div class="formula-expr">a = &radic;(c&sup2; &minus; b&sup2;)</div>
           <div class="formula-desc">Calculate one side when hypotenuse and other side are known.</div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 7: Compound Curves ── -->
+  <div class="acc-block" id="sec7">
+    <div class="acc-header" onclick="toggle('sec7')">
+      <div class="acc-header-left">
+        <span class="acc-num">07</span>
+        <span class="acc-title">Compound Curves</span>
+      </div>
+      <span class="acc-chevron">&#9660;</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding-top:10px">
+
+        <div class="sub-heading">Compound Curve Parameters</div>
+        <table class="param-table">
+          <thead><tr><th>Symbol</th><th>Name</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="param-sym">R<sub>l</sub></span><br><span class="param-unit">ft / m</span></td>
+              <td><span class="param-name">Large Radius</span></td>
+              <td><span class="param-desc">Radius of the larger-radius sub-curve.</span></td>
+            </tr>
+            <tr>
+              <td><span class="param-sym">R<sub>s</sub></span><br><span class="param-unit">ft / m</span></td>
+              <td><span class="param-name">Small Radius</span></td>
+              <td><span class="param-desc">Radius of the smaller-radius sub-curve.</span></td>
+            </tr>
+            <tr>
+              <td><span class="param-sym">&Delta;</span><br><span class="param-unit">degrees</span></td>
+              <td><span class="param-name">Total Delta</span></td>
+              <td><span class="param-desc">Total deflection angle = &Delta;<sub>l</sub> + &Delta;<sub>s</sub>.</span></td>
+            </tr>
+            <tr>
+              <td><span class="param-sym">&Delta;<sub>l</sub></span><br><span class="param-unit">degrees</span></td>
+              <td><span class="param-name">Delta (Large Curve)</span></td>
+              <td><span class="param-desc">Deflection angle for the large-radius sub-curve.</span></td>
+            </tr>
+            <tr>
+              <td><span class="param-sym">&Delta;<sub>s</sub></span><br><span class="param-unit">degrees</span></td>
+              <td><span class="param-name">Delta (Small Curve)</span></td>
+              <td><span class="param-desc">Deflection angle for the small-radius sub-curve.</span></td>
+            </tr>
+            <tr>
+              <td><span class="param-sym">T<sub>long</sub></span><br><span class="param-unit">ft / m</span></td>
+              <td><span class="param-name">Long Tangent</span></td>
+              <td><span class="param-desc">Distance from main PI to BC<sub>1</sub> — the longer of the two main tangents.</span></td>
+            </tr>
+            <tr>
+              <td><span class="param-sym">T<sub>short</sub></span><br><span class="param-unit">ft / m</span></td>
+              <td><span class="param-name">Short Tangent</span></td>
+              <td><span class="param-desc">Distance from main PI to EC<sub>2</sub> — the shorter of the two main tangents.</span></td>
+            </tr>
+            <tr>
+              <td><span class="param-sym">T<sub>l</sub></span><br><span class="param-unit">ft / m</span></td>
+              <td><span class="param-name">Sub-tangent (large)</span></td>
+              <td><span class="param-desc">Tangent length along the R<sub>l</sub> curve from BC<sub>1</sub> to PCC.</span></td>
+            </tr>
+            <tr>
+              <td><span class="param-sym">T<sub>s</sub></span><br><span class="param-unit">ft / m</span></td>
+              <td><span class="param-name">Sub-tangent (small)</span></td>
+              <td><span class="param-desc">Tangent length along the R<sub>s</sub> curve from PCC to EC<sub>2</sub>.</span></td>
+            </tr>
+            <tr>
+              <td><span class="param-sym">PCC</span></td>
+              <td><span class="param-name">Point of Compound Curvature</span></td>
+              <td><span class="param-desc">The point where the two sub-curves meet.</span></td>
+            </tr>
+            <tr>
+              <td><span class="param-sym">BC<sub>1</sub></span></td>
+              <td><span class="param-name">Begin Curve</span></td>
+              <td><span class="param-desc">Start of the compound curve, on the large-radius side.</span></td>
+            </tr>
+            <tr>
+              <td><span class="param-sym">EC<sub>2</sub></span></td>
+              <td><span class="param-name">End Curve</span></td>
+              <td><span class="param-desc">End of the compound curve, on the small-radius side.</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-heading">Key Relationship</div>
+        <div class="formula-item" data-formula="cc-delta">
+          <div class="formula-name">Total Delta Angle</div>
+          <div class="formula-expr">&Delta; = &Delta;<sub>l</sub> + &Delta;<sub>s</sub></div>
+          <div class="formula-desc">The total deflection angle is the sum of the two sub-curve delta angles.</div>
+        </div>
+
+        <div class="sub-heading">Main Tangents</div>
+        <div class="formula-item" data-formula="cc-tlong">
+          <div class="formula-name">Long Tangent</div>
+          <div class="formula-expr">T<sub>long</sub> = [ R<sub>l</sub> &minus; R<sub>s</sub>&middot;cos(&Delta;) + (R<sub>l</sub> &minus; R<sub>s</sub>)&middot;cos(&Delta;<sub>s</sub>) ] / sin(&Delta;)</div>
+          <div class="formula-desc">Distance from the main PI to BC<sub>1</sub>. Requires R<sub>l</sub>, R<sub>s</sub>, &Delta;, and &Delta;<sub>s</sub>.</div>
+        </div>
+        <div class="formula-item" data-formula="cc-tshort">
+          <div class="formula-name">Short Tangent</div>
+          <div class="formula-expr">T<sub>short</sub> = [ R<sub>l</sub> &minus; R<sub>s</sub>&middot;cos(&Delta;) &minus; (R<sub>l</sub> &minus; R<sub>s</sub>)&middot;cos(&Delta;<sub>l</sub>) ] / sin(&Delta;)</div>
+          <div class="formula-desc">Distance from the main PI to EC<sub>2</sub>. Requires R<sub>l</sub>, R<sub>s</sub>, &Delta;, and &Delta;<sub>l</sub>.</div>
+        </div>
+
+        <div class="sub-heading">Solving for Delta Angles — arccos form</div>
+        <div class="formula-item" data-formula="cc-delta-l-acos">
+          <div class="formula-name">&Delta;<sub>l</sub> from T<sub>s</sub> (arccos)</div>
+          <div class="formula-expr">&Delta;<sub>l</sub> = cos<sup>&minus;1</sup>( 1 &minus; [ T<sub>s</sub>&middot;sin(&Delta;) &minus; R<sub>s</sub>&middot;(1 &minus; cos(&Delta;)) ] / (R<sub>l</sub> &minus; R<sub>s</sub>) )</div>
+          <div class="formula-desc">Solve for the large-curve delta angle given T<sub>s</sub>, R<sub>l</sub>, R<sub>s</sub>, and &Delta;.</div>
+        </div>
+        <div class="formula-item" data-formula="cc-delta-s-acos">
+          <div class="formula-name">&Delta;<sub>s</sub> from T<sub>l</sub> (arccos)</div>
+          <div class="formula-expr">&Delta;<sub>s</sub> = cos<sup>&minus;1</sup>( 1 &minus; [ R<sub>l</sub>&middot;(1 &minus; cos(&Delta;)) &minus; T<sub>l</sub>&middot;sin(&Delta;) ] / (R<sub>l</sub> &minus; R<sub>s</sub>) )</div>
+          <div class="formula-desc">Solve for the small-curve delta angle given T<sub>l</sub>, R<sub>l</sub>, R<sub>s</sub>, and &Delta;.</div>
+        </div>
+
+        <div class="sub-heading">Solving for Delta Angles — arctan form (alternate)</div>
+        <div class="formula-item" data-formula="cc-delta-l-atan">
+          <div class="formula-name">&Delta;<sub>l</sub> from T<sub>s</sub> (arctan)</div>
+          <div class="formula-expr">&Delta;<sub>l</sub> = 2&middot;tan<sup>&minus;1</sup>( [ T<sub>s</sub>&middot;sin(&Delta;) &minus; R<sub>s</sub>&middot;(1&minus;cos(&Delta;)) ] / [ T<sub>l</sub> + T<sub>s</sub>&middot;cos(&Delta;) &minus; R<sub>s</sub>&middot;sin(&Delta;) ] )</div>
+          <div class="formula-desc">Alternate form — algebraically equivalent to the arccos version above.</div>
+        </div>
+        <div class="formula-item" data-formula="cc-delta-s-atan">
+          <div class="formula-name">&Delta;<sub>s</sub> from T<sub>l</sub> (arctan)</div>
+          <div class="formula-expr">&Delta;<sub>s</sub> = 2&middot;tan<sup>&minus;1</sup>( [ T<sub>l</sub>&middot;sin(&Delta;) &minus; R<sub>l</sub>&middot;(1&minus;cos(&Delta;)) ] / [ T<sub>s</sub> + T<sub>l</sub>&middot;cos(&Delta;) &minus; R<sub>l</sub>&middot;sin(&Delta;) ] )</div>
+          <div class="formula-desc">Alternate form — algebraically equivalent to the arccos version above. (Symmetric counterpart to the &Delta;<sub>l</sub> arctan form — verify against source if results differ.)</div>
+        </div>
+
+        <div class="sub-heading">Solving for Radii</div>
+        <div class="formula-item" data-formula="cc-rl">
+          <div class="formula-name">Large Radius from R<sub>s</sub>, T<sub>s</sub>, &Delta;, &Delta;<sub>l</sub></div>
+          <div class="formula-expr">R<sub>l</sub> = R<sub>s</sub> + [ T<sub>s</sub>&middot;sin(&Delta;) &minus; R<sub>s</sub>&middot;(1&minus;cos(&Delta;)) ] / (1&minus;cos(&Delta;<sub>l</sub>))</div>
+          <div class="formula-desc">Solve for the large radius when R<sub>s</sub>, T<sub>s</sub>, &Delta;, and &Delta;<sub>l</sub> are known.</div>
+        </div>
+        <div class="formula-item" data-formula="cc-rs">
+          <div class="formula-name">Small Radius from R<sub>l</sub>, T<sub>l</sub>, &Delta;, &Delta;<sub>s</sub></div>
+          <div class="formula-expr">R<sub>s</sub> = R<sub>l</sub> &minus; [ R<sub>l</sub>&middot;(1&minus;cos(&Delta;)) &minus; T<sub>l</sub>&middot;sin(&Delta;) ] / (1&minus;cos(&Delta;<sub>s</sub>))</div>
+          <div class="formula-desc">Solve for the small radius when R<sub>l</sub>, T<sub>l</sub>, &Delta;, and &Delta;<sub>s</sub> are known.</div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -379,16 +540,717 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
         <div class="note-item"><span class="note-bullet">&#8250;</span><span>The curve calculator requires 2–3 known parameters to solve for the rest.</span></div>
         <div class="note-item"><span class="note-bullet">&#8250;</span><span>PI = Point of Intersection &nbsp;|&nbsp; BC / PC = Begin Curve &nbsp;|&nbsp; EC / PT = End Curve.</span></div>
         <div class="note-item"><span class="note-bullet">&#8250;</span><span>Use Settings in the Curve Calculator to adjust decimal precision and angle format (DMS / DD).</span></div>
+        <div class="note-item"><span class="note-bullet">&#8250;</span><span>Inline calculators: angle inputs use DMS shorthand — e.g. <strong style="color:#4fc3f7">45.3000</strong> = 45° 30' 00".</span></div>
       </div>
     </div>
   </div>
 
 </div>
 <script>
+// ── Accordion ────────────────────────────────────────────────────
 function toggle(id){
   var el=document.getElementById(id);
   el.classList.toggle('open');
 }
+
+// ── DMS utilities ────────────────────────────────────────────────
+function parseDMS(s){
+  s=String(s).trim();
+  if(!s)return NaN;
+  var neg=s.charAt(0)==='-';
+  if(neg)s=s.slice(1);
+  var n=parseFloat(s);
+  if(isNaN(n))return NaN;
+  var d=Math.floor(n);
+  var rem=Math.round((n-d)*10000);
+  var m=Math.floor(rem/100);
+  var sc=rem%100;
+  if(m>=60||sc>=60)return NaN;
+  var dd=d+m/60+sc/3600;
+  return neg?-dd:dd;
+}
+
+function toDMS(dd){
+  if(isNaN(dd)||!isFinite(dd))return '\u2014';
+  var neg=dd<0;
+  var v=Math.abs(dd);
+  var d=Math.floor(v);
+  var mf=(v-d)*60;
+  var m=Math.floor(mf);
+  var s=Math.round((mf-m)*60);
+  if(s>=60){s=0;m+=1;}
+  if(m>=60){m=0;d+=1;}
+  return (neg?'-':'')+d+'\u00b0 '+pad2(m)+"' "+pad2(s)+'"';
+}
+
+function pad2(n){return n<10?'0'+n:''+n;}
+function toRad(deg){return deg*Math.PI/180;}
+function toDeg(rad){return rad*180/Math.PI;}
+function fmt(n,dp){return isNaN(n)||!isFinite(n)?'\u2014':n.toFixed(dp!=null?dp:4);}
+
+// ── Formula definitions ──────────────────────────────────────────
+// Each entry: { vars:[{id,sym,label,unit,angle},...], solve:{id:fn,...}, resultFormat:{id:fn} (optional) }
+// To add a new formula: add an entry here and data-formula="key" on the HTML formula-item.
+var FORMULAS={
+
+  // Section 2 ──────────────────────────────────────────────────
+  'chord':{
+    vars:[
+      {id:'R',sym:'R',label:'R  Radius',unit:'m / ft',angle:false},
+      {id:'D',sym:'\u0394',label:'\u0394  Delta',unit:'DMS or DD\u00b0',angle:true},
+      {id:'C',sym:'C',label:'C  Chord',unit:'m / ft',angle:false}
+    ],
+    solve:{
+      C:function(v){return 2*v.R*Math.sin(toRad(v.D)/2);},
+      R:function(v){return v.C/(2*Math.sin(toRad(v.D)/2));},
+      D:function(v){return toDeg(2*Math.asin(v.C/(2*v.R)));}
+    }
+  },
+
+  'tangent':{
+    vars:[
+      {id:'R',sym:'R',label:'R  Radius',unit:'m / ft',angle:false},
+      {id:'D',sym:'\u0394',label:'\u0394  Delta',unit:'DMS or DD\u00b0',angle:true},
+      {id:'T',sym:'T',label:'T  Sub Tangent',unit:'m / ft',angle:false}
+    ],
+    solve:{
+      T:function(v){return v.R*Math.tan(toRad(v.D)/2);},
+      R:function(v){return v.T/Math.tan(toRad(v.D)/2);},
+      D:function(v){return toDeg(2*Math.atan(v.T/v.R));}
+    }
+  },
+
+  'midordinate':{
+    vars:[
+      {id:'R',sym:'R',label:'R  Radius',unit:'m / ft',angle:false},
+      {id:'D',sym:'\u0394',label:'\u0394  Delta',unit:'DMS or DD\u00b0',angle:true},
+      {id:'M',sym:'M',label:'M  Midordinate',unit:'m / ft',angle:false}
+    ],
+    solve:{
+      M:function(v){return v.R*(1-Math.cos(toRad(v.D)/2));},
+      R:function(v){return v.M/(1-Math.cos(toRad(v.D)/2));},
+      D:function(v){return toDeg(2*Math.acos(1-v.M/v.R));}
+    }
+  },
+
+  'external':{
+    vars:[
+      {id:'R',sym:'R',label:'R  Radius',unit:'m / ft',angle:false},
+      {id:'D',sym:'\u0394',label:'\u0394  Delta',unit:'DMS or DD\u00b0',angle:true},
+      {id:'E',sym:'E',label:'E  External',unit:'m / ft',angle:false}
+    ],
+    solve:{
+      E:function(v){return v.R*(1/Math.cos(toRad(v.D)/2)-1);},
+      R:function(v){return v.E/(1/Math.cos(toRad(v.D)/2)-1);},
+      D:function(v){return toDeg(2*Math.acos(v.R/(v.R+v.E)));}
+    }
+  },
+
+  'arclength':{
+    vars:[
+      {id:'R',sym:'R',label:'R  Radius',unit:'m / ft',angle:false},
+      {id:'D',sym:'\u0394',label:'\u0394  Delta',unit:'DMS or DD\u00b0',angle:true},
+      {id:'L',sym:'L',label:'L  Arc Length',unit:'m / ft',angle:false}
+    ],
+    solve:{
+      L:function(v){return Math.PI*v.R*v.D/180;},
+      R:function(v){return 180*v.L/(Math.PI*v.D);},
+      D:function(v){return 180*v.L/(Math.PI*v.R);}
+    }
+  },
+
+  'deg-arc':{
+    vars:[
+      {id:'Da',sym:'D\u2090',label:'D\u2090  Degree of Curvature (Arc)',unit:'DMS or DD\u00b0',angle:true},
+      {id:'R', sym:'R', label:'R   Radius',unit:'m / ft',angle:false}
+    ],
+    solve:{
+      Da:function(v){return 5729.578/v.R;},
+      R: function(v){return 5729.578/v.Da;}
+    }
+  },
+
+  'deg-chord':{
+    vars:[
+      {id:'Dc',sym:'D\u1d9c',label:'D\u1d9c  Degree of Curvature (Chord)',unit:'DMS or DD\u00b0',angle:true},
+      {id:'R', sym:'R', label:'R   Radius',unit:'m / ft',angle:false}
+    ],
+    solve:{
+      Dc:function(v){return toDeg(2*Math.asin(50/v.R));},
+      R: function(v){return 50/Math.sin(toRad(v.Dc)/2);}
+    }
+  },
+
+  // Section 3 ──────────────────────────────────────────────────
+  'r-from-m':{
+    vars:[
+      {id:'R',sym:'R',label:'R  Radius',unit:'m / ft',angle:false},
+      {id:'M',sym:'M',label:'M  Midordinate',unit:'m / ft',angle:false},
+      {id:'D',sym:'\u0394',label:'\u0394  Delta',unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      R:function(v){return v.M/(1-Math.cos(toRad(v.D)/2));},
+      M:function(v){return v.R*(1-Math.cos(toRad(v.D)/2));},
+      D:function(v){return toDeg(2*Math.acos(1-v.M/v.R));}
+    }
+  },
+
+  'e-from-r':{
+    vars:[
+      {id:'E',sym:'E',label:'E  External',unit:'m / ft',angle:false},
+      {id:'R',sym:'R',label:'R  Radius',unit:'m / ft',angle:false},
+      {id:'D',sym:'\u0394',label:'\u0394  Delta',unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      E:function(v){return v.R*(1/Math.cos(toRad(v.D)/2)-1);},
+      R:function(v){return v.E/(1/Math.cos(toRad(v.D)/2)-1);},
+      D:function(v){return toDeg(2*Math.acos(v.R/(v.R+v.E)));}
+    }
+  },
+
+  'pi-to-centre':{
+    vars:[
+      {id:'O',sym:'O',label:'O  PI\u2192Centre Distance',unit:'m / ft',angle:false},
+      {id:'R',sym:'R',label:'R  Radius',unit:'m / ft',angle:false},
+      {id:'T',sym:'T',label:'T  Sub Tangent',unit:'m / ft',angle:false}
+    ],
+    solve:{
+      O:function(v){return Math.sqrt(v.R*v.R+v.T*v.T);},
+      R:function(v){return Math.sqrt(v.O*v.O-v.T*v.T);},
+      T:function(v){return Math.sqrt(v.O*v.O-v.R*v.R);}
+    }
+  },
+
+  'e-alt':{
+    vars:[
+      {id:'E',sym:'E',label:'E  External',unit:'m / ft',angle:false},
+      {id:'O',sym:'O',label:'O  PI\u2192Centre Distance',unit:'m / ft',angle:false},
+      {id:'R',sym:'R',label:'R  Radius',unit:'m / ft',angle:false}
+    ],
+    solve:{
+      E:function(v){return v.O-v.R;},
+      O:function(v){return v.E+v.R;},
+      R:function(v){return v.O-v.E;}
+    }
+  },
+
+  'delta-rad':{
+    vars:[
+      {id:'D',sym:'\u0394',label:'\u0394  Delta',unit:'radians (plain decimal)',angle:false},
+      {id:'L',sym:'L',label:'L  Arc Length',unit:'m / ft',angle:false},
+      {id:'R',sym:'R',label:'R  Radius',unit:'m / ft',angle:false}
+    ],
+    solve:{
+      D:function(v){return v.L/v.R;},
+      L:function(v){return v.D*v.R;},
+      R:function(v){return v.L/v.D;}
+    },
+    resultFormat:{
+      D:function(n){return n.toFixed(6)+' rad  (\u2248 '+toDMS(toDeg(n))+')';}
+    }
+  },
+
+  'delta-deg':{
+    vars:[
+      {id:'D',sym:'\u0394',label:'\u0394  Delta',unit:'DMS or DD\u00b0',angle:true},
+      {id:'L',sym:'L',label:'L  Arc Length',unit:'m / ft',angle:false},
+      {id:'R',sym:'R',label:'R  Radius',unit:'m / ft',angle:false}
+    ],
+    solve:{
+      D:function(v){return toDeg(v.L/v.R);},
+      L:function(v){return toRad(v.D)*v.R;},
+      R:function(v){return v.L/toRad(v.D);}
+    }
+  },
+
+  // Section 4 ──────────────────────────────────────────────────
+  'chainage-bc':{
+    vars:[
+      {id:'PI_s',sym:'PI',label:'PI  Intersection Station',unit:'',angle:false},
+      {id:'T',   sym:'T', label:'T   Sub Tangent',unit:'m / ft',angle:false},
+      {id:'BC',  sym:'BC',label:'BC  Begin Curve Station',unit:'',angle:false}
+    ],
+    solve:{
+      BC:   function(v){return v.PI_s-v.T;},
+      PI_s: function(v){return v.BC+v.T;},
+      T:    function(v){return v.PI_s-v.BC;}
+    }
+  },
+
+  'chainage-ec':{
+    vars:[
+      {id:'BC',sym:'BC',label:'BC  Begin Curve Station',unit:'',angle:false},
+      {id:'L', sym:'L', label:'L   Arc Length',unit:'m / ft',angle:false},
+      {id:'EC',sym:'EC',label:'EC  End Curve Station',unit:'',angle:false}
+    ],
+    solve:{
+      EC:function(v){return v.BC+v.L;},
+      BC:function(v){return v.EC-v.L;},
+      L: function(v){return v.EC-v.BC;}
+    }
+  },
+
+  'deflection':{
+    vars:[
+      {id:'hd',sym:'\u03b4/2',label:'\u03b4/2  Half Deflection Angle',unit:'DMS or DD\u00b0',angle:true},
+      {id:'l', sym:'l',       label:'l    Arc Length to Station',unit:'m / ft',angle:false},
+      {id:'R', sym:'R',       label:'R    Radius',unit:'m / ft',angle:false}
+    ],
+    solve:{
+      hd:function(v){return 90*v.l/(Math.PI*v.R);},
+      l: function(v){return v.hd*Math.PI*v.R/90;},
+      R: function(v){return 90*v.l/(Math.PI*v.hd);}
+    }
+  },
+
+  // Section 5 ──────────────────────────────────────────────────
+  'sin-ratio':{
+    vars:[
+      {id:'alpha',sym:'\u03b1',label:'\u03b1  Angle',unit:'DMS or DD\u00b0',angle:true},
+      {id:'O',    sym:'O',     label:'O  Opposite',unit:'',angle:false},
+      {id:'H',    sym:'H',     label:'H  Hypotenuse',unit:'',angle:false}
+    ],
+    solve:{
+      alpha:function(v){return toDeg(Math.asin(v.O/v.H));},
+      O:    function(v){return v.H*Math.sin(toRad(v.alpha));},
+      H:    function(v){return v.O/Math.sin(toRad(v.alpha));}
+    }
+  },
+
+  'cos-ratio':{
+    vars:[
+      {id:'alpha',sym:'\u03b1',label:'\u03b1  Angle',unit:'DMS or DD\u00b0',angle:true},
+      {id:'A',    sym:'A',     label:'A  Adjacent',unit:'',angle:false},
+      {id:'H',    sym:'H',     label:'H  Hypotenuse',unit:'',angle:false}
+    ],
+    solve:{
+      alpha:function(v){return toDeg(Math.acos(v.A/v.H));},
+      A:    function(v){return v.H*Math.cos(toRad(v.alpha));},
+      H:    function(v){return v.A/Math.cos(toRad(v.alpha));}
+    }
+  },
+
+  'tan-ratio':{
+    vars:[
+      {id:'alpha',sym:'\u03b1',label:'\u03b1  Angle',unit:'DMS or DD\u00b0',angle:true},
+      {id:'O',    sym:'O',     label:'O  Opposite',unit:'',angle:false},
+      {id:'A',    sym:'A',     label:'A  Adjacent',unit:'',angle:false}
+    ],
+    solve:{
+      alpha:function(v){return toDeg(Math.atan(v.O/v.A));},
+      O:    function(v){return v.A*Math.tan(toRad(v.alpha));},
+      A:    function(v){return v.O/Math.tan(toRad(v.alpha));}
+    }
+  },
+
+  'angle-convert':{
+    vars:[
+      {id:'deg',sym:'deg',label:'Degrees',unit:'\u00b0 (decimal)',angle:false},
+      {id:'rad',sym:'rad',label:'Radians',unit:'rad',angle:false}
+    ],
+    solve:{
+      rad:function(v){return toRad(v.deg);},
+      deg:function(v){return toDeg(v.rad);}
+    },
+    resultFormat:{
+      rad:function(n){return 'rad = '+n.toFixed(8);},
+      deg:function(n){return 'deg = '+n.toFixed(6)+'\u00b0';}
+    }
+  },
+
+  // Section 6 ──────────────────────────────────────────────────
+  'hd-angle':{
+    vars:[
+      {id:'HD',   sym:'HD',label:'HD  Horizontal Distance',unit:'m / ft',angle:false},
+      {id:'SD',   sym:'SD',label:'SD  Slope Distance',unit:'m / ft',angle:false},
+      {id:'alpha',sym:'\u03b1',label:'\u03b1   Vertical Angle',unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      HD:   function(v){return v.SD*Math.sin(toRad(v.alpha));},
+      SD:   function(v){return v.HD/Math.sin(toRad(v.alpha));},
+      alpha:function(v){return toDeg(Math.asin(v.HD/v.SD));}
+    }
+  },
+
+  'hd-pyth':{
+    vars:[
+      {id:'HD',sym:'HD',label:'HD  Horizontal Distance',unit:'m / ft',angle:false},
+      {id:'SD',sym:'SD',label:'SD  Slope Distance',unit:'m / ft',angle:false},
+      {id:'VD',sym:'VD',label:'VD  Vertical Distance',unit:'m / ft',angle:false}
+    ],
+    solve:{
+      HD:function(v){return Math.sqrt(v.SD*v.SD-v.VD*v.VD);},
+      SD:function(v){return Math.sqrt(v.HD*v.HD+v.VD*v.VD);},
+      VD:function(v){return Math.sqrt(v.SD*v.SD-v.HD*v.HD);}
+    }
+  },
+
+  'vd-zenith':{
+    vars:[
+      {id:'VD',sym:'VD',label:'VD  Vertical Distance',unit:'m / ft',angle:false},
+      {id:'SD',sym:'SD',label:'SD  Slope Distance',unit:'m / ft',angle:false},
+      {id:'Z', sym:'Z', label:'Z   Zenith Angle',unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      VD:function(v){return v.SD*Math.cos(toRad(v.Z));},
+      SD:function(v){return v.VD/Math.cos(toRad(v.Z));},
+      Z: function(v){return toDeg(Math.acos(v.VD/v.SD));}
+    }
+  },
+
+  'pythag-abc':{
+    vars:[
+      {id:'a',sym:'a',label:'a  Side',unit:'',angle:false},
+      {id:'b',sym:'b',label:'b  Side',unit:'',angle:false},
+      {id:'c',sym:'c',label:'c  Hypotenuse',unit:'',angle:false}
+    ],
+    solve:{
+      c:function(v){return Math.sqrt(v.a*v.a+v.b*v.b);},
+      a:function(v){return Math.sqrt(v.c*v.c-v.b*v.b);},
+      b:function(v){return Math.sqrt(v.c*v.c-v.a*v.a);}
+    }
+  },
+
+  // Section 7 — Compound Curves ────────────────────────────────
+  'cc-delta':{
+    vars:[
+      {id:'D', sym:'\u0394',   label:'\u0394    Total Delta',         unit:'DMS or DD\u00b0',angle:true},
+      {id:'Dl',sym:'\u0394_l', label:'\u0394_l  Delta (Large Curve)', unit:'DMS or DD\u00b0',angle:true},
+      {id:'Ds',sym:'\u0394_s', label:'\u0394_s  Delta (Small Curve)', unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      D: function(v){return v.Dl+v.Ds;},
+      Dl:function(v){return v.D-v.Ds;},
+      Ds:function(v){return v.D-v.Dl;}
+    }
+  },
+
+  // T_long = [ Rl - Rs·cos(D) + (Rl-Rs)·cos(Ds) ] / sin(D)
+  'cc-tlong':{
+    vars:[
+      {id:'Tl',sym:'T_long',label:'T_long  Long Tangent',        unit:'m / ft',      angle:false},
+      {id:'Rl',sym:'R_l',   label:'R_l     Large Radius',        unit:'m / ft',      angle:false},
+      {id:'Rs',sym:'R_s',   label:'R_s     Small Radius',        unit:'m / ft',      angle:false},
+      {id:'D', sym:'\u0394',label:'\u0394       Total Delta',    unit:'DMS or DD\u00b0',angle:true},
+      {id:'Ds',sym:'\u0394_s',label:'\u0394_s     Delta (Small Curve)',unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      Tl:function(v){
+        return (v.Rl-v.Rs*Math.cos(toRad(v.D))+(v.Rl-v.Rs)*Math.cos(toRad(v.Ds)))/Math.sin(toRad(v.D));
+      },
+      Ds:function(v){
+        var cosDs=(v.Tl*Math.sin(toRad(v.D))-v.Rl+v.Rs*Math.cos(toRad(v.D)))/(v.Rl-v.Rs);
+        return toDeg(Math.acos(cosDs));
+      }
+      // Rl / Rs inversions require simultaneous equations — not solvable here
+    }
+  },
+
+  // T_short = [ Rl - Rs·cos(D) - (Rl-Rs)·cos(Dl) ] / sin(D)
+  'cc-tshort':{
+    vars:[
+      {id:'Ts',sym:'T_short',label:'T_short  Short Tangent',      unit:'m / ft',      angle:false},
+      {id:'Rl',sym:'R_l',    label:'R_l      Large Radius',        unit:'m / ft',      angle:false},
+      {id:'Rs',sym:'R_s',    label:'R_s      Small Radius',        unit:'m / ft',      angle:false},
+      {id:'D', sym:'\u0394', label:'\u0394        Total Delta',    unit:'DMS or DD\u00b0',angle:true},
+      {id:'Dl',sym:'\u0394_l',label:'\u0394_l      Delta (Large Curve)',unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      Ts:function(v){
+        return (v.Rl-v.Rs*Math.cos(toRad(v.D))-(v.Rl-v.Rs)*Math.cos(toRad(v.Dl)))/Math.sin(toRad(v.D));
+      },
+      Dl:function(v){
+        var cosDl=(v.Rl-v.Rs*Math.cos(toRad(v.D))-v.Ts*Math.sin(toRad(v.D)))/(v.Rl-v.Rs);
+        return toDeg(Math.acos(cosDl));
+      }
+    }
+  },
+
+  // Dl = acos( 1 - [ Ts·sin(D) - Rs·(1-cos(D)) ] / (Rl-Rs) )
+  'cc-delta-l-acos':{
+    vars:[
+      {id:'Dl',sym:'\u0394_l',label:'\u0394_l  Delta (Large Curve)', unit:'DMS or DD\u00b0',angle:true},
+      {id:'Ts',sym:'T_s',    label:'T_s  Sub-tangent (small)', unit:'m / ft',      angle:false},
+      {id:'Rl',sym:'R_l',    label:'R_l  Large Radius',        unit:'m / ft',      angle:false},
+      {id:'Rs',sym:'R_s',    label:'R_s  Small Radius',        unit:'m / ft',      angle:false},
+      {id:'D', sym:'\u0394', label:'\u0394    Total Delta',    unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      Dl:function(v){
+        var arg=1-(v.Ts*Math.sin(toRad(v.D))-v.Rs*(1-Math.cos(toRad(v.D))))/(v.Rl-v.Rs);
+        return toDeg(Math.acos(arg));
+      },
+      // Rearranged: Ts = [ Rs·(1-cos(D)) + (Rl-Rs)·(1-cos(Dl)) ] / sin(D)
+      Ts:function(v){
+        return (v.Rs*(1-Math.cos(toRad(v.D)))+(v.Rl-v.Rs)*(1-Math.cos(toRad(v.Dl))))/Math.sin(toRad(v.D));
+      }
+    }
+  },
+
+  // Ds = acos( 1 - [ Rl·(1-cos(D)) - Tl·sin(D) ] / (Rl-Rs) )
+  'cc-delta-s-acos':{
+    vars:[
+      {id:'Ds',sym:'\u0394_s',label:'\u0394_s  Delta (Small Curve)', unit:'DMS or DD\u00b0',angle:true},
+      {id:'Tl',sym:'T_l',    label:'T_l  Sub-tangent (large)', unit:'m / ft',      angle:false},
+      {id:'Rl',sym:'R_l',    label:'R_l  Large Radius',        unit:'m / ft',      angle:false},
+      {id:'Rs',sym:'R_s',    label:'R_s  Small Radius',        unit:'m / ft',      angle:false},
+      {id:'D', sym:'\u0394', label:'\u0394    Total Delta',    unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      Ds:function(v){
+        var arg=1-(v.Rl*(1-Math.cos(toRad(v.D)))-v.Tl*Math.sin(toRad(v.D)))/(v.Rl-v.Rs);
+        return toDeg(Math.acos(arg));
+      },
+      // Rearranged: Tl = [ Rl·(1-cos(D)) - (Rl-Rs)·(1-cos(Ds)) ] / sin(D)
+      Tl:function(v){
+        return (v.Rl*(1-Math.cos(toRad(v.D)))-(v.Rl-v.Rs)*(1-Math.cos(toRad(v.Ds))))/Math.sin(toRad(v.D));
+      }
+    }
+  },
+
+  // Dl = 2·atan( [ Ts·sin(D) - Rs·(1-cos(D)) ] / [ Tl + Ts·cos(D) - Rs·sin(D) ] )
+  'cc-delta-l-atan':{
+    vars:[
+      {id:'Dl',sym:'\u0394_l',label:'\u0394_l  Delta (Large Curve)', unit:'DMS or DD\u00b0',angle:true},
+      {id:'Tl',sym:'T_l',    label:'T_l  Sub-tangent (large)', unit:'m / ft',      angle:false},
+      {id:'Ts',sym:'T_s',    label:'T_s  Sub-tangent (small)', unit:'m / ft',      angle:false},
+      {id:'Rs',sym:'R_s',    label:'R_s  Small Radius',        unit:'m / ft',      angle:false},
+      {id:'D', sym:'\u0394', label:'\u0394    Total Delta',    unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      Dl:function(v){
+        var num=v.Ts*Math.sin(toRad(v.D))-v.Rs*(1-Math.cos(toRad(v.D)));
+        var den=v.Tl+v.Ts*Math.cos(toRad(v.D))-v.Rs*Math.sin(toRad(v.D));
+        return toDeg(2*Math.atan2(num,den));
+      }
+    }
+  },
+
+  // Ds = 2·atan( [ Tl·sin(D) - Rl·(1-cos(D)) ] / [ Ts + Tl·cos(D) - Rl·sin(D) ] )
+  // Corrected to symmetric form (l↔s swap of cc-delta-l-atan).
+  // The denominator from the source sheet appeared to have a transcription error — verify if results differ.
+  'cc-delta-s-atan':{
+    vars:[
+      {id:'Ds',sym:'\u0394_s',label:'\u0394_s  Delta (Small Curve)', unit:'DMS or DD\u00b0',angle:true},
+      {id:'Tl',sym:'T_l',    label:'T_l  Sub-tangent (large)', unit:'m / ft',      angle:false},
+      {id:'Ts',sym:'T_s',    label:'T_s  Sub-tangent (small)', unit:'m / ft',      angle:false},
+      {id:'Rl',sym:'R_l',    label:'R_l  Large Radius',        unit:'m / ft',      angle:false},
+      {id:'D', sym:'\u0394', label:'\u0394    Total Delta',    unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      Ds:function(v){
+        var num=v.Tl*Math.sin(toRad(v.D))-v.Rl*(1-Math.cos(toRad(v.D)));
+        var den=v.Ts+v.Tl*Math.cos(toRad(v.D))-v.Rl*Math.sin(toRad(v.D));
+        return toDeg(2*Math.atan2(num,den));
+      }
+    }
+  },
+
+  // Rl = Rs + [ Ts·sin(D) - Rs·(1-cos(D)) ] / (1 - cos(Dl))
+  'cc-rl':{
+    vars:[
+      {id:'Rl',sym:'R_l',    label:'R_l  Large Radius',        unit:'m / ft',      angle:false},
+      {id:'Rs',sym:'R_s',    label:'R_s  Small Radius',        unit:'m / ft',      angle:false},
+      {id:'Ts',sym:'T_s',    label:'T_s  Sub-tangent (small)', unit:'m / ft',      angle:false},
+      {id:'D', sym:'\u0394', label:'\u0394    Total Delta',    unit:'DMS or DD\u00b0',angle:true},
+      {id:'Dl',sym:'\u0394_l',label:'\u0394_l  Delta (Large Curve)',unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      Rl:function(v){
+        return v.Rs+(v.Ts*Math.sin(toRad(v.D))-v.Rs*(1-Math.cos(toRad(v.D))))/(1-Math.cos(toRad(v.Dl)));
+      },
+      // Rearranged: Ts = [ (Rl-Rs)·(1-cos(Dl)) + Rs·(1-cos(D)) ] / sin(D)
+      Ts:function(v){
+        return ((v.Rl-v.Rs)*(1-Math.cos(toRad(v.Dl)))+v.Rs*(1-Math.cos(toRad(v.D))))/Math.sin(toRad(v.D));
+      }
+    }
+  },
+
+  // Rs = Rl - [ Rl·(1-cos(D)) - Tl·sin(D) ] / (1 - cos(Ds))
+  'cc-rs':{
+    vars:[
+      {id:'Rs',sym:'R_s',    label:'R_s  Small Radius',        unit:'m / ft',      angle:false},
+      {id:'Rl',sym:'R_l',    label:'R_l  Large Radius',        unit:'m / ft',      angle:false},
+      {id:'Tl',sym:'T_l',    label:'T_l  Sub-tangent (large)', unit:'m / ft',      angle:false},
+      {id:'D', sym:'\u0394', label:'\u0394    Total Delta',    unit:'DMS or DD\u00b0',angle:true},
+      {id:'Ds',sym:'\u0394_s',label:'\u0394_s  Delta (Small Curve)',unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      Rs:function(v){
+        return v.Rl-(v.Rl*(1-Math.cos(toRad(v.D)))-v.Tl*Math.sin(toRad(v.D)))/(1-Math.cos(toRad(v.Ds)));
+      },
+      // Rearranged: Tl = [ Rl·(1-cos(D)) - (Rl-Rs)·(1-cos(Ds)) ] / sin(D)
+      Tl:function(v){
+        return (v.Rl*(1-Math.cos(toRad(v.D)))-(v.Rl-v.Rs)*(1-Math.cos(toRad(v.Ds))))/Math.sin(toRad(v.D));
+      }
+    }
+  }
+
+};
+
+// ── Build inline calc panels on load ────────────────────────────
+var _cpIdx=0;
+
+function buildCalcPanels(){
+  var items=document.querySelectorAll('[data-formula]');
+  for(var i=0;i<items.length;i++){
+    var item=items[i];
+    var key=item.getAttribute('data-formula');
+
+    if(key==='triangle-link'){
+      var a=document.createElement('a');
+      a.href='triangle.html';
+      a.className='tri-link';
+      a.textContent='\u2192 Open Triangle Solver';
+      item.appendChild(a);
+      continue;
+    }
+
+    var def=FORMULAS[key];
+    if(!def)continue;
+
+    var pid='cp'+(_cpIdx++);
+
+    // Toggle button
+    var btn=document.createElement('button');
+    btn.type='button';
+    btn.className='calc-toggle';
+    btn.id='ctbtn-'+pid;
+    btn.innerHTML='&#9654;&#xFE0E; Calculate';
+    (function(pid,btn,key,def){
+      btn.onclick=function(){
+        var panel=document.getElementById(pid);
+        var open=panel.classList.toggle('open');
+        btn.classList.toggle('open',open);
+        btn.innerHTML=open?'&#9660;&#xFE0E; Calculate':'&#9654;&#xFE0E; Calculate';
+      };
+    })(pid,btn,key,def);
+
+    // Panel
+    var panel=document.createElement('div');
+    panel.className='calc-panel';
+    panel.id=pid;
+
+    var hint=document.createElement('div');
+    hint.className='calc-hint';
+    hint.textContent='Leave one field empty \u2014 that value will be solved.';
+    panel.appendChild(hint);
+
+    // Input fields
+    for(var j=0;j<def.vars.length;j++){
+      var vr=def.vars[j];
+      var field=document.createElement('div');
+      field.className='calc-field';
+      var lbl=document.createElement('label');
+      lbl.htmlFor=pid+'-'+vr.id;
+      lbl.textContent=vr.label+(vr.unit?' ['+vr.unit+']':'');
+      var inp=document.createElement('input');
+      inp.type='text';
+      inp.id=pid+'-'+vr.id;
+      inp.autocomplete='off';
+      inp.inputMode='decimal';
+      if(vr.angle)inp.placeholder='e.g. 45.3000';
+      (function(pid,key,def){
+        inp.addEventListener('keydown',function(e){
+          if(e.key==='Enter')solveCalc(key,def,pid);
+        });
+      })(pid,key,def);
+      field.appendChild(lbl);
+      field.appendChild(inp);
+      panel.appendChild(field);
+    }
+
+    // Solve button
+    var solveBtn=document.createElement('button');
+    solveBtn.type='button';
+    solveBtn.className='calc-solve-btn';
+    solveBtn.textContent='Solve';
+    (function(pid,key,def){
+      solveBtn.onclick=function(){solveCalc(key,def,pid);};
+    })(pid,key,def);
+    panel.appendChild(solveBtn);
+
+    // Result div
+    var resultDiv=document.createElement('div');
+    resultDiv.className='calc-result';
+    resultDiv.id=pid+'-result';
+    panel.appendChild(resultDiv);
+
+    item.appendChild(btn);
+    item.appendChild(panel);
+  }
+}
+
+// ── Solver ───────────────────────────────────────────────────────
+function solveCalc(key,def,pid){
+  var resultDiv=document.getElementById(pid+'-result');
+  var vals={};
+  var blanks=[];
+
+  for(var j=0;j<def.vars.length;j++){
+    var vr=def.vars[j];
+    var inp=document.getElementById(pid+'-'+vr.id);
+    var raw=inp.value.trim();
+    if(!raw){
+      blanks.push(vr);
+    } else {
+      var n=vr.angle?parseDMS(raw):parseFloat(raw);
+      vals[vr.id]=n;
+    }
+  }
+
+  function showErr(msg){
+    resultDiv.className='calc-result err';
+    resultDiv.textContent=msg;
+  }
+
+  if(blanks.length===0){
+    showErr('Clear one field \u2014 the empty field is what gets solved.');
+    return;
+  }
+  if(blanks.length>1){
+    showErr('Fill in all but one field, then press Solve.');
+    return;
+  }
+
+  // Check inputs for NaN
+  for(var id in vals){
+    if(isNaN(vals[id])){
+      showErr('Invalid input \u2014 check your values.');
+      return;
+    }
+  }
+
+  var unknown=blanks[0];
+  var solveFn=def.solve[unknown.id];
+  if(!solveFn){
+    showErr('Cannot solve for '+unknown.sym+'.');
+    return;
+  }
+
+  var result;
+  try{ result=solveFn(vals); }
+  catch(e){ showErr('Math error \u2014 check values.'); return; }
+
+  if(isNaN(result)||!isFinite(result)){
+    showErr('No real solution \u2014 check values.');
+    return;
+  }
+
+  var display;
+  if(def.resultFormat&&def.resultFormat[unknown.id]){
+    display=def.resultFormat[unknown.id](result);
+  } else if(unknown.angle){
+    display=unknown.sym+' = '+toDMS(result);
+  } else {
+    display=unknown.sym+' = '+fmt(result,4);
+  }
+
+  resultDiv.className='calc-result ok';
+  resultDiv.textContent=display;
+}
+
+document.addEventListener('DOMContentLoaded',buildCalcPanels);
 </script>
 </body>
 </html>

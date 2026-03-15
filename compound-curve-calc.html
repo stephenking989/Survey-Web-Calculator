@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compound Curve Calculator — SurveyCalc</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh}
+.top-bar{display:flex;align-items:center;gap:12px;background:#16213e;border-bottom:1px solid #0f3460;padding:10px 16px}
+.back-btn{display:flex;align-items:center;gap:6px;color:#4fc3f7;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid #1e3a5f;background:transparent;transition:all .2s}
+.back-btn:hover{border-color:#4fc3f7;background:rgba(79,195,247,.08)}
+.top-bar-title{font-size:15px;font-weight:600;color:#e0e0e0}
+.page{padding:16px;max-width:480px;margin:0 auto}
+.section-title{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#4fc3f7;margin:0 0 10px}
+.card{background:#16213e;border:1px solid #0f3460;border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.tog-btn{padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid #1e3a5f;background:#0f1b35;color:#888;transition:all .2s}
+.tog-btn:first-child{border-radius:6px 0 0 6px}
+.tog-btn:last-child{border-radius:0 6px 6px 0}
+.tog-btn.active{background:#4fc3f7;border-color:#4fc3f7;color:#0a0a1a}
+.prec-sel{padding:6px 8px;background:#0f1b35;border:1px solid #1e3a5f;border-radius:6px;color:#e0e0e0;font-size:12px;outline:none}
+.set-lbl{font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em}
+.inp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.inp-field{display:flex;flex-direction:column;gap:3px}
+.inp-label{font-size:12px;color:#888;display:flex;align-items:center;justify-content:space-between}
+.inp-sym{font-size:11px;color:#4fc3f7;font-style:italic;font-weight:600}
+.inp-input{padding:9px 10px;background:#0f1b35;border:1px solid #1e3a5f;border-radius:8px;color:#e0e0e0;font-size:15px;outline:none;width:100%}
+.inp-input:focus{border-color:#4fc3f7}
+.inp-input.field-known{border-color:#4fc3f7}
+.inp-input.field-error{border-color:#ff5252}
+.inp-err{font-size:12px;color:#ff5252;min-height:16px;margin-top:2px}
+.btn-pri{flex:1;padding:10px;background:#4fc3f7;border:2px solid;border-color:#81d4fa #0a1a30 #0a1a30 #81d4fa;border-radius:8px;color:#0a0a1a;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-pri:active{transform:translateY(1px)}
+.btn-sec{flex:1;padding:10px;background:#0f1b35;border:2px solid;border-color:#2a4a70 #0a1a30 #0a1a30 #2a4a70;border-radius:8px;color:#aaa;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s}
+.btn-sec:active{transform:translateY(1px)}
+.res-row{display:flex;align-items:center;justify-content:space-between;padding:7px 8px;border-radius:7px;cursor:pointer;border:1px solid transparent;transition:all .15s;margin-bottom:3px}
+.res-row:hover{background:#0f2440;border-color:#1e3a5f}
+.res-row:hover .res-val{color:#4fc3f7}
+.res-label{font-size:12px;color:#888;margin-right:6px}
+.res-val{font-size:13px;font-weight:600;color:#e0e0e0;font-family:'Courier New',monospace;text-align:right;white-space:nowrap}
+.known-tag{font-size:10px;background:#0f3460;color:#4fc3f7;border-radius:4px;padding:2px 5px;margin-left:5px}
+.divider{border:none;border-top:1px solid #0f3460;margin:8px 0}
+.btn-copy-sm{padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid #1e3a5f;background:transparent;color:#888;transition:all .2s}
+.btn-copy-sm:hover{border-color:#4fc3f7;color:#4fc3f7}
+.btn-copy-sm.copied{border-color:#66bb6a;color:#66bb6a}
+/* Two-block result layout */
+.res-split{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.res-block{flex:1;min-width:140px}
+.res-block-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#4fc3f7;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid #1e3a5f}
+.summ-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#4fc3f7;margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <a href="index.html" class="back-btn">&#8592; Home</a>
+  <div class="top-bar-title">Compound Curve Calculator</div>
+</div>
+<div class="page">
+  <div style="margin-top:16px">
+    <div style="font-size:12px;color:#666;margin-bottom:14px">Enter any 4 or more known values — solver chains through all applicable formulas</div>
+
+    <!-- Settings -->
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">
+          <div><div class="set-lbl">Units</div><div style="display:flex"><button class="tog-btn active" id="tog_metric">Metric</button><button class="tog-btn" id="tog_imperial">Imperial</button></div></div>
+          <div><div class="set-lbl">Angle Input</div><div style="display:flex"><button class="tog-btn active" id="tog_dms">DMS</button><button class="tog-btn" id="tog_dd">DD</button></div></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div><div class="set-lbl">Distance Precision</div><select id="prec_val" class="prec-sel"><option value="0">0 dp</option><option value="1">1 dp</option><option value="2">2 dp</option><option value="3" selected>3 dp</option><option value="4">4 dp</option><option value="5">5 dp</option><option value="6">6 dp</option><option value="7">7 dp</option><option value="8">8 dp</option></select></div>
+          <div><div class="set-lbl">Angle Precision</div><select id="prec_ang" class="prec-sel"><option value="0" selected>0 dp</option><option value="1">1 dp</option><option value="2">2 dp</option><option value="3">3 dp</option><option value="4">4 dp</option><option value="5">5 dp</option><option value="6">6 dp</option><option value="7">7 dp</option><option value="8">8 dp</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input card -->
+    <div class="card" style="margin-bottom:12px">
+      <div class="section-title">Compound Curve Parameters</div>
+      <div style="font-size:12px;color:#666;margin-bottom:12px">Enter any 4 or more known values</div>
+      <div class="inp-grid">
+
+        <div class="set-lbl" style="grid-column:1/-1;margin-bottom:2px">Delta Angles</div>
+        <div class="inp-field">
+          <div class="inp-label">Total Delta <span class="inp-sym">&Delta;</span></div>
+          <input class="inp-input" id="inp_D" type="text" inputmode="decimal" placeholder="0.0000" data-angle="1">
+        </div>
+        <div class="inp-field">
+          <div class="inp-label">Delta (Large) <span class="inp-sym">&Delta;<sub>l</sub></span></div>
+          <input class="inp-input" id="inp_Dl" type="text" inputmode="decimal" placeholder="0.0000" data-angle="1">
+        </div>
+        <div class="inp-field">
+          <div class="inp-label">Delta (Small) <span class="inp-sym">&Delta;<sub>s</sub></span></div>
+          <input class="inp-input" id="inp_Ds" type="text" inputmode="decimal" placeholder="0.0000" data-angle="1">
+        </div>
+
+        <div class="set-lbl" style="grid-column:1/-1;margin-top:10px;margin-bottom:2px">Radii &amp; Main Tangents</div>
+        <div class="inp-field">
+          <div class="inp-label">Large Radius <span class="inp-sym">R<sub>l</sub></span></div>
+          <input class="inp-input" id="inp_Rl" type="text" inputmode="decimal" placeholder="0.000">
+        </div>
+        <div class="inp-field">
+          <div class="inp-label">Small Radius <span class="inp-sym">R<sub>s</sub></span></div>
+          <input class="inp-input" id="inp_Rs" type="text" inputmode="decimal" placeholder="0.000">
+        </div>
+        <div class="inp-field">
+          <div class="inp-label">Long Tangent <span class="inp-sym">T<sub>long</sub></span></div>
+          <input class="inp-input" id="inp_Tlong" type="text" inputmode="decimal" placeholder="0.000">
+        </div>
+        <div class="inp-field">
+          <div class="inp-label">Short Tangent <span class="inp-sym">T<sub>short</sub></span></div>
+          <input class="inp-input" id="inp_Tshort" type="text" inputmode="decimal" placeholder="0.000">
+        </div>
+        <div class="inp-field">
+          <div class="inp-label">Sub-tang. (Large) <span class="inp-sym">T<sub>l</sub></span></div>
+          <input class="inp-input" id="inp_Tl" type="text" inputmode="decimal" placeholder="0.000">
+        </div>
+        <div class="inp-field">
+          <div class="inp-label">Sub-tang. (Small) <span class="inp-sym">T<sub>s</sub></span></div>
+          <input class="inp-input" id="inp_Ts" type="text" inputmode="decimal" placeholder="0.000">
+        </div>
+
+        <div class="set-lbl" style="grid-column:1/-1;margin-top:10px;margin-bottom:2px">Curve 1 — Large Radius</div>
+        <div class="inp-field">
+          <div class="inp-label">Arc Length <span class="inp-sym">L<sub>1</sub></span></div>
+          <input class="inp-input" id="inp_L1" type="text" inputmode="decimal" placeholder="0.000">
+        </div>
+        <div class="inp-field">
+          <div class="inp-label">Chord <span class="inp-sym">C<sub>1</sub></span></div>
+          <input class="inp-input" id="inp_C1" type="text" inputmode="decimal" placeholder="0.000">
+        </div>
+        <div class="inp-field">
+          <div class="inp-label">External <span class="inp-sym">E<sub>1</sub></span></div>
+          <input class="inp-input" id="inp_E1" type="text" inputmode="decimal" placeholder="0.000">
+        </div>
+        <div class="inp-field">
+          <div class="inp-label">Mid-ordinate <span class="inp-sym">M<sub>1</sub></span></div>
+          <input class="inp-input" id="inp_M1" type="text" inputmode="decimal" placeholder="0.000">
+        </div>
+
+        <div class="set-lbl" style="grid-column:1/-1;margin-top:10px;margin-bottom:2px">Curve 2 — Small Radius</div>
+        <div class="inp-field">
+          <div class="inp-label">Arc Length <span class="inp-sym">L<sub>2</sub></span></div>
+          <input class="inp-input" id="inp_L2" type="text" inputmode="decimal" placeholder="0.000">
+        </div>
+        <div class="inp-field">
+          <div class="inp-label">Chord <span class="inp-sym">C<sub>2</sub></span></div>
+          <input class="inp-input" id="inp_C2" type="text" inputmode="decimal" placeholder="0.000">
+        </div>
+        <div class="inp-field">
+          <div class="inp-label">External <span class="inp-sym">E<sub>2</sub></span></div>
+          <input class="inp-input" id="inp_E2" type="text" inputmode="decimal" placeholder="0.000">
+        </div>
+        <div class="inp-field">
+          <div class="inp-label">Mid-ordinate <span class="inp-sym">M<sub>2</sub></span></div>
+          <input class="inp-input" id="inp_M2" type="text" inputmode="decimal" placeholder="0.000">
+        </div>
+
+      </div>
+      <div class="inp-err" id="err_global" style="margin-top:8px"></div>
+    </div>
+
+    <!-- Buttons -->
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <button class="btn-sec" id="reset_btn">Reset</button>
+      <button class="btn-pri" id="calc_btn">Calculate</button>
+    </div>
+
+    <!-- Results -->
+    <div id="results_section" style="display:none">
+      <div class="card">
+        <div class="section-title" style="margin-bottom:10px">Compound Curve Results</div>
+        <div class="res-split">
+          <div class="res-block">
+            <div class="res-block-title">Curve 1 &mdash; Large Radius</div>
+            <div id="res_c1"></div>
+          </div>
+          <div class="res-block">
+            <div class="res-block-title">Curve 2 &mdash; Small Radius</div>
+            <div id="res_c2"></div>
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="summ-title">Summary</div>
+        <div id="res_summary"></div>
+        <hr class="divider">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+          <button class="btn-copy-sm" id="copy_btn">Copy Results</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script>
+// ── Clipboard helper (with textarea fallback for Android) ───────
+function copyToClipboard(text, btn, doneLabel, resetLabel){
+  function flash(){
+    if(!btn) return;
+    btn.textContent = doneLabel || 'Copied!';
+    setTimeout(function(){ btn.textContent = resetLabel || btn.textContent; }, 1500);
+  }
+  function fb(){
+    var t=document.createElement('textarea');
+    t.value=text; t.style.position='fixed'; t.style.opacity='0';
+    document.body.appendChild(t); t.focus(); t.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(t);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(flash, function(){ fb(); flash(); });
+  } else { fb(); flash(); }
+}
+
+// ── Settings state ──────────────────────────────────────────────
+var _unit   = 'metric';
+var _afmt   = 'dms';
+var _pdist  = 3;
+var _pang   = 0;
+var _lastSolved = null;
+var _inputKeys  = null;
+
+// ── Angle parsing (verbatim from curve-calc.html) ───────────────
+function parseAngle(s){
+  if(!s) return null;
+  s = s.trim()
+    .replace(/[\u00b0\u00ba]/g,'d')
+    .replace(/[\u2032']/g,'m')
+    .replace(/[\u2033"]/g,'s');
+  if(_afmt === 'dd'){
+    var v = parseFloat(s); return isNaN(v) ? null : v;
+  }
+  if(_afmt === 'dm'){
+    var parts = s.split(/[dm\s]+/).filter(function(x){return x.length>0;});
+    if(parts.length >= 2){
+      var d=parseFloat(parts[0]), m=parseFloat(parts[1]);
+      return (isNaN(d)||isNaN(m)) ? null : d+m/60;
+    }
+    var v2=parseFloat(s); return isNaN(v2)?null:v2;
+  }
+  // DMS: try D.MMSS shorthand (e.g. 23.4512 = 23d 45m 12s)
+  var plain = s.match(/^(\d+)\.(\d+)$/);
+  if(plain){
+    var frac = plain[2];
+    while(frac.length < 4) frac += '0';
+    var dd=parseInt(plain[1],10), mm=parseInt(frac.substring(0,2),10), ss=parseFloat(frac.substring(2))||0;
+    if(mm<60 && ss<60) return dd + mm/60 + ss/3600;
+  }
+  var parts2 = s.split(/[dms\s]+/).filter(function(x){return x.length>0;});
+  if(parts2.length>=3){
+    var d3=parseFloat(parts2[0]),m3=parseFloat(parts2[1]),s3=parseFloat(parts2[2]);
+    return (isNaN(d3)||isNaN(m3)||isNaN(s3))?null:d3+m3/60+s3/3600;
+  }
+  if(parts2.length===2){
+    var d4=parseFloat(parts2[0]),m4=parseFloat(parts2[1]);
+    return (isNaN(d4)||isNaN(m4))?null:d4+m4/60;
+  }
+  var v3=parseFloat(s); return isNaN(v3)?null:v3;
+}
+
+// ── Angle formatting (verbatim from curve-calc.html) ───────────
+function p2(n){return n<10?'0'+n:''+n;}
+function pSec(s){var parts=s.split('.');if(parts[0].length<2)parts[0]='0'+parts[0];return parts.join('.');}
+
+function fmtAngle(deg){
+  if(deg===null||isNaN(deg)) return '';
+  if(_afmt==='dd') return deg.toFixed(_pang)+'\u00b0';
+  if(_afmt==='dm'){
+    var d=Math.floor(deg),m=(deg-d)*60;
+    return d+'\u00b0 '+m.toFixed(_pang)+'\u2032';
+  }
+  var d=Math.floor(deg),rem=(deg-d)*60,m=Math.floor(rem),s=(rem-m)*60;
+  var ss=s.toFixed(_pang);
+  if(parseFloat(ss)>=60){ss=(0).toFixed(_pang);m++;if(m>=60){m=0;d++;}}
+  return d+'\u00b0 '+p2(m)+'\u2032 '+pSec(ss)+'\u2033';
+}
+
+function fmtAngleDMS(deg){
+  if(deg===null||isNaN(deg)) return '';
+  var d=Math.floor(deg),rem=(deg-d)*60,m=Math.floor(rem),s=(rem-m)*60;
+  var ss=s.toFixed(0);
+  if(parseFloat(ss)>=60){ss='0';m++;if(m>=60){m=0;d++;}}
+  return d+'d '+p2(m)+'m '+pSec(ss)+'s';
+}
+
+function fmtD(v){
+  if(v===null||v===undefined||isNaN(v)) return '\u2014';
+  return v.toFixed(_pdist);
+}
+
+// ── Input readers ───────────────────────────────────────────────
+function getVal(id){var el=document.getElementById(id);if(!el)return null;var s=el.value.trim();if(!s)return null;var v=parseFloat(s);return isNaN(v)?null:v;}
+function getAng(id){var el=document.getElementById(id);if(!el)return null;var s=el.value.trim();if(!s)return null;return parseAngle(s);}
+function clrErr(){document.getElementById('err_global').textContent='';}
+function showErr(m){document.getElementById('err_global').textContent=m;}
+
+// ── Propagation solver ──────────────────────────────────────────
+// Forward-chaining rules — each fires only when all inputs are known and output is still null.
+// Bad results (NaN, Infinity, out-of-range) are silently skipped.
+function solveCompound(inp){
+  var DEG = Math.PI / 180;
+  var s = {
+    // Primary compound curve parameters
+    Rl:     inp.Rl,
+    Rs:     inp.Rs,
+    D:      inp.D,
+    Dl:     inp.Dl,
+    Ds:     inp.Ds,
+    Tlong:  inp.Tlong,
+    Tshort: inp.Tshort,
+    Tl:     inp.Tl,
+    Ts:     inp.Ts,
+    // Individual curve parameters (can also be inputs)
+    L1:     inp.L1,
+    C1:     inp.C1,
+    E1:     inp.E1,
+    M1:     inp.M1,
+    L2:     inp.L2,
+    C2:     inp.C2,
+    E2:     inp.E2,
+    M2:     inp.M2
+  };
+
+  var changed;
+
+  // fire: set s[key]=val only if key is null and val is valid for its type
+  function fire(key, val, isAngle){
+    if(s[key] !== null) return;
+    if(val === null || val === undefined || isNaN(val) || !isFinite(val)) return;
+    if(isAngle  && (val <= 0 || val >= 180)) return;
+    if(!isAngle && val <= 0) return;
+    s[key] = val;
+    changed = true;
+  }
+
+  for(var iter = 0; iter < 20; iter++){
+    changed = false;
+
+    // ── Delta relationships ──────────────────────────────────────────
+    if(s.Dl !== null && s.Ds !== null)
+      fire('D',  s.Dl + s.Ds,  true);
+    if(s.D  !== null && s.Ds !== null)
+      fire('Dl', s.D  - s.Ds,  true);
+    if(s.D  !== null && s.Dl !== null)
+      fire('Ds', s.D  - s.Dl,  true);
+
+    // ── Sub-tangents from R and delta ────────────────────────────────
+    if(s.Rl !== null && s.Dl !== null)
+      fire('Tl', s.Rl * Math.tan(s.Dl * DEG / 2), false);
+    if(s.Tl !== null && s.Dl !== null && Math.abs(Math.tan(s.Dl * DEG / 2)) > 1e-12)
+      fire('Rl', s.Tl / Math.tan(s.Dl * DEG / 2), false);
+    if(s.Tl !== null && s.Rl !== null)
+      fire('Dl', 2 * Math.atan(s.Tl / s.Rl) / DEG, true);
+
+    if(s.Rs !== null && s.Ds !== null)
+      fire('Ts', s.Rs * Math.tan(s.Ds * DEG / 2), false);
+    if(s.Ts !== null && s.Ds !== null && Math.abs(Math.tan(s.Ds * DEG / 2)) > 1e-12)
+      fire('Rs', s.Ts / Math.tan(s.Ds * DEG / 2), false);
+    if(s.Ts !== null && s.Rs !== null)
+      fire('Ds', 2 * Math.atan(s.Ts / s.Rs) / DEG, true);
+
+    // ── T_long = [Rl - Rs·cos(D) + (Rl-Rs)·cos(Ds)] / sin(D) ──────
+    if(s.Rl !== null && s.Rs !== null && s.D !== null && s.Ds !== null
+        && Math.abs(Math.sin(s.D * DEG)) > 1e-12)
+      fire('Tlong',
+        (s.Rl - s.Rs * Math.cos(s.D * DEG) + (s.Rl - s.Rs) * Math.cos(s.Ds * DEG))
+        / Math.sin(s.D * DEG), false);
+
+    if(s.Tlong !== null && s.Rl !== null && s.Rs !== null && s.D !== null
+        && Math.abs(s.Rl - s.Rs) > 1e-9){
+      var cosDs = (s.Tlong * Math.sin(s.D * DEG) - s.Rl + s.Rs * Math.cos(s.D * DEG))
+                  / (s.Rl - s.Rs);
+      if(Math.abs(cosDs) <= 1) fire('Ds', Math.acos(cosDs) / DEG, true);
+    }
+
+    // ── T_short = [Rl - Rs·cos(D) - (Rl-Rs)·cos(Dl)] / sin(D) ────
+    if(s.Rl !== null && s.Rs !== null && s.D !== null && s.Dl !== null
+        && Math.abs(Math.sin(s.D * DEG)) > 1e-12)
+      fire('Tshort',
+        (s.Rl - s.Rs * Math.cos(s.D * DEG) - (s.Rl - s.Rs) * Math.cos(s.Dl * DEG))
+        / Math.sin(s.D * DEG), false);
+
+    if(s.Tshort !== null && s.Rl !== null && s.Rs !== null && s.D !== null
+        && Math.abs(s.Rl - s.Rs) > 1e-9){
+      var cosDl = (s.Rl - s.Rs * Math.cos(s.D * DEG) - s.Tshort * Math.sin(s.D * DEG))
+                  / (s.Rl - s.Rs);
+      if(Math.abs(cosDl) <= 1) fire('Dl', Math.acos(cosDl) / DEG, true);
+    }
+
+    // ── Dl from Ts (arccos form) ────────────────────────────────────
+    if(s.Ts !== null && s.Rl !== null && s.Rs !== null && s.D !== null
+        && Math.abs(s.Rl - s.Rs) > 1e-9){
+      var argDl = 1 - (s.Ts * Math.sin(s.D * DEG) - s.Rs * (1 - Math.cos(s.D * DEG)))
+                      / (s.Rl - s.Rs);
+      if(Math.abs(argDl) <= 1) fire('Dl', Math.acos(argDl) / DEG, true);
+    }
+
+    // ── Ds from Tl (arccos form) ────────────────────────────────────
+    if(s.Tl !== null && s.Rl !== null && s.Rs !== null && s.D !== null
+        && Math.abs(s.Rl - s.Rs) > 1e-9){
+      var argDs = 1 - (s.Rl * (1 - Math.cos(s.D * DEG)) - s.Tl * Math.sin(s.D * DEG))
+                      / (s.Rl - s.Rs);
+      if(Math.abs(argDs) <= 1) fire('Ds', Math.acos(argDs) / DEG, true);
+    }
+
+    // ── Rl from Rs, Ts, D, Dl ────────────────────────────────────────
+    if(s.Rs !== null && s.Ts !== null && s.D !== null && s.Dl !== null
+        && Math.abs(1 - Math.cos(s.Dl * DEG)) > 1e-12)
+      fire('Rl',
+        s.Rs + (s.Ts * Math.sin(s.D * DEG) - s.Rs * (1 - Math.cos(s.D * DEG)))
+               / (1 - Math.cos(s.Dl * DEG)), false);
+
+    // ── Rs from Rl, Tl, D, Ds ────────────────────────────────────────
+    if(s.Rl !== null && s.Tl !== null && s.D !== null && s.Ds !== null
+        && Math.abs(1 - Math.cos(s.Ds * DEG)) > 1e-12)
+      fire('Rs',
+        s.Rl - (s.Rl * (1 - Math.cos(s.D * DEG)) - s.Tl * Math.sin(s.D * DEG))
+               / (1 - Math.cos(s.Ds * DEG)), false);
+
+    // ── Curve 1: L1 = Rl · Dl(rad) ──────────────────────────────────
+    if(s.Rl !== null && s.Dl !== null)
+      fire('L1', s.Rl * s.Dl * DEG, false);
+    if(s.L1 !== null && s.Dl !== null && s.Dl > 1e-9)
+      fire('Rl', s.L1 / (s.Dl * DEG), false);
+    if(s.L1 !== null && s.Rl !== null){
+      var dl_from_L1 = s.L1 / (s.Rl * DEG);
+      fire('Dl', dl_from_L1, true);
+    }
+
+    // ── Curve 1: C1 = 2·Rl·sin(Dl/2) ───────────────────────────────
+    if(s.Rl !== null && s.Dl !== null)
+      fire('C1', 2 * s.Rl * Math.sin(s.Dl * DEG / 2), false);
+    if(s.C1 !== null && s.Dl !== null && Math.abs(Math.sin(s.Dl * DEG / 2)) > 1e-12)
+      fire('Rl', s.C1 / (2 * Math.sin(s.Dl * DEG / 2)), false);
+    if(s.C1 !== null && s.Rl !== null){
+      var sinHalf1 = s.C1 / (2 * s.Rl);
+      if(Math.abs(sinHalf1) <= 1) fire('Dl', 2 * Math.asin(sinHalf1) / DEG, true);
+    }
+
+    // ── Curve 1: E1 = Rl·(sec(Dl/2) - 1) ───────────────────────────
+    if(s.Rl !== null && s.Dl !== null)
+      fire('E1', s.Rl * (1 / Math.cos(s.Dl * DEG / 2) - 1), false);
+    if(s.E1 !== null && s.Dl !== null){
+      var secM1 = 1 / Math.cos(s.Dl * DEG / 2) - 1;
+      if(Math.abs(secM1) > 1e-12) fire('Rl', s.E1 / secM1, false);
+    }
+    if(s.E1 !== null && s.Rl !== null){
+      var cosArg1 = s.Rl / (s.Rl + s.E1);
+      if(Math.abs(cosArg1) <= 1) fire('Dl', 2 * Math.acos(cosArg1) / DEG, true);
+    }
+
+    // ── Curve 1: M1 = Rl·(1 - cos(Dl/2)) ───────────────────────────
+    if(s.Rl !== null && s.Dl !== null)
+      fire('M1', s.Rl * (1 - Math.cos(s.Dl * DEG / 2)), false);
+    if(s.M1 !== null && s.Dl !== null){
+      var oneMinusCos1 = 1 - Math.cos(s.Dl * DEG / 2);
+      if(Math.abs(oneMinusCos1) > 1e-12) fire('Rl', s.M1 / oneMinusCos1, false);
+    }
+    if(s.M1 !== null && s.Rl !== null){
+      var cosArg1m = 1 - s.M1 / s.Rl;
+      if(Math.abs(cosArg1m) <= 1) fire('Dl', 2 * Math.acos(cosArg1m) / DEG, true);
+    }
+
+    // ── Curve 2: L2 = Rs · Ds(rad) ──────────────────────────────────
+    if(s.Rs !== null && s.Ds !== null)
+      fire('L2', s.Rs * s.Ds * DEG, false);
+    if(s.L2 !== null && s.Ds !== null && s.Ds > 1e-9)
+      fire('Rs', s.L2 / (s.Ds * DEG), false);
+    if(s.L2 !== null && s.Rs !== null){
+      var ds_from_L2 = s.L2 / (s.Rs * DEG);
+      fire('Ds', ds_from_L2, true);
+    }
+
+    // ── Curve 2: C2 = 2·Rs·sin(Ds/2) ───────────────────────────────
+    if(s.Rs !== null && s.Ds !== null)
+      fire('C2', 2 * s.Rs * Math.sin(s.Ds * DEG / 2), false);
+    if(s.C2 !== null && s.Ds !== null && Math.abs(Math.sin(s.Ds * DEG / 2)) > 1e-12)
+      fire('Rs', s.C2 / (2 * Math.sin(s.Ds * DEG / 2)), false);
+    if(s.C2 !== null && s.Rs !== null){
+      var sinHalf2 = s.C2 / (2 * s.Rs);
+      if(Math.abs(sinHalf2) <= 1) fire('Ds', 2 * Math.asin(sinHalf2) / DEG, true);
+    }
+
+    // ── Curve 2: E2 = Rs·(sec(Ds/2) - 1) ───────────────────────────
+    if(s.Rs !== null && s.Ds !== null)
+      fire('E2', s.Rs * (1 / Math.cos(s.Ds * DEG / 2) - 1), false);
+    if(s.E2 !== null && s.Ds !== null){
+      var secM2 = 1 / Math.cos(s.Ds * DEG / 2) - 1;
+      if(Math.abs(secM2) > 1e-12) fire('Rs', s.E2 / secM2, false);
+    }
+    if(s.E2 !== null && s.Rs !== null){
+      var cosArg2 = s.Rs / (s.Rs + s.E2);
+      if(Math.abs(cosArg2) <= 1) fire('Ds', 2 * Math.acos(cosArg2) / DEG, true);
+    }
+
+    // ── Curve 2: M2 = Rs·(1 - cos(Ds/2)) ───────────────────────────
+    if(s.Rs !== null && s.Ds !== null)
+      fire('M2', s.Rs * (1 - Math.cos(s.Ds * DEG / 2)), false);
+    if(s.M2 !== null && s.Ds !== null){
+      var oneMinusCos2 = 1 - Math.cos(s.Ds * DEG / 2);
+      if(Math.abs(oneMinusCos2) > 1e-12) fire('Rs', s.M2 / oneMinusCos2, false);
+    }
+    if(s.M2 !== null && s.Rs !== null){
+      var cosArg2m = 1 - s.M2 / s.Rs;
+      if(Math.abs(cosArg2m) <= 1) fire('Ds', 2 * Math.acos(cosArg2m) / DEG, true);
+    }
+
+    if(!changed) break;
+  }
+
+  return s;
+}
+
+// ── Main calculate ──────────────────────────────────────────────
+function calculate(){
+  clrErr();
+
+  var inputMap = {
+    Rl:     getVal('inp_Rl'),
+    Rs:     getVal('inp_Rs'),
+    D:      getAng('inp_D'),
+    Dl:     getAng('inp_Dl'),
+    Ds:     getAng('inp_Ds'),
+    Tlong:  getVal('inp_Tlong'),
+    Tshort: getVal('inp_Tshort'),
+    Tl:     getVal('inp_Tl'),
+    Ts:     getVal('inp_Ts'),
+    L1:     getVal('inp_L1'),
+    C1:     getVal('inp_C1'),
+    E1:     getVal('inp_E1'),
+    M1:     getVal('inp_M1'),
+    L2:     getVal('inp_L2'),
+    C2:     getVal('inp_C2'),
+    E2:     getVal('inp_E2'),
+    M2:     getVal('inp_M2')
+  };
+
+  // Count filled inputs
+  var inputKeys = [];
+  for(var k in inputMap){ if(inputMap[k] !== null) inputKeys.push(k); }
+
+  if(inputKeys.length < 4){
+    showErr('Enter at least 4 known values.');
+    document.getElementById('results_section').style.display = 'none';
+    return;
+  }
+
+  var s = solveCompound(inputMap);
+
+  // Validate Rl > Rs
+  if(s.Rl !== null && s.Rs !== null && s.Rl <= s.Rs){
+    showErr('R\u2097 must be greater than R\u209B — check inputs.');
+    document.getElementById('results_section').style.display = 'none';
+    return;
+  }
+
+  // Validate delta consistency
+  if(s.D !== null && s.Dl !== null && s.Ds !== null){
+    if(Math.abs(s.Dl + s.Ds - s.D) > 0.001){
+      showErr('\u0394\u2097 + \u0394\u209B does not equal \u0394 — check inputs.');
+      document.getElementById('results_section').style.display = 'none';
+      return;
+    }
+  }
+
+  // Need at minimum Rl, Rs, Dl, Ds to show useful results
+  if(s.Rl === null || s.Rs === null || s.Dl === null || s.Ds === null){
+    showErr('Could not solve — provide more values or check for conflicts.');
+    document.getElementById('results_section').style.display = 'none';
+    return;
+  }
+
+  _lastSolved = s;
+  _inputKeys  = inputKeys;
+
+  renderResults(s, inputKeys);
+}
+
+// ── Render results ──────────────────────────────────────────────
+function renderResults(s, inputKeys){
+  var du = _unit === 'metric' ? 'm' : 'ft';
+  var ik = {};
+  for(var i = 0; i < inputKeys.length; i++) ik[inputKeys[i]] = true;
+
+  function row(label, val, isAngle, knownKey){
+    var dispVal;
+    if(val === null || val === undefined){
+      dispVal = '\u2014';
+    } else if(isAngle){
+      dispVal = fmtAngle(val);
+    } else {
+      dispVal = fmtD(val) + ' ' + du;
+    }
+    var tag = (knownKey && ik[knownKey]) ? '<span class="known-tag">KNOWN</span>' : '';
+    return '<div class="res-row">'
+      + '<div class="res-label">' + label + '</div>'
+      + '<div class="res-val">' + dispVal + tag + '</div>'
+      + '</div>';
+  }
+
+  // Curve 1
+  var c1 = '';
+  c1 += row('R<sub>l</sub>',                  s.Rl,  false, 'Rl');
+  c1 += row('\u0394<sub>l</sub>',             s.Dl,  true,  'Dl');
+  c1 += row('T<sub>l</sub>',                  s.Tl,  false, 'Tl');
+  c1 += row('L\u2081 Arc',                    s.L1,  false, 'L1');
+  c1 += row('C\u2081 Chord',                  s.C1,  false, 'C1');
+  c1 += row('E\u2081 External',               s.E1,  false, 'E1');
+  c1 += row('M\u2081 Mid-ord.',               s.M1,  false, 'M1');
+  document.getElementById('res_c1').innerHTML = c1;
+
+  // Curve 2
+  var c2 = '';
+  c2 += row('R<sub>s</sub>',                  s.Rs,  false, 'Rs');
+  c2 += row('\u0394<sub>s</sub>',             s.Ds,  true,  'Ds');
+  c2 += row('T<sub>s</sub>',                  s.Ts,  false, 'Ts');
+  c2 += row('L\u2082 Arc',                    s.L2,  false, 'L2');
+  c2 += row('C\u2082 Chord',                  s.C2,  false, 'C2');
+  c2 += row('E\u2082 External',               s.E2,  false, 'E2');
+  c2 += row('M\u2082 Mid-ord.',               s.M2,  false, 'M2');
+  document.getElementById('res_c2').innerHTML = c2;
+
+  // Summary
+  var totalArc = (s.L1 !== null && s.L2 !== null) ? s.L1 + s.L2 : null;
+  var summ = '';
+  summ += row('Total \u0394',                 s.D,      true,  'D');
+  summ += row('T<sub>long</sub>',             s.Tlong,  false, 'Tlong');
+  summ += row('T<sub>short</sub>',            s.Tshort, false, 'Tshort');
+  summ += '<div class="res-row">'
+    + '<div class="res-label">Total Arc (L\u2081+L\u2082)</div>'
+    + '<div class="res-val">'
+    + (totalArc !== null ? fmtD(totalArc) + ' ' + du : '\u2014')
+    + '</div></div>';
+  document.getElementById('res_summary').innerHTML = summ;
+
+  document.getElementById('results_section').style.display = '';
+}
+
+// ── Reset ───────────────────────────────────────────────────────
+function resetCalc(){
+  document.querySelectorAll('.inp-input').forEach(function(el){el.value='';});
+  clrErr();
+  document.getElementById('results_section').style.display = 'none';
+  _lastSolved = null; _inputKeys = null;
+}
+
+// ── Copy ────────────────────────────────────────────────────────
+function copyResults(){
+  if(!_lastSolved) return;
+  var s  = _lastSolved;
+  var du = _unit === 'metric' ? 'm' : 'ft';
+  function da(v){ return v !== null && v !== undefined ? fmtD(v) + ' ' + du : '\u2014'; }
+  function aa(v){ return v !== null && v !== undefined ? fmtAngleDMS(v) : '\u2014'; }
+  var totalArc = (s.L1 !== null && s.L2 !== null) ? fmtD(s.L1 + s.L2) + ' ' + du : '\u2014';
+  var lines = [
+    '--- COMPOUND CURVE RESULTS ---',
+    '--- CURVE 1 (Large Radius) ---',
+    'Large Radius (Rl)\t'    + da(s.Rl),
+    'Delta 1 (\u0394l)\t'    + aa(s.Dl),
+    'Sub-tangent (Tl)\t'     + da(s.Tl),
+    'Arc Length (L1)\t'      + da(s.L1),
+    'Chord (C1)\t'           + da(s.C1),
+    'External (E1)\t'        + da(s.E1),
+    'Mid-ordinate (M1)\t'    + da(s.M1),
+    '--- CURVE 2 (Small Radius) ---',
+    'Small Radius (Rs)\t'    + da(s.Rs),
+    'Delta 2 (\u0394s)\t'    + aa(s.Ds),
+    'Sub-tangent (Ts)\t'     + da(s.Ts),
+    'Arc Length (L2)\t'      + da(s.L2),
+    'Chord (C2)\t'           + da(s.C2),
+    'External (E2)\t'        + da(s.E2),
+    'Mid-ordinate (M2)\t'    + da(s.M2),
+    '--- SUMMARY ---',
+    'Total Delta (\u0394)\t'     + aa(s.D),
+    'Long Tangent (T_long)\t'    + da(s.Tlong),
+    'Short Tangent (T_short)\t'  + da(s.Tshort),
+    'Total Arc Length\t'         + totalArc
+  ];
+  var btn = document.getElementById('copy_btn');
+  copyToClipboard(lines.join('\n'), btn, 'Copied!', 'Copy Results');
+  btn.classList.add('copied');
+  setTimeout(function(){ btn.classList.remove('copied'); }, 1500);
+}
+
+// ── Settings ────────────────────────────────────────────────────
+function setUnit(u){
+  _unit = u;
+  document.getElementById('tog_metric').classList.toggle('active',   u === 'metric');
+  document.getElementById('tog_imperial').classList.toggle('active',  u === 'imperial');
+  if(_lastSolved) renderResults(_lastSolved, _inputKeys);
+}
+
+function setAfmt(f){
+  _afmt = f;
+  document.getElementById('tog_dms').classList.toggle('active', f === 'dms');
+  document.getElementById('tog_dd').classList.toggle('active',  f === 'dd');
+  if(_lastSolved) renderResults(_lastSolved, _inputKeys);
+}
+
+function updatePrec(){
+  _pdist = parseInt(document.getElementById('prec_val').value, 10);
+  _pang  = parseInt(document.getElementById('prec_ang').value, 10);
+  if(_lastSolved) renderResults(_lastSolved, _inputKeys);
+}
+
+// ── Init ────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('calc_btn').addEventListener('click', calculate);
+  document.getElementById('reset_btn').addEventListener('click', resetCalc);
+  document.getElementById('copy_btn').addEventListener('click', copyResults);
+  document.getElementById('tog_metric').addEventListener('click',   function(){ setUnit('metric'); });
+  document.getElementById('tog_imperial').addEventListener('click',  function(){ setUnit('imperial'); });
+  document.getElementById('tog_dms').addEventListener('click', function(){ setAfmt('dms'); });
+  document.getElementById('tog_dd').addEventListener('click',  function(){ setAfmt('dd'); });
+  document.getElementById('prec_val').addEventListener('change', updatePrec);
+  document.getElementById('prec_ang').addEventListener('change', updatePrec);
+  document.querySelectorAll('.inp-input').forEach(function(el){
+    el.addEventListener('keydown', function(e){ if(e.key === 'Enter') calculate(); });
+  });
+});
+</script>
+</body>
+</html>

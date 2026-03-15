@@ -266,7 +266,7 @@ function copyAllResults(){
   if(!triLastResult)return;
   var r=triLastResult,sp=parseInt(document.getElementById('prec_side').value,10),u=triUnit==='metric'?'m':'ft';
   var lines=['Triangle Calculation','Side a: '+r.a.toFixed(sp)+' '+u,'Side b: '+r.b.toFixed(sp)+' '+u,'Side c: '+r.c.toFixed(sp)+' '+u,'Angle A: '+fmtAngleCopy(r.A),'Angle B: '+fmtAngleCopy(r.B),'Angle C: '+fmtAngleCopy(r.C)];
-  copyToClipboard(lines.join('\r\n'),document.getElementById('copy_all_btn'));
+  copyToClipboard(lines.join('\n'),document.getElementById('copy_all_btn'));
 }
 
 function drawDiagram(r){

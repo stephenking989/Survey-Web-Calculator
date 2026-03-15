@@ -130,6 +130,25 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
     </div>
   </div>
 </div><script>
+// ── Clipboard helper (with textarea fallback for Android) ───────────────────
+function copyToClipboard(text, btn, doneLabel, resetLabel){
+  function flash(){
+    if(!btn) return;
+    btn.textContent = doneLabel || 'Copied!';
+    setTimeout(function(){ btn.textContent = resetLabel || btn.textContent; }, 1500);
+  }
+  function fb(){
+    var t=document.createElement('textarea');
+    t.value=text; t.style.position='fixed'; t.style.opacity='0';
+    document.body.appendChild(t); t.focus(); t.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(t);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(flash, function(){ fb(); flash(); });
+  } else { fb(); flash(); }
+}
+
 // ── Settings state ─────────────────────────────────────────────────────────
 var _unit = 'metric';   // 'metric' | 'imperial'
 var _afmt = 'dms';      // 'dms' | 'dd' | 'dm'
@@ -280,11 +299,7 @@ function copyStakeout(){
       fmtD(r.cumArc), fmtD(r.cumChord), fmtAngleDMS(r.cumDefl)
     ].join('\t'));
   }
-  navigator.clipboard.writeText(lines.join('\r\n')).then(function(){
-    var btn=document.getElementById('copy_stk_btn');
-    btn.textContent='Copied!';
-    setTimeout(function(){btn.textContent='Copy Stakeout';},1500);
-  });
+  copyToClipboard(lines.join('\n'), document.getElementById('copy_stk_btn'), 'Copied!', 'Copy Stakeout');
 }
 
 function exportCSV(){
@@ -442,11 +457,7 @@ function copyResults(){
     'External (E)\t'+fmtD(r.E)+' '+du,
     'Mid-ordinate (M)\t'+fmtD(r.M)+' '+du
   ];
-  navigator.clipboard.writeText(lines.join('\r\n')).then(function(){
-    var btn=document.getElementById('copy_btn');
-    btn.textContent='Copied!';
-    setTimeout(function(){btn.textContent='Copy Results';},1500);
-  });
+  copyToClipboard(lines.join('\n'), document.getElementById('copy_btn'), 'Copied!', 'Copy Results');
 }
 
 // ── Settings ────────────────────────────────────────────────────────────────
