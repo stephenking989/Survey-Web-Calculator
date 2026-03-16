@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angle Converter — SurveyCalc</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh}
+.top-bar{display:flex;align-items:center;gap:12px;background:#16213e;border-bottom:1px solid #0f3460;padding:10px 16px}
+.back-btn{display:flex;align-items:center;gap:6px;color:#4fc3f7;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid #1e3a5f;background:transparent;transition:all .2s}
+.back-btn:hover{border-color:#4fc3f7;background:rgba(79,195,247,.08)}
+.top-bar-title{font-size:15px;font-weight:600;color:#e0e0e0}
+.page{padding:16px;max-width:480px;margin:0 auto}
+.section-title{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#4fc3f7;margin:0 0 10px}
+.card{background:#16213e;border:1px solid #0f3460;border-radius:12px;padding:14px 16px;margin-bottom:12px}
+
+/* ── Circular format selector buttons ── */
+.fmt-btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:12px}
+.fmt-btn{width:56px;height:56px;border-radius:50%;border:2px solid #1e3a5f;background:#0f1b35;color:#888;font-size:10px;font-weight:700;cursor:pointer;transition:all .2s;text-transform:uppercase;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.2;letter-spacing:.03em}
+.fmt-btn.active{background:#4fc3f7;border-color:#81d4fa;color:#0a0a1a;box-shadow:0 0 14px rgba(79,195,247,.35)}
+.fmt-btn:hover:not(.active){border-color:#4fc3f7;color:#4fc3f7}
+
+/* ── Input field ── */
+.ang-input{width:100%;padding:12px 14px;background:#0f1b35;border:1.5px solid #1e3a5f;border-radius:8px;color:#e0e0e0;font-size:20px;font-family:'Courier New',monospace;outline:none;transition:border-color .2s}
+.ang-input:focus{border-color:#4fc3f7}
+.ang-input.inp-error{border-color:#ff5252}
+.ang-err{font-size:11px;color:#ff5252;min-height:16px;margin-top:5px}
+.ang-warn{font-size:11px;color:#aaa;min-height:16px;margin-top:4px}
+
+/* ── Result rows ── */
+.res-row{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:7px;border:1px solid transparent;margin-bottom:4px;transition:all .15s}
+.res-row:hover{background:#0f2440;border-color:#1e3a5f}
+.res-row:hover .res-row-val{color:#4fc3f7}
+.res-row-left{flex:0 0 114px;display:flex;align-items:center;gap:6px}
+.res-row-label{font-size:12px;color:#888;white-space:nowrap}
+.res-row-val{flex:1;font-size:14px;font-weight:600;color:#e0e0e0;font-family:'Courier New',monospace;word-break:break-all}
+.input-badge{font-size:9px;background:#0f3460;color:#4fc3f7;border-radius:4px;padding:2px 5px;white-space:nowrap;flex-shrink:0}
+.btn-copy-sm{padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid #1e3a5f;background:transparent;color:#888;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.btn-copy-sm:hover{border-color:#4fc3f7;color:#4fc3f7}
+.btn-copy-sm.copied{border-color:#66bb6a;color:#66bb6a}
+
+/* ── Buttons ── */
+.btn-sec{padding:6px 12px;background:#0f1b35;border:1px solid #1e3a5f;border-radius:6px;color:#aaa;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-sec:hover{border-color:#4fc3f7;color:#4fc3f7}
+
+/* ── Accordion (formula reference) ── */
+.acc-block{background:#16213e;border:1px solid #0f3460;border-radius:12px;margin-bottom:10px;overflow:hidden}
+.acc-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;user-select:none;transition:background .2s}
+.acc-header:hover{background:rgba(79,195,247,.05)}
+.acc-header-left{display:flex;align-items:center;gap:10px}
+.acc-title{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4fc3f7}
+.acc-chevron{font-size:13px;color:#4fc3f7;transition:transform .25s}
+.acc-block.open .acc-chevron{transform:rotate(180deg)}
+.acc-body{display:none;padding:0 16px 14px;border-top:1px solid #0f3460}
+.acc-block.open .acc-body{display:block}
+
+/* ── Formula items inside accordion ── */
+.subgroup-heading{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3a7090;margin:14px 0 6px;padding-bottom:5px;border-bottom:1px solid #0f3460}
+.formula-item{padding:9px 0;border-bottom:1px solid rgba(15,52,96,.6)}
+.formula-item:last-child{border-bottom:none}
+.formula-name{font-size:12px;font-weight:600;color:#aaa;margin-bottom:3px}
+.formula-expr{font-size:13px;color:#e0e0e0;font-family:'Courier New',monospace;margin-bottom:3px}
+.formula-desc{font-size:11px;color:#666;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="index.html" class="back-btn">&#8592; Survey Calculator</a>
+  <div class="top-bar-title">Angle Converter</div>
+</div>
+
+<div class="page">
+  <div style="margin-top:16px">
+
+    <!-- ── Input card ── -->
+    <div class="card">
+      <div class="section-title">Input Format</div>
+
+      <div class="fmt-btns">
+        <button class="fmt-btn active" id="fmt_dd"      onclick="setFmt('dd')">DD</button>
+        <button class="fmt-btn"        id="fmt_dms"     onclick="setFmt('dms')">DMS</button>
+        <button class="fmt-btn"        id="fmt_compact" onclick="setFmt('compact')">CPT<br>DMS</button>
+        <button class="fmt-btn"        id="fmt_rad"     onclick="setFmt('rad')">RAD</button>
+        <button class="fmt-btn"        id="fmt_grad"    onclick="setFmt('grad')">GRAD</button>
+        <button class="fmt-btn"        id="fmt_bearing" onclick="setFmt('bearing')">BRG</button>
+      </div>
+
+      <div id="fmt_hint" style="font-size:11px;color:#3a7090;margin-bottom:8px;min-height:14px;text-align:center"></div>
+
+      <input id="ang_input" class="ang-input" type="text" inputmode="decimal"
+             autocomplete="off" autocorrect="off" spellcheck="false" placeholder="45.7583">
+
+      <div id="ang_err" class="ang-err"></div>
+      <div id="ang_warn" class="ang-warn"></div>
+
+      <div style="display:flex;justify-content:flex-end;margin-top:6px">
+        <button class="btn-sec" onclick="clearInput()">Clear</button>
+      </div>
+    </div>
+
+    <!-- ── Results card ── -->
+    <div class="card" id="card_results" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="section-title" style="margin:0">Conversions</div>
+        <button class="btn-sec" id="copy_all_btn" onclick="copyAll()">Copy All</button>
+      </div>
+      <div id="result_rows"></div>
+    </div>
+
+    <!-- ── Formula Reference (accordion) ── -->
+    <div class="acc-block" id="sec_formulas">
+      <div class="acc-header" onclick="toggle('sec_formulas')">
+        <div class="acc-header-left">
+          <span class="acc-title">Formula Reference</span>
+        </div>
+        <span class="acc-chevron">&#9660;</span>
+      </div>
+      <div class="acc-body">
+        <div style="padding-top:10px">
+
+          <!-- DD ↔ DMS -->
+          <div class="subgroup-heading">DD &harr; DMS (Degrees Minutes Seconds)</div>
+
+          <div class="formula-item">
+            <div class="formula-name">DD to DMS</div>
+            <div class="formula-expr">d = &lfloor;DD&rfloor; &nbsp; m = &lfloor;(DD &minus; d) &times; 60&rfloor; &nbsp; s = ((DD &minus; d) &times; 60 &minus; m) &times; 60</div>
+            <div class="formula-desc">Extract integer degrees, convert the fractional degree to minutes, then the fractional minute to seconds.</div>
+          </div>
+
+          <div class="formula-item">
+            <div class="formula-name">DMS to DD</div>
+            <div class="formula-expr">DD = d + m / 60 + s / 3600</div>
+            <div class="formula-desc">Sum degrees, minutes converted to fractions of a degree, and seconds as a fraction.</div>
+          </div>
+
+          <!-- DD ↔ Compact DMS -->
+          <div class="subgroup-heading">DD &harr; Compact DMS</div>
+
+          <div class="formula-item">
+            <div class="formula-name">Compact DMS format</div>
+            <div class="formula-expr">value = DD.MMSS &nbsp;&nbsp; e.g. 45.4530 = 45&deg; 45&prime; 30&Prime;</div>
+            <div class="formula-desc">The integer part is degrees. The first two decimal digits are minutes. The next two are seconds. Both digit pairs must be 00–59.</div>
+          </div>
+
+          <div class="formula-item">
+            <div class="formula-name">Compact to DD</div>
+            <div class="formula-expr">d = trunc(value) &nbsp; m = trunc(frac &times; 100) &nbsp; s = (frac &times; 10000) mod 100</div>
+            <div class="formula-desc">Isolate the minute and second digit pairs by scaling the fractional part. Then apply DD = d + m/60 + s/3600.</div>
+          </div>
+
+          <div class="formula-item">
+            <div class="formula-name">DD to Compact</div>
+            <div class="formula-expr">compact = d + pad(m) / 100 + pad(s) / 10000</div>
+            <div class="formula-desc">Compute DMS from DD, then reassemble with zero-padded two-digit m and s (e.g. 45° 5' 3" → 45.0503).</div>
+          </div>
+
+          <!-- DD ↔ Radians -->
+          <div class="subgroup-heading">DD &harr; Radians</div>
+
+          <div class="formula-item">
+            <div class="formula-name">Degrees to Radians</div>
+            <div class="formula-expr">rad = DD &times; (&pi; / 180)</div>
+            <div class="formula-desc">Multiply decimal degrees by π/180. One full rotation = 2π ≈ 6.2832 radians.</div>
+          </div>
+
+          <div class="formula-item">
+            <div class="formula-name">Radians to Degrees</div>
+            <div class="formula-expr">DD = rad &times; (180 / &pi;)</div>
+            <div class="formula-desc">Inverse of the above. Multiply radians by 180/π.</div>
+          </div>
+
+          <div class="formula-item">
+            <div class="formula-name">Key radian values</div>
+            <div class="formula-expr">0&deg; = 0 &nbsp; 90&deg; &asymp; 1.5708 &nbsp; 180&deg; = &pi; &nbsp; 270&deg; &asymp; 4.7124 &nbsp; 360&deg; = 2&pi;</div>
+            <div class="formula-desc">Common reference angles in radians.</div>
+          </div>
+
+          <!-- DD ↔ Grads -->
+          <div class="subgroup-heading">DD &harr; Grads / Gon</div>
+
+          <div class="formula-item">
+            <div class="formula-name">Degrees to Grads</div>
+            <div class="formula-expr">grad = DD &times; (400 / 360) = DD &times; 10 / 9</div>
+            <div class="formula-desc">There are 400 grads in a full circle. Used in European surveying and engineering.</div>
+          </div>
+
+          <div class="formula-item">
+            <div class="formula-name">Grads to Degrees</div>
+            <div class="formula-expr">DD = grad &times; (360 / 400) = grad &times; 0.9</div>
+            <div class="formula-desc">Inverse. Multiply grads by 0.9 to get decimal degrees.</div>
+          </div>
+
+          <div class="formula-item">
+            <div class="formula-name">Key grad values</div>
+            <div class="formula-expr">0&deg; = 0 &nbsp; 90&deg; = 100 &nbsp; 180&deg; = 200 &nbsp; 270&deg; = 300 &nbsp; 360&deg; = 400 grad</div>
+            <div class="formula-desc">Quarter-circle = 100 grad — the defining property of the grad system.</div>
+          </div>
+
+          <!-- Quadrant Bearing -->
+          <div class="subgroup-heading">Quadrant Bearing &harr; Azimuth (DD)</div>
+
+          <div class="formula-item">
+            <div class="formula-name">Azimuth to Bearing — NE quadrant (0&deg;&ndash;90&deg;)</div>
+            <div class="formula-expr">N [Az]&deg; E</div>
+            <div class="formula-desc">Azimuth equals the bearing angle measured from North toward East.</div>
+          </div>
+
+          <div class="formula-item">
+            <div class="formula-name">Azimuth to Bearing — SE quadrant (90&deg;&ndash;180&deg;)</div>
+            <div class="formula-expr">S [180 &minus; Az]&deg; E</div>
+            <div class="formula-desc">Bearing angle = 180° minus the azimuth.</div>
+          </div>
+
+          <div class="formula-item">
+            <div class="formula-name">Azimuth to Bearing — SW quadrant (180&deg;&ndash;270&deg;)</div>
+            <div class="formula-expr">S [Az &minus; 180&deg;]&deg; W</div>
+            <div class="formula-desc">Bearing angle = azimuth minus 180°.</div>
+          </div>
+
+          <div class="formula-item">
+            <div class="formula-name">Azimuth to Bearing — NW quadrant (270&deg;&ndash;360&deg;)</div>
+            <div class="formula-expr">N [360 &minus; Az]&deg; W</div>
+            <div class="formula-desc">Bearing angle = 360° minus the azimuth.</div>
+          </div>
+
+          <div class="formula-item">
+            <div class="formula-name">Bearing to Azimuth</div>
+            <div class="formula-expr">N&theta;E &rarr; Az=&theta; &nbsp; S&theta;E &rarr; Az=180&minus;&theta; &nbsp; S&theta;W &rarr; Az=180+&theta; &nbsp; N&theta;W &rarr; Az=360&minus;&theta;</div>
+            <div class="formula-desc">&theta; is always positive and 0–90°. Cardinals: N=0°, E=90°, S=180°, W=270°.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── State ────────────────────────────────────────────────────────────────────
+var currentFmt   = 'dd';
+var currentDD    = null;
+var currentSecDP = 0;    // decimal places for seconds in DMS/Bearing output
+window._ac = [];         // copy strings for per-row buttons (indexed by row position)
+
+// ── Format metadata ──────────────────────────────────────────────────────────
+var FORMATS = [
+  { id:'dd',      btnId:'fmt_dd',      label:'DD',          placeholder:'45.758333',    hint:'Decimal degrees — e.g.  45.758333' },
+  { id:'dms',     btnId:'fmt_dms',     label:'DMS',         placeholder:'45 45 30',     hint:'Degrees minutes seconds — e.g.  45 45 30  or  45\u00b045\'30"' },
+  { id:'compact', btnId:'fmt_compact', label:'Compact DMS', placeholder:'45.4530',      hint:'Compact DMS (DD.MMSS) — e.g.  45.4530 = 45\u00b0 45\u2032 30\u2033' },
+  { id:'rad',     btnId:'fmt_rad',     label:'Radians',     placeholder:'0.798584',     hint:'Radians — e.g.  0.798584' },
+  { id:'grad',    btnId:'fmt_grad',    label:'Grads',       placeholder:'50.8426',      hint:'Grads / Gon (400 grad = 360\u00b0) — e.g.  50.8426' },
+  { id:'bearing', btnId:'fmt_bearing', label:'Bearing',     placeholder:'N45.4530E',    hint:'Quadrant bearing — e.g.  N45.4530E  or  N 45 45 30 E' }
+];
+
+// ── Utilities ────────────────────────────────────────────────────────────────
+function pad2(n){ return n < 10 ? '0' + n : '' + n; }
+
+function copyToClipboard(text, btn){
+  function fb(){ var t=document.createElement('textarea'); t.value=text; t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t); t.focus(); t.select(); try{ document.execCommand('copy'); }catch(e){} document.body.removeChild(t); }
+  function flash(){ if(!btn) return; var o=btn.textContent; btn.textContent='Copied!'; btn.classList.add('copied'); setTimeout(function(){ btn.textContent=o; btn.classList.remove('copied'); }, 1500); }
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(flash, function(){ fb(); flash(); }); } else { fb(); flash(); }
+}
+
+function toggle(id){ document.getElementById(id).classList.toggle('open'); }
+
+// ── Parsers ──────────────────────────────────────────────────────────────────
+
+// Compact DMS: 45.4530 → 45° 45' 30" → DD
+function parseCompactDMS(raw){
+  raw = raw.trim();
+  var neg = raw.charAt(0) === '-';
+  if(neg) raw = raw.slice(1);
+  var dot = raw.indexOf('.');
+  var d, fr;
+  if(dot === -1){
+    d  = parseInt(raw, 10);
+    fr = '0000';
+  } else {
+    d  = parseInt(raw.slice(0, dot), 10);
+    fr = (raw.slice(dot + 1) + '0000').slice(0, 4);
+  }
+  if(isNaN(d)) return null;
+  var m = parseInt(fr.slice(0, 2), 10);
+  var s = parseInt(fr.slice(2, 4), 10);
+  if(m > 59 || s > 59) return null;
+  var dd = d + m / 60 + s / 3600;
+  return neg ? -dd : dd;
+}
+
+// Full DMS: "45 45 30" or "45°45'30"" → DD
+function parseDMSFull(raw){
+  raw = raw.trim();
+  var neg = raw.charAt(0) === '-';
+  if(neg) raw = raw.slice(1).trim();
+  // symbolic: 45°45'30" or 45d45m30s
+  var sym = raw.match(/^(\d+(?:\.\d+)?)[°d\s]+(\d+(?:\.\d+)?)['\u2032ms\s]+(\d+(?:\.\d+)?)["s\u2033]?\s*$/i);
+  if(!sym){
+    // space-separated: 45 45 30 or 45 45 30.5
+    sym = raw.match(/^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s*$/);
+  }
+  if(!sym) return null;
+  var d = parseFloat(sym[1]);
+  var m = parseFloat(sym[2]);
+  var s = parseFloat(sym[3]);
+  if(m >= 60 || s >= 60) return null;
+  var dd = d + m / 60 + s / 3600;
+  return neg ? -dd : dd;
+}
+
+// Quadrant Bearing: "N45.4530E" or "N 45 45 30 E" → DD (azimuth)
+function parseBearing(raw){
+  raw = raw.trim().toUpperCase();
+  // Match: [N/S] ... [E/W]  or  single cardinal letter
+  var single = raw.match(/^([NSEW])$/);
+  if(single){
+    return { N:0, E:90, S:180, W:270 }[single[1]];
+  }
+  // Two-letter quadrant bearing: prefix, angle string, suffix
+  var m = raw.match(/^([NS])\s*([\d°'\"\s.dms]+?)\s*([EW])$/i);
+  if(!m) return null;
+  var prefix = m[1];
+  var angStr = m[2].trim();
+  var suffix = m[3];
+  // Parse the sub-angle
+  var subDD = null;
+  if(/\s/.test(angStr) || /[°d'ms"]/i.test(angStr)){
+    subDD = parseDMSFull(angStr);
+  } else {
+    // Try compact first; if no decimal point, treat as integer DD
+    if(angStr.indexOf('.') !== -1){
+      subDD = parseCompactDMS(angStr);
+    } else {
+      subDD = parseFloat(angStr);
+      if(isNaN(subDD)) subDD = null;
+    }
+  }
+  if(subDD === null) return null;
+  if(subDD < 0 || subDD > 90) return null;   // bearing sub-angle must be 0–90
+  // Apply quadrant offset to get azimuth
+  var az;
+  if     (prefix === 'N' && suffix === 'E') az = subDD;
+  else if(prefix === 'S' && suffix === 'E') az = 180 - subDD;
+  else if(prefix === 'S' && suffix === 'W') az = 180 + subDD;
+  else if(prefix === 'N' && suffix === 'W') az = 360 - subDD;
+  else return null;
+  return az;
+}
+
+// Main dispatcher: string + format id → decimal degrees or null
+function parseInput(raw, fmt){
+  raw = raw.trim();
+  if(!raw) return null;
+  var n;
+  switch(fmt){
+    case 'dd':
+      n = parseFloat(raw);
+      return isNaN(n) ? null : n;
+    case 'dms':
+      return parseDMSFull(raw);
+    case 'compact':
+      return parseCompactDMS(raw);
+    case 'rad':
+      n = parseFloat(raw);
+      return isNaN(n) ? null : n * 180 / Math.PI;
+    case 'grad':
+      n = parseFloat(raw);
+      return isNaN(n) ? null : n * 0.9;
+    case 'bearing':
+      return parseBearing(raw);
+    default:
+      return null;
+  }
+}
+
+// ── Seconds decimal-place detection ─────────────────────────────────────────
+
+// For DMS / Bearing inputs: read decimal places directly from the input string.
+// For DD / Rad / Grad / Compact: derive from the computed seconds value.
+// Returns an integer >= 0.
+
+function detectDPfromString(raw, fmt){
+  if(fmt === 'compact') return 0;  // compact is always whole seconds (DDMMSS pairs)
+
+  if(fmt === 'dms'){
+    // Grab the last numeric token — that's the seconds field
+    var m = raw.trim().match(/(\d+(?:\.\d+)?)[s"\u2033]?\s*$/i);
+    if(!m) return 0;
+    var dot = m[1].indexOf('.');
+    return dot === -1 ? 0 : m[1].length - dot - 1;
+  }
+
+  if(fmt === 'bearing'){
+    // Isolate the sub-angle string between the two compass letters
+    var bm = raw.trim().toUpperCase().match(/^([NS])\s*([\d\u00b0'"\s.dms]+?)\s*([EW])$/i);
+    if(!bm) return 0;
+    var angStr = bm[2].trim();
+    // Full DMS inside bearing → recurse as 'dms'
+    if(/\s/.test(angStr) || /[\u00b0d'ms"]/i.test(angStr)){
+      return detectDPfromString(angStr, 'dms');
+    }
+    // Compact sub-angle → 0 dp
+    return 0;
+  }
+
+  return -1;  // signal: use computeSecDP()
+}
+
+function computeSecDP(dd){
+  // Determine dp from the computed seconds value.
+  var v = Math.abs(dd);
+  var d = Math.floor(v);
+  var mt = (v - d) * 60;
+  var m = Math.floor(mt);
+  var s = (mt - m) * 60;
+
+  // Strip floating-point dust (round to 9 sig figures)
+  s = Math.round(s * 1e9) / 1e9;
+
+  // Within half a milli-second of a whole number → treat as whole
+  if(Math.abs(s - Math.round(s)) < 5e-4) return 0;
+
+  // Find minimum decimal places that faithfully represent the value
+  for(var dp = 1; dp <= 6; dp++){
+    var sr = Math.round(s * Math.pow(10, dp)) / Math.pow(10, dp);
+    if(Math.abs(sr - s) < 5e-8) return dp;
+  }
+  return 6;
+}
+
+function getSecDP(dd, raw, fmt){
+  var fromInput = detectDPfromString(raw, fmt);
+  if(fromInput >= 0) return fromInput;   // DMS / Bearing / Compact: trust the string
+  return computeSecDP(dd);              // DD / Rad / Grad: derive from value
+}
+
+// ── Formatters ───────────────────────────────────────────────────────────────
+
+function ddToDMSStr(dd, decSec){
+  // Returns "D° MM' SS[.SSS]"  — decSec = decimal places on seconds
+  var neg = dd < 0;
+  var v   = Math.abs(dd);
+  var d   = Math.floor(v);
+  var mt  = (v - d) * 60;
+  var m   = Math.floor(mt);
+  var s   = (mt - m) * 60;
+  // round to requested precision
+  var factor = Math.pow(10, decSec || 0);
+  s = Math.round(s * factor) / factor;
+  if(s >= 60){ s = 0; m++; }
+  if(m >= 60){ m = 0; d++; }
+  var sStr = decSec > 0 ? s.toFixed(decSec) : pad2(Math.round(s));
+  if(decSec > 0){
+    // ensure leading zero on seconds  e.g. "05.000"
+    var parts = sStr.split('.');
+    parts[0] = pad2(parseInt(parts[0], 10));
+    sStr = parts.join('.');
+  }
+  return (neg ? '-' : '') + d + '\u00b0 ' + pad2(m) + '\u2032 ' + sStr + '\u2033';
+}
+
+function ddToCompact(dd){
+  var neg = dd < 0;
+  var v   = Math.abs(dd);
+  var d   = Math.floor(v);
+  var mt  = (v - d) * 60;
+  var m   = Math.floor(mt);
+  var s   = Math.round((mt - m) * 60);
+  if(s >= 60){ s = 0; m++; }
+  if(m >= 60){ m = 0; d++; }
+  return (neg ? '-' : '') + d + '.' + pad2(m) + pad2(s);
+}
+
+function ddToRad(dd){
+  return (dd * Math.PI / 180).toFixed(6) + ' rad';
+}
+
+function ddToGrad(dd){
+  return (dd * 400 / 360).toFixed(4) + ' grad';
+}
+
+function ddToBearing(dd, dp){
+  // dp = decimal places for seconds (same as DMS output)
+  if(dp === undefined) dp = 0;
+  // Normalize to 0–360
+  var az = ((dd % 360) + 360) % 360;
+  var EPS = 1e-8;
+  // Cardinal cases
+  if(Math.abs(az - 0)   < EPS || Math.abs(az - 360) < EPS) return 'N';
+  if(Math.abs(az - 90)  < EPS) return 'E';
+  if(Math.abs(az - 180) < EPS) return 'S';
+  if(Math.abs(az - 270) < EPS) return 'W';
+  var prefix, suffix, sub;
+  if(az > 0 && az < 90)         { prefix = 'N'; suffix = 'E'; sub = az; }
+  else if(az > 90  && az < 180) { prefix = 'S'; suffix = 'E'; sub = 180 - az; }
+  else if(az > 180 && az < 270) { prefix = 'S'; suffix = 'W'; sub = az - 180; }
+  else                           { prefix = 'N'; suffix = 'W'; sub = 360 - az; }
+  var subStr = ddToDMSStr(sub, dp);
+  return prefix + ' ' + subStr + ' ' + suffix;
+}
+
+// ── setFmt ───────────────────────────────────────────────────────────────────
+function setFmt(id){
+  currentFmt = id;
+  var fmtObj = null;
+  for(var i = 0; i < FORMATS.length; i++){
+    var f = FORMATS[i];
+    document.getElementById(f.btnId).classList.toggle('active', f.id === id);
+    if(f.id === id) fmtObj = f;
+  }
+  if(fmtObj){
+    document.getElementById('ang_input').placeholder = fmtObj.placeholder;
+    document.getElementById('fmt_hint').textContent  = fmtObj.hint;
+  }
+  convertAndRender();
+}
+
+// ── Main conversion driver ───────────────────────────────────────────────────
+function convertAndRender(){
+  var raw = document.getElementById('ang_input').value;
+  var errEl  = document.getElementById('ang_err');
+  var warnEl = document.getElementById('ang_warn');
+  var inp    = document.getElementById('ang_input');
+
+  errEl.textContent  = '';
+  warnEl.textContent = '';
+  inp.classList.remove('inp-error');
+
+  if(!raw.trim()){
+    document.getElementById('card_results').style.display = 'none';
+    currentDD = null;
+    return;
+  }
+
+  var dd = parseInput(raw, currentFmt);
+
+  if(dd === null){
+    var msgs = {
+      dd:      'Enter a number — e.g. 45.758333',
+      dms:     'Format: 45 45 30  or  45\u00b045\'30"',
+      compact: 'Format: 45.4530  (= 45\u00b0 45\u2032 30\u2033 — digits must be 00\u201359)',
+      rad:     'Enter a number in radians — e.g. 0.798584',
+      grad:    'Enter a number in grads — e.g. 50.8426',
+      bearing: 'Format: N45.4530E  or  N 45 45 30 E  (sub-angle must be 0\u201390\u00b0)'
+    };
+    errEl.textContent = msgs[currentFmt] || 'Invalid input';
+    inp.classList.add('inp-error');
+    document.getElementById('card_results').style.display = 'none';
+    currentDD = null;
+    return;
+  }
+
+  currentDD    = dd;
+  currentSecDP = getSecDP(dd, raw.trim(), currentFmt);
+
+  // Soft warning for out-of-0-360 range (bearing is normalized internally)
+  var norm = ((dd % 360) + 360) % 360;
+  if(Math.abs(dd) > 360){
+    warnEl.textContent = 'Angle outside 0\u2013360\u00b0 — bearing shown for normalized value (' + norm.toFixed(4) + '\u00b0)';
+  }
+
+  renderResults(dd);
+}
+
+// ── renderResults ────────────────────────────────────────────────────────────
+function renderResults(dd){
+  var rows = [
+    { id:'dd',      label:'DD',          value: dd.toFixed(6) + '\u00b0',  copy: dd.toFixed(6) + '\u00b0' },
+    { id:'dms',     label:'DMS',         value: ddToDMSStr(dd, currentSecDP),  copy: ddToDMSStr(dd, currentSecDP) },
+    { id:'compact', label:'Compact DMS', value: ddToCompact(dd),            copy: ddToCompact(dd) },
+    { id:'rad',     label:'Radians',     value: ddToRad(dd),                copy: ddToRad(dd) },
+    { id:'grad',    label:'Grads',       value: ddToGrad(dd),               copy: ddToGrad(dd) },
+    { id:'bearing', label:'Bearing',     value: ddToBearing(dd, currentSecDP), copy: ddToBearing(dd, currentSecDP) }
+  ];
+
+  window._ac = [];
+  var html = '';
+  for(var i = 0; i < rows.length; i++){
+    var r = rows[i];
+    window._ac.push(r.copy);
+    var badge = (r.id === currentFmt) ? '<span class="input-badge">input</span>' : '';
+    html +=
+      '<div class="res-row">' +
+        '<div class="res-row-left"><span class="res-row-label">' + r.label + '</span>' + badge + '</div>' +
+        '<span class="res-row-val">' + r.value + '</span>' +
+        '<button class="btn-copy-sm" data-i="' + i + '">Copy</button>' +
+      '</div>';
+  }
+
+  document.getElementById('result_rows').innerHTML = html;
+  document.getElementById('card_results').style.display = '';
+}
+
+// Per-row copy via event delegation
+document.getElementById('result_rows').addEventListener('click', function(e){
+  var btn = e.target.closest('.btn-copy-sm');
+  if(!btn) return;
+  copyToClipboard(window._ac[+btn.dataset.i], btn);
+});
+
+// ── Copy All ─────────────────────────────────────────────────────────────────
+function copyAll(){
+  if(currentDD === null) return;
+  var dd = currentDD;
+  var fmtLabel = '';
+  for(var i = 0; i < FORMATS.length; i++){ if(FORMATS[i].id === currentFmt){ fmtLabel = FORMATS[i].label; break; } }
+  var inputVal = document.getElementById('ang_input').value.trim();
+  var lines = [
+    'Angle Conversions',
+    'Input: ' + inputVal + ' (' + fmtLabel + ')',
+    '',
+    'DD:           ' + dd.toFixed(6) + '\u00b0',
+    'DMS:          ' + ddToDMSStr(dd, currentSecDP),
+    'Compact DMS:  ' + ddToCompact(dd),
+    'Radians:      ' + ddToRad(dd),
+    'Grads:        ' + ddToGrad(dd),
+    'Bearing:      ' + ddToBearing(dd, currentSecDP)
+  ];
+  copyToClipboard(lines.join('\n'), document.getElementById('copy_all_btn'));
+}
+
+// ── Clear ────────────────────────────────────────────────────────────────────
+function clearInput(){
+  document.getElementById('ang_input').value = '';
+  convertAndRender();
+  document.getElementById('ang_input').focus();
+}
+
+// ── Event wiring ─────────────────────────────────────────────────────────────
+document.getElementById('ang_input').addEventListener('input', convertAndRender);
+
+// Focus / blur border
+document.getElementById('ang_input').addEventListener('focus', function(){
+  if(!this.classList.contains('inp-error')) this.style.borderColor = '#4fc3f7';
+});
+document.getElementById('ang_input').addEventListener('blur', function(){
+  if(!this.classList.contains('inp-error')) this.style.borderColor = '#1e3a5f';
+});
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+setFmt('dd');
+</script>
+</body>
+</html>

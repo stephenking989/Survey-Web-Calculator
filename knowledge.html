@@ -524,6 +524,160 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
     </div>
   </div>
 
+  <!-- ── Section 8: Traverse Coordinates ── -->
+  <div class="acc-block" id="sec8">
+    <div class="acc-header" onclick="toggle('sec8')">
+      <div class="acc-header-left">
+        <span class="acc-num">08</span>
+        <span class="acc-title">Traverse Coordinates</span>
+      </div>
+      <span class="acc-chevron">&#9660;</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding-top:10px">
+
+        <div class="subgroup-heading">Departures from HD &amp; Azimuth</div>
+
+        <div class="formula-item" data-formula="delta-n-cos">
+          <div class="formula-name">Northing Departure</div>
+          <div class="formula-expr">&Delta;N = HD &times; cos(Az)</div>
+          <div class="formula-desc">Northing departure from horizontal distance and azimuth. Az is a full-circle azimuth in degrees (0–360).</div>
+        </div>
+
+        <div class="formula-item" data-formula="delta-e-sin">
+          <div class="formula-name">Easting Departure</div>
+          <div class="formula-expr">&Delta;E = HD &times; sin(Az)</div>
+          <div class="formula-desc">Easting departure from horizontal distance and azimuth.</div>
+        </div>
+
+        <div class="subgroup-heading">Delta from Two Points</div>
+
+        <div class="formula-item" data-formula="delta-n-pts">
+          <div class="formula-name">Northing Delta</div>
+          <div class="formula-expr">&Delta;N = N<sub>2</sub> &minus; N<sub>1</sub></div>
+          <div class="formula-desc">Northing change: End point minus Start point.</div>
+        </div>
+
+        <div class="formula-item" data-formula="delta-e-pts">
+          <div class="formula-name">Easting Delta</div>
+          <div class="formula-expr">&Delta;E = E<sub>2</sub> &minus; E<sub>1</sub></div>
+          <div class="formula-desc">Easting change: End point minus Start point.</div>
+        </div>
+
+        <div class="subgroup-heading">Coordinate Propagation</div>
+
+        <div class="formula-item" data-formula="coord-n">
+          <div class="formula-name">Northing of Point B</div>
+          <div class="formula-expr">N<sub>B</sub> = N<sub>A</sub> + &Delta;N</div>
+          <div class="formula-desc">Compute northing of next point from known point and departure.</div>
+        </div>
+
+        <div class="formula-item" data-formula="coord-e">
+          <div class="formula-name">Easting of Point B</div>
+          <div class="formula-expr">E<sub>B</sub> = E<sub>A</sub> + &Delta;E</div>
+          <div class="formula-desc">Compute easting of next point from known point and departure.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 9: Traverse Closure ── -->
+  <div class="acc-block" id="sec9">
+    <div class="acc-header" onclick="toggle('sec9')">
+      <div class="acc-header-left">
+        <span class="acc-num">09</span>
+        <span class="acc-title">Traverse Closure &amp; Adjustment</span>
+      </div>
+      <span class="acc-chevron">&#9660;</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding-top:10px">
+
+        <div class="subgroup-heading">Closure Error</div>
+
+        <div class="formula-item" data-formula="lec">
+          <div class="formula-name">Linear Error of Closure</div>
+          <div class="formula-expr">LEC = &radic;(&Sigma;&Delta;N&sup2; + &Sigma;&Delta;E&sup2;)</div>
+          <div class="formula-desc">Resultant misclosure vector from the sum of northing and easting errors.</div>
+        </div>
+
+        <div class="formula-item" data-formula="rop">
+          <div class="formula-name">Ratio of Precision</div>
+          <div class="formula-expr">RoP = &Sigma;HD / LEC</div>
+          <div class="formula-desc">Traverse precision expressed as a ratio (e.g. 1&nbsp;:&nbsp;5000 — higher is better).</div>
+        </div>
+
+        <div class="subgroup-heading">Compass Rule Adjustment</div>
+
+        <div class="formula-item" data-formula="cf-dn">
+          <div class="formula-name">Correction Factor — Northing</div>
+          <div class="formula-expr">CF<sub>&Delta;N</sub> = &Sigma;&Delta;N / &Sigma;HD</div>
+          <div class="formula-desc">Proportional correction factor distributed across all northing departures.</div>
+        </div>
+
+        <div class="formula-item" data-formula="cf-de">
+          <div class="formula-name">Correction Factor — Easting</div>
+          <div class="formula-expr">CF<sub>&Delta;E</sub> = &Sigma;&Delta;E / &Sigma;HD</div>
+          <div class="formula-desc">Proportional correction factor distributed across all easting departures.</div>
+        </div>
+
+        <div class="formula-item" data-formula="compass-n">
+          <div class="formula-name">Compass Rule Correction — Northing</div>
+          <div class="formula-expr">CR = CF<sub>&Delta;N</sub> &times; HD<sub>ab</sub></div>
+          <div class="formula-desc">Northing correction for leg ab, proportional to its length.</div>
+        </div>
+
+        <div class="formula-item" data-formula="compass-e">
+          <div class="formula-name">Compass Rule Correction — Easting</div>
+          <div class="formula-expr">CR = CF<sub>&Delta;E</sub> &times; HD<sub>ab</sub></div>
+          <div class="formula-desc">Easting correction for leg ab, proportional to its length.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 10: Line Geometry ── -->
+  <div class="acc-block" id="sec10">
+    <div class="acc-header" onclick="toggle('sec10')">
+      <div class="acc-header-left">
+        <span class="acc-num">10</span>
+        <span class="acc-title">Line Geometry</span>
+      </div>
+      <span class="acc-chevron">&#9660;</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding-top:10px">
+
+        <div class="formula-item" data-formula="slope-intercept">
+          <div class="formula-name">Slope-Intercept Form</div>
+          <div class="formula-expr">y = mx + b</div>
+          <div class="formula-desc">Line expressed using slope m and y-intercept b.</div>
+        </div>
+
+        <div class="formula-item" data-formula="point-slope">
+          <div class="formula-name">Point-Slope Form</div>
+          <div class="formula-expr">(y &minus; y<sub>1</sub>) = m(x &minus; x<sub>1</sub>)</div>
+          <div class="formula-desc">Line through a known point (x₁, y₁) with slope m.</div>
+        </div>
+
+        <div class="formula-item" data-formula="slope-two-pts">
+          <div class="formula-name">Slope of a Line</div>
+          <div class="formula-expr">m = (y<sub>2</sub> &minus; y<sub>1</sub>) / (x<sub>2</sub> &minus; x<sub>1</sub>)</div>
+          <div class="formula-desc">Gradient calculated from two known points on the line.</div>
+        </div>
+
+        <div class="formula-item" data-formula="general-form">
+          <div class="formula-name">General Form</div>
+          <div class="formula-expr">Ax + By + C = 0</div>
+          <div class="formula-desc">Any line in general (standard) form. Solve for x, y, or any coefficient given the others.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- ── Important Notes ── -->
   <div class="acc-block" id="secN">
     <div class="acc-header" onclick="toggle('secN')">
@@ -1083,6 +1237,247 @@ var FORMULAS={
       Tl:function(v){
         return (v.Rl*(1-Math.cos(toRad(v.D)))-(v.Rl-v.Rs)*(1-Math.cos(toRad(v.Ds))))/Math.sin(toRad(v.D));
       }
+    }
+  },
+
+  // Section 8 — Traverse Coordinates ──────────────────────────────
+  // ΔN = HD·cos(Az)
+  'delta-n-cos':{
+    vars:[
+      {id:'dN',sym:'\u0394N',label:'\u0394N  Northing Departure', unit:'m / ft',        angle:false},
+      {id:'HD',sym:'HD',     label:'HD   Horizontal Distance',    unit:'m / ft',        angle:false},
+      {id:'Az',sym:'Az',     label:'Az   Azimuth',                unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      dN:function(v){ return v.HD*Math.cos(toRad(v.Az)); },
+      HD:function(v){ return v.dN/Math.cos(toRad(v.Az)); },
+      Az:function(v){ return toDeg(Math.acos(v.dN/v.HD)); }
+    }
+  },
+
+  // ΔE = HD·sin(Az)
+  'delta-e-sin':{
+    vars:[
+      {id:'dE',sym:'\u0394E',label:'\u0394E  Easting Departure',  unit:'m / ft',        angle:false},
+      {id:'HD',sym:'HD',     label:'HD   Horizontal Distance',    unit:'m / ft',        angle:false},
+      {id:'Az',sym:'Az',     label:'Az   Azimuth',                unit:'DMS or DD\u00b0',angle:true}
+    ],
+    solve:{
+      dE:function(v){ return v.HD*Math.sin(toRad(v.Az)); },
+      HD:function(v){ return v.dE/Math.sin(toRad(v.Az)); },
+      Az:function(v){ return toDeg(Math.asin(v.dE/v.HD)); }
+    }
+  },
+
+  // ΔN = N2 - N1
+  'delta-n-pts':{
+    vars:[
+      {id:'dN',sym:'\u0394N',label:'\u0394N  Northing Departure',unit:'m / ft',angle:false},
+      {id:'N2',sym:'N\u2082',label:'N\u2082  Northing (End)',    unit:'m / ft',angle:false},
+      {id:'N1',sym:'N\u2081',label:'N\u2081  Northing (Start)',  unit:'m / ft',angle:false}
+    ],
+    solve:{
+      dN:function(v){ return v.N2-v.N1; },
+      N2:function(v){ return v.N1+v.dN; },
+      N1:function(v){ return v.N2-v.dN; }
+    }
+  },
+
+  // ΔE = E2 - E1
+  'delta-e-pts':{
+    vars:[
+      {id:'dE',sym:'\u0394E',label:'\u0394E  Easting Departure', unit:'m / ft',angle:false},
+      {id:'E2',sym:'E\u2082',label:'E\u2082  Easting (End)',     unit:'m / ft',angle:false},
+      {id:'E1',sym:'E\u2081',label:'E\u2081  Easting (Start)',   unit:'m / ft',angle:false}
+    ],
+    solve:{
+      dE:function(v){ return v.E2-v.E1; },
+      E2:function(v){ return v.E1+v.dE; },
+      E1:function(v){ return v.E2-v.dE; }
+    }
+  },
+
+  // NB = NA + ΔN
+  'coord-n':{
+    vars:[
+      {id:'NB',sym:'N_B',label:'N_B  Northing (Point B)',   unit:'m / ft',angle:false},
+      {id:'NA',sym:'N_A',label:'N_A  Northing (Point A)',   unit:'m / ft',angle:false},
+      {id:'dN',sym:'\u0394N', label:'\u0394N   Northing Departure',unit:'m / ft',angle:false}
+    ],
+    solve:{
+      NB:function(v){ return v.NA+v.dN; },
+      NA:function(v){ return v.NB-v.dN; },
+      dN:function(v){ return v.NB-v.NA; }
+    }
+  },
+
+  // EB = EA + ΔE
+  'coord-e':{
+    vars:[
+      {id:'EB',sym:'E_B',label:'E_B  Easting (Point B)',    unit:'m / ft',angle:false},
+      {id:'EA',sym:'E_A',label:'E_A  Easting (Point A)',    unit:'m / ft',angle:false},
+      {id:'dE',sym:'\u0394E', label:'\u0394E   Easting Departure', unit:'m / ft',angle:false}
+    ],
+    solve:{
+      EB:function(v){ return v.EA+v.dE; },
+      EA:function(v){ return v.EB-v.dE; },
+      dE:function(v){ return v.EB-v.EA; }
+    }
+  },
+
+  // Section 9 — Traverse Closure ───────────────────────────────────
+  // LEC = √(ΣΔN² + ΣΔE²)
+  'lec':{
+    vars:[
+      {id:'LEC',sym:'LEC',  label:'LEC  Linear Error of Closure',  unit:'m / ft',angle:false},
+      {id:'sdN',sym:'\u03a3\u0394N',label:'\u03a3\u0394N  Sum of Northing Errors', unit:'m / ft',angle:false},
+      {id:'sdE',sym:'\u03a3\u0394E',label:'\u03a3\u0394E  Sum of Easting Errors',  unit:'m / ft',angle:false}
+    ],
+    solve:{
+      LEC:function(v){ return Math.sqrt(v.sdN*v.sdN+v.sdE*v.sdE); },
+      sdN:function(v){ return Math.sqrt(Math.max(0,v.LEC*v.LEC-v.sdE*v.sdE)); },
+      sdE:function(v){ return Math.sqrt(Math.max(0,v.LEC*v.LEC-v.sdN*v.sdN)); }
+    }
+  },
+
+  // RoP = ΣHD / LEC
+  'rop':{
+    vars:[
+      {id:'RoP',sym:'RoP', label:'RoP  Ratio of Precision',        unit:'unitless',  angle:false},
+      {id:'SHD',sym:'\u03a3HD',label:'\u03a3HD  Sum of Horiz. Distances',unit:'m / ft',angle:false},
+      {id:'LEC',sym:'LEC', label:'LEC  Linear Error of Closure',   unit:'m / ft',    angle:false}
+    ],
+    solve:{
+      RoP:function(v){ return v.SHD/v.LEC; },
+      SHD:function(v){ return v.RoP*v.LEC; },
+      LEC:function(v){ return v.SHD/v.RoP; }
+    }
+  },
+
+  // CF_ΔN = ΣΔN / ΣHD
+  'cf-dn':{
+    vars:[
+      {id:'CF', sym:'CF\u0394N',label:'CF\u0394N  Correction Factor (N)',     unit:'',      angle:false},
+      {id:'sdN',sym:'\u03a3\u0394N',label:'\u03a3\u0394N  Sum of Northing Deps', unit:'m / ft',angle:false},
+      {id:'SHD',sym:'\u03a3HD',    label:'\u03a3HD   Sum of Horiz. Distances',  unit:'m / ft',angle:false}
+    ],
+    solve:{
+      CF: function(v){ return v.sdN/v.SHD; },
+      sdN:function(v){ return v.CF*v.SHD; },
+      SHD:function(v){ return v.sdN/v.CF; }
+    }
+  },
+
+  // CF_ΔE = ΣΔE / ΣHD
+  'cf-de':{
+    vars:[
+      {id:'CF', sym:'CF\u0394E',label:'CF\u0394E  Correction Factor (E)',     unit:'',      angle:false},
+      {id:'sdE',sym:'\u03a3\u0394E',label:'\u03a3\u0394E  Sum of Easting Deps',  unit:'m / ft',angle:false},
+      {id:'SHD',sym:'\u03a3HD',    label:'\u03a3HD   Sum of Horiz. Distances',  unit:'m / ft',angle:false}
+    ],
+    solve:{
+      CF: function(v){ return v.sdE/v.SHD; },
+      sdE:function(v){ return v.CF*v.SHD; },
+      SHD:function(v){ return v.sdE/v.CF; }
+    }
+  },
+
+  // Compass Rule: CR = CF_ΔN × HD_ab
+  'compass-n':{
+    vars:[
+      {id:'CR',  sym:'CR',     label:'CR     Correction (N, leg ab)',  unit:'m / ft',angle:false},
+      {id:'CF',  sym:'CF\u0394N',label:'CF\u0394N  Correction Factor (N)',unit:'',      angle:false},
+      {id:'HDab',sym:'HD_ab',  label:'HD_ab  Leg Distance',            unit:'m / ft',angle:false}
+    ],
+    solve:{
+      CR:   function(v){ return v.CF*v.HDab; },
+      CF:   function(v){ return v.CR/v.HDab; },
+      HDab: function(v){ return v.CR/v.CF; }
+    }
+  },
+
+  // Compass Rule: CR = CF_ΔE × HD_ab
+  'compass-e':{
+    vars:[
+      {id:'CR',  sym:'CR',     label:'CR     Correction (E, leg ab)',  unit:'m / ft',angle:false},
+      {id:'CF',  sym:'CF\u0394E',label:'CF\u0394E  Correction Factor (E)',unit:'',      angle:false},
+      {id:'HDab',sym:'HD_ab',  label:'HD_ab  Leg Distance',            unit:'m / ft',angle:false}
+    ],
+    solve:{
+      CR:   function(v){ return v.CF*v.HDab; },
+      CF:   function(v){ return v.CR/v.HDab; },
+      HDab: function(v){ return v.CR/v.CF; }
+    }
+  },
+
+  // Section 10 — Line Geometry ─────────────────────────────────────
+  // y = mx + b
+  'slope-intercept':{
+    vars:[
+      {id:'y',sym:'y',label:'y  y-value',     unit:'',angle:false},
+      {id:'m',sym:'m',label:'m  Slope',        unit:'',angle:false},
+      {id:'x',sym:'x',label:'x  x-value',     unit:'',angle:false},
+      {id:'b',sym:'b',label:'b  y-intercept', unit:'',angle:false}
+    ],
+    solve:{
+      y:function(v){ return v.m*v.x+v.b; },
+      m:function(v){ return (v.y-v.b)/v.x; },
+      x:function(v){ return (v.y-v.b)/v.m; },
+      b:function(v){ return v.y-v.m*v.x; }
+    }
+  },
+
+  // (y - y1) = m(x - x1)
+  'point-slope':{
+    vars:[
+      {id:'y', sym:'y', label:'y   y-value',         unit:'',angle:false},
+      {id:'y1',sym:'y\u2081',label:'y\u2081  y-value (Point 1)',unit:'',angle:false},
+      {id:'m', sym:'m', label:'m   Slope',             unit:'',angle:false},
+      {id:'x', sym:'x', label:'x   x-value',           unit:'',angle:false},
+      {id:'x1',sym:'x\u2081',label:'x\u2081  x-value (Point 1)',unit:'',angle:false}
+    ],
+    solve:{
+      y: function(v){ return v.m*(v.x-v.x1)+v.y1; },
+      y1:function(v){ return v.y-v.m*(v.x-v.x1); },
+      m: function(v){ return (v.y-v.y1)/(v.x-v.x1); },
+      x: function(v){ return (v.y-v.y1)/v.m+v.x1; },
+      x1:function(v){ return v.x-(v.y-v.y1)/v.m; }
+    }
+  },
+
+  // m = (y2 - y1) / (x2 - x1)
+  'slope-two-pts':{
+    vars:[
+      {id:'m', sym:'m', label:'m   Slope',            unit:'',angle:false},
+      {id:'y2',sym:'y\u2082',label:'y\u2082  y-value (End)',  unit:'',angle:false},
+      {id:'y1',sym:'y\u2081',label:'y\u2081  y-value (Start)',unit:'',angle:false},
+      {id:'x2',sym:'x\u2082',label:'x\u2082  x-value (End)',  unit:'',angle:false},
+      {id:'x1',sym:'x\u2081',label:'x\u2081  x-value (Start)',unit:'',angle:false}
+    ],
+    solve:{
+      m: function(v){ return (v.y2-v.y1)/(v.x2-v.x1); },
+      y2:function(v){ return v.m*(v.x2-v.x1)+v.y1; },
+      y1:function(v){ return v.y2-v.m*(v.x2-v.x1); },
+      x2:function(v){ return (v.y2-v.y1)/v.m+v.x1; },
+      x1:function(v){ return v.x2-(v.y2-v.y1)/v.m; }
+    }
+  },
+
+  // Ax + By + C = 0
+  'general-form':{
+    vars:[
+      {id:'A',sym:'A',label:'A  Coefficient A',unit:'',angle:false},
+      {id:'B',sym:'B',label:'B  Coefficient B',unit:'',angle:false},
+      {id:'C',sym:'C',label:'C  Constant C',   unit:'',angle:false},
+      {id:'x',sym:'x',label:'x  x-value',      unit:'',angle:false},
+      {id:'y',sym:'y',label:'y  y-value',       unit:'',angle:false}
+    ],
+    solve:{
+      y:function(v){ return -(v.A*v.x+v.C)/v.B; },
+      x:function(v){ return -(v.B*v.y+v.C)/v.A; },
+      A:function(v){ return -(v.B*v.y+v.C)/v.x; },
+      B:function(v){ return -(v.A*v.x+v.C)/v.y; },
+      C:function(v){ return -(v.A*v.x+v.B*v.y); }
     }
   }
 
