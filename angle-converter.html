@@ -43,6 +43,9 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
 /* ── Buttons ── */
 .btn-sec{padding:6px 12px;background:#0f1b35;border:1px solid #1e3a5f;border-radius:6px;color:#aaa;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
 .btn-sec:hover{border-color:#4fc3f7;color:#4fc3f7}
+.dms-btn{padding:10px 12px;font-size:14px;border:1px solid #1e3a5f;border-radius:6px;background:#0f1b35;color:#888;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.dms-btn:hover{border-color:#4fc3f7;color:#4fc3f7}
+.dms-btn-done{border-color:#66bb6a !important;color:#66bb6a !important}
 
 /* ── Accordion (formula reference) ── */
 .acc-block{background:#16213e;border:1px solid #0f3460;border-radius:12px;margin-bottom:10px;overflow:hidden}
@@ -89,8 +92,12 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
 
       <div id="fmt_hint" style="font-size:11px;color:#3a7090;margin-bottom:8px;min-height:14px;text-align:center"></div>
 
-      <input id="ang_input" class="ang-input" type="text" inputmode="decimal"
-             autocomplete="off" autocorrect="off" spellcheck="false" placeholder="45.7583">
+      <div style="display:flex;gap:6px;align-items:center">
+        <input id="ang_input" class="ang-input" type="text" inputmode="decimal"
+               autocomplete="off" autocorrect="off" spellcheck="false" placeholder="45.7583"
+               style="width:auto;flex:1;min-width:0">
+        <button class="dms-btn" id="dms_btn_ang" style="display:none">&#x00b0;&#x2032;&#x2033;</button>
+      </div>
 
       <div id="ang_err" class="ang-err"></div>
       <div id="ang_warn" class="ang-warn"></div>
@@ -238,6 +245,7 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
   </div>
 </div>
 
+<script src="shared.js"></script>
 <script>
 // ── State ────────────────────────────────────────────────────────────────────
 var currentFmt   = 'dd';
@@ -514,6 +522,7 @@ function setFmt(id){
     document.getElementById('ang_input').placeholder = fmtObj.placeholder;
     document.getElementById('fmt_hint').textContent  = fmtObj.hint;
   }
+  document.getElementById('dms_btn_ang').style.display = id === 'dms' ? '' : 'none';
   convertAndRender();
 }
 
@@ -630,6 +639,9 @@ function clearInput(){
 
 // ── Event wiring ─────────────────────────────────────────────────────────────
 document.getElementById('ang_input').addEventListener('input', convertAndRender);
+document.getElementById('dms_btn_ang').addEventListener('click', function(){
+  window.SurveyCalc.insertDMSSymbol(document.getElementById('ang_input'), this);
+});
 
 // Focus / blur border
 document.getElementById('ang_input').addEventListener('focus', function(){

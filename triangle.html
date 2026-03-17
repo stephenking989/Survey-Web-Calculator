@@ -40,6 +40,9 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
 .btn-copy-sm{padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid #1e3a5f;background:transparent;color:#888;transition:all .2s}
 .btn-copy-sm:hover{border-color:#4fc3f7;color:#4fc3f7}
 .btn-copy-sm.copied{border-color:#66bb6a;color:#66bb6a}
+.dms-btn{padding:8px 10px;font-size:13px;border:1px solid #1e3a5f;border-radius:6px;background:#0f1b35;color:#888;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.dms-btn:hover{border-color:#4fc3f7;color:#4fc3f7}
+.dms-btn-done{border-color:#66bb6a !important;color:#66bb6a !important}
 </style>
 </head>
 <body>
@@ -81,11 +84,11 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
     <div class="card">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="tri-field"><label class="tri-label" for="t_sideA">Side a <span class="unit-lbl">(m)</span></label><input class="tri-input" id="t_sideA" type="text" inputmode="decimal" placeholder="0"><div class="tri-err" id="err_sideA"></div></div>
-        <div class="tri-field"><label class="tri-label" for="t_angA">Angle A</label><input class="tri-input" id="t_angA" type="text" inputmode="decimal" placeholder="0.0000"><div class="tri-err" id="err_angA"></div></div>
+        <div class="tri-field"><label class="tri-label" for="t_angA">Angle A</label><div style="display:flex;gap:4px"><input class="tri-input" id="t_angA" type="text" inputmode="decimal" placeholder="0.0000" style="width:auto;flex:1;min-width:0"><button class="dms-btn" id="dms_btn_angA">&#x00b0;&#x2032;&#x2033;</button></div><div class="tri-err" id="err_angA"></div></div>
         <div class="tri-field"><label class="tri-label" for="t_sideB">Side b <span class="unit-lbl">(m)</span></label><input class="tri-input" id="t_sideB" type="text" inputmode="decimal" placeholder="0"><div class="tri-err" id="err_sideB"></div></div>
-        <div class="tri-field"><label class="tri-label" for="t_angB">Angle B</label><input class="tri-input" id="t_angB" type="text" inputmode="decimal" placeholder="0.0000"><div class="tri-err" id="err_angB"></div></div>
+        <div class="tri-field"><label class="tri-label" for="t_angB">Angle B</label><div style="display:flex;gap:4px"><input class="tri-input" id="t_angB" type="text" inputmode="decimal" placeholder="0.0000" style="width:auto;flex:1;min-width:0"><button class="dms-btn" id="dms_btn_angB">&#x00b0;&#x2032;&#x2033;</button></div><div class="tri-err" id="err_angB"></div></div>
         <div class="tri-field"><label class="tri-label" for="t_sideC">Side c <span class="unit-lbl">(m)</span></label><input class="tri-input" id="t_sideC" type="text" inputmode="decimal" placeholder="0"><div class="tri-err" id="err_sideC"></div></div>
-        <div class="tri-field"><label class="tri-label" for="t_angC">Angle C</label><input class="tri-input" id="t_angC" type="text" inputmode="decimal" placeholder="0.0000"><div class="tri-err" id="err_angC"></div></div>
+        <div class="tri-field"><label class="tri-label" for="t_angC">Angle C</label><div style="display:flex;gap:4px"><input class="tri-input" id="t_angC" type="text" inputmode="decimal" placeholder="0.0000" style="width:auto;flex:1;min-width:0"><button class="dms-btn" id="dms_btn_angC">&#x00b0;&#x2032;&#x2033;</button></div><div class="tri-err" id="err_angC"></div></div>
       </div>
       <div class="tri-err" id="err_global" style="margin-top:8px;font-size:13px"></div>
       <div style="display:flex;gap:10px;margin-top:12px">
@@ -109,7 +112,9 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
   </div>
 </div>
 
+<script src="shared.js"></script>
 <script>
+var SC=window.SurveyCalc||{};
 var triUnit='metric',triAngleFmt='dms',triLastResult=null;
 
 function pad2(n){return n<10?'0'+n:''+n}
@@ -133,18 +138,14 @@ function setAngleFmt(f){
   document.getElementById('tog_dms').classList.toggle('active',f==='dms');
   document.getElementById('tog_dd').classList.toggle('active',f==='dd');
   ['t_angA','t_angB','t_angC'].forEach(function(id){document.getElementById(id).placeholder=f==='dms'?'0.0000':'0.000000'});
+  var dShow=f==='dms'?'':'none';
+  ['dms_btn_angA','dms_btn_angB','dms_btn_angC'].forEach(function(id){document.getElementById(id).style.display=dShow});
   if(triLastResult)renderResults(triLastResult);
 }
 
 function parseTriAngle(val){
   val=val.trim();if(!val)return null;
-  if(triAngleFmt==='dd'){var n=parseFloat(val);return isNaN(n)?null:n}
-  var neg=val.charAt(0)==='-';if(neg)val=val.slice(1);
-  var pts=val.split('.');var d=parseInt(pts[0],10)||0;
-  var fr=((pts[1]||'')+'0000').slice(0,4);
-  var m=parseInt(fr.slice(0,2),10)||0;var s=parseFloat(fr.slice(2,4))||0;
-  if(m>59||s>=60)return null;
-  var dd=d+m/60+s/3600;return neg?-dd:dd;
+  return SC.parseAngleDMS?SC.parseAngleDMS(val,triAngleFmt):null;
 }
 
 function fmtAngle(dd){
@@ -318,6 +319,11 @@ document.getElementById('tog_dd').addEventListener('click',function(){setAngleFm
 document.getElementById('prec_side').addEventListener('change',function(){if(triLastResult)renderResults(triLastResult)});
 document.getElementById('prec_ang').addEventListener('change',function(){if(triLastResult)renderResults(triLastResult)});
 document.getElementById('copy_all_btn').addEventListener('click',copyAllResults);
+['A','B','C'].forEach(function(k){
+  document.getElementById('dms_btn_ang'+k).addEventListener('click',function(){
+    SC.insertDMSSymbol(document.getElementById('t_ang'+k),this);
+  });
+});
 </script>
 </body>
 </html>

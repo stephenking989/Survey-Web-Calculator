@@ -57,6 +57,9 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
 .log-dd{font-size:11px;color:#555;margin-top:1px}
 .log-empty{color:#555;font-size:13px;text-align:center;padding:16px 0}
 .error-msg{color:#ff8a65;font-size:12px;margin-top:8px;display:none}
+.dms-btn{padding:8px 10px;font-size:13px;border:1px solid #1e3a5f;border-radius:6px;background:#0f1b35;color:#888;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.dms-btn:hover{border-color:#4fc3f7;color:#4fc3f7}
+.dms-btn-done{border-color:#66bb6a !important;color:#66bb6a !important}
 </style>
 </head>
 <body>
@@ -81,6 +84,7 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
       <div class="input-row">
         <label>Input A</label>
         <input class="dms-input" id="a_val" type="text" inputmode="decimal" placeholder="0.0000">
+        <button class="dms-btn" id="dms_btn_a">&#x00b0;&#x2032;&#x2033;</button>
         <button class="btn btn-secondary" id="clearA_btn">&#x2715;</button>
         <button class="btn btn-secondary" id="flipA_btn">&#8597; 180&#xb0;</button>
       </div>
@@ -97,6 +101,7 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
       <div class="input-row">
         <label>Input B</label>
         <input class="dms-input" id="b_val" type="text" inputmode="decimal" placeholder="0.0000">
+        <button class="dms-btn" id="dms_btn_b">&#x00b0;&#x2032;&#x2033;</button>
         <button class="btn btn-secondary" id="clearB_btn">&#x2715;</button>
         <button class="btn btn-secondary" id="flipB_btn">&#8597; 180&#xb0;</button>
       </div>
@@ -133,7 +138,9 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
   </div>
 </div>
 
+<script src="shared.js"></script>
 <script>
+var SC=window.SurveyCalc||{};
 var currentOp='add',resultSec=null,logEntries=[],logCount=0,angCalcFmt='dms';
 
 function pad2(n){return n<10?'0'+n:''+n}
@@ -162,12 +169,15 @@ function setAngCalcFmt(fmt){
   angCalcFmt=fmt;
   document.getElementById('atog_dms').classList.toggle('active',fmt==='dms');
   document.getElementById('atog_dd').classList.toggle('active',fmt==='dd');
-  var hd='DMS: 12.3432  or  12d34m32s  or  12 34 32';
+  var hd='DMS: 45\u00b0 34\u2032 23\u2033  or  45.3423  or  45 34 23';
   var hdd='Decimal degrees: e.g. 12.575000';
   document.getElementById('hint_a').textContent=fmt==='dms'?hd:hdd;
   document.getElementById('hint_b').textContent=fmt==='dms'?hd:hdd;
   document.getElementById('a_val').placeholder=fmt==='dms'?'0.0000':'0.000000';
   document.getElementById('b_val').placeholder=fmt==='dms'?'0.0000':'0.000000';
+  var dShow=fmt==='dms'?'':'none';
+  document.getElementById('dms_btn_a').style.display=dShow;
+  document.getElementById('dms_btn_b').style.display=dShow;
   clearAll();
 }
 
@@ -310,6 +320,8 @@ document.getElementById('log_btn').addEventListener('click',function(){logResult
 document.getElementById('clear_log_btn').addEventListener('click',function(){clearLog();keepFocus()});
 document.getElementById('copy_log_btn').addEventListener('click',function(){copyLog();keepFocus()});
 document.getElementById('clear_btn').addEventListener('click',function(){clearAll();focusField('a',true)});
+document.getElementById('dms_btn_a').addEventListener('click',function(){SC.insertDMSSymbol(document.getElementById('a_val'),this)});
+document.getElementById('dms_btn_b').addEventListener('click',function(){SC.insertDMSSymbol(document.getElementById('b_val'),this)});
 
 setAngCalcFmt('dms');
 setTimeout(function(){focusField('a',true)},100);
