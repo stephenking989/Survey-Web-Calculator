@@ -31,6 +31,8 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
 .op-btn{flex:1;padding:10px;border:1px solid #1e3a5f;border-radius:8px;background:#0f1b35;color:#888;font-size:20px;cursor:pointer;transition:all .2s}
 .op-btn.active{background:#4fc3f7;border-color:#4fc3f7;color:#0a0a1a}
 .op-btn:hover:not(.active){border-color:#4fc3f7;color:#4fc3f7}
+.op-swap{font-size:16px;color:#4fc3f7;border-color:#1e3a5f}
+.op-swap:hover{background:rgba(79,195,247,.08);color:#81d4fa}
 .result-box{background:#0a0a1a;border:1px solid #1e3a5f;border-radius:8px;padding:14px;display:flex;align-items:center;gap:10px}
 .result-text{flex:1;min-width:0}
 .result-main{font-size:24px;font-weight:600;color:#4fc3f7;font-family:'Courier New',monospace;word-break:break-word}
@@ -120,6 +122,7 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
 
     <div class="op-row">
       <button class="op-btn active" id="op_add">+</button>
+      <button class="op-btn op-swap" id="op_swap" title="Swap A ↔ B">&#8645;</button>
       <button class="op-btn" id="op_sub">&minus;</button>
     </div>
 
@@ -433,6 +436,11 @@ function calculate(){
 }
 
 function clearField(p){ document.getElementById(p + '_val').value = ''; calculate(); }
+function swapFields(){
+  var aEl = document.getElementById('a_val'), bEl = document.getElementById('b_val');
+  var tmp = aEl.value; aEl.value = bEl.value; bEl.value = tmp;
+  calculate();
+}
 function flip(p){
   var c = parseDMS(document.getElementById(p + '_val').value);
   document.getElementById(p + '_val').value = toCondensed(((c + 648000) % 1296000 + 1296000) % 1296000);
@@ -442,6 +450,24 @@ function flipResult(){ if(resultSec === null) return; resultSec = ((resultSec + 
 function copyResult(btn){ if(resultSec === null) return; copyToClipboard(toExpanded(resultSec), btn); }
 function copyTo(p){ if(resultSec === null) return; document.getElementById(p + '_val').value = toCondensed(resultSec); calculate(); }
 
+// ── HISTORY PERSISTENCE ───────────────────────────────────────────────────────
+var HIST_KEY = 'sc_angleCalcHistory';
+function saveHistory(){
+  try{ localStorage.setItem(HIST_KEY, JSON.stringify({entries:logEntries, count:logCount})); }catch(e){}
+}
+function loadHistory(){
+  try{
+    var raw = localStorage.getItem(HIST_KEY);
+    if(!raw) return;
+    var d = JSON.parse(raw);
+    if(d && Array.isArray(d.entries) && d.entries.length){
+      logEntries = d.entries;
+      logCount = typeof d.count === 'number' ? d.count : d.entries.length;
+      renderLog();
+    }
+  }catch(e){}
+}
+
 function logResult(){
   if(resultSec === null) return;
   logCount++;
@@ -449,6 +475,7 @@ function logResult(){
   var b = document.getElementById('b_val').value || '0.0000';
   logEntries.push({ num:logCount, a:a, b:b, op:currentOp==='add'?'+':'\u2212', expanded:toExpanded(resultSec), dd:toDD(resultSec) });
   renderLog();
+  saveHistory();
 }
 
 function renderLog(){
@@ -463,7 +490,7 @@ function renderLog(){
   el.scrollTop = el.scrollHeight;
 }
 
-function clearLog(){ logEntries = []; logCount = 0; document.getElementById('copy_log_btn').disabled = true; renderLog(); keepFocus(); }
+function clearLog(){ logEntries = []; logCount = 0; document.getElementById('copy_log_btn').disabled = true; renderLog(); saveHistory(); keepFocus(); }
 
 function copyLog(){
   if(!logEntries.length) return;
@@ -527,8 +554,9 @@ document.getElementById('b_val').addEventListener('input', calculate);
 document.getElementById('atog_dms').addEventListener('click', function(){ setAngCalcFmt('dms'); keepFocus(); });
 document.getElementById('atog_dd').addEventListener('click',  function(){ setAngCalcFmt('dd');  keepFocus(); });
 document.getElementById('atog_brg').addEventListener('click', function(){ setAngCalcFmt('brg'); keepFocus(); });
-document.getElementById('op_add').addEventListener('click', function(){ setOp('add'); keepFocus(); });
-document.getElementById('op_sub').addEventListener('click', function(){ setOp('sub'); keepFocus(); });
+document.getElementById('op_add').addEventListener('click',  function(){ setOp('add'); keepFocus(); });
+document.getElementById('op_swap').addEventListener('click', function(){ swapFields(); keepFocus(); });
+document.getElementById('op_sub').addEventListener('click',  function(){ setOp('sub'); keepFocus(); });
 document.getElementById('flipA_btn').addEventListener('click',    function(){ flip('a'); focusField('a', true); });
 document.getElementById('flipB_btn').addEventListener('click',    function(){ flip('b'); focusField('b', true); });
 document.getElementById('clearA_btn').addEventListener('click',   function(){ clearField('a'); focusField('a', true); });
@@ -545,6 +573,7 @@ document.getElementById('dms_btn_a').addEventListener('click', function(){ SC.in
 document.getElementById('dms_btn_b').addEventListener('click', function(){ SC.insertDMSSymbol(document.getElementById('b_val'), this); });
 
 setAngCalcFmt('dms');
+loadHistory();
 setTimeout(function(){ focusField('a', true); }, 100);
 
 
