@@ -256,7 +256,7 @@ function parseBearing(raw){
   raw = raw.trim().toUpperCase();
   var single = raw.match(/^([NSEW])$/);
   if(single) return { N:0, E:90, S:180, W:270 }[single[1]];
-  var m = raw.match(/^([NS])\s*([\d°'"\s.dms]+?)\s*([EW])$/i);
+  var m = raw.match(/^([NS])\s*([\d°\u2032\u2033'"\s.dms]+?)\s*([EW])$/i);
   if(!m) return null;
   var prefix = m[1], angStr = m[2].trim(), suffix = m[3];
   var subDD = null;
@@ -599,7 +599,7 @@ function cvDetectDP(raw, fmt){
     return dot === -1 ? 0 : m[1].length - dot - 1;
   }
   if(fmt === 'bearing'){
-    var bm = raw.trim().toUpperCase().match(/^([NS])\s*([\d\u00b0'"\s.dms]+?)\s*([EW])$/i);
+    var bm = raw.trim().toUpperCase().match(/^([NS])\s*([\d\u00b0\u2032\u2033'"\s.dms]+?)\s*([EW])$/i);
     if(!bm) return 0;
     var angStr = bm[2].trim();
     if(/\s/.test(angStr) || /[\u00b0d'ms"]/i.test(angStr)) return cvDetectDP(angStr, 'dms');

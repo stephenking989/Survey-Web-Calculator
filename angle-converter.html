@@ -327,7 +327,7 @@ function parseBearing(raw){
     return { N:0, E:90, S:180, W:270 }[single[1]];
   }
   // Two-letter quadrant bearing: prefix, angle string, suffix
-  var m = raw.match(/^([NS])\s*([\d°'\"\s.dms]+?)\s*([EW])$/i);
+  var m = raw.match(/^([NS])\s*([\d°\u2032\u2033'"\s.dms]+?)\s*([EW])$/i);
   if(!m) return null;
   var prefix = m[1];
   var angStr = m[2].trim();
@@ -402,7 +402,7 @@ function detectDPfromString(raw, fmt){
 
   if(fmt === 'bearing'){
     // Isolate the sub-angle string between the two compass letters
-    var bm = raw.trim().toUpperCase().match(/^([NS])\s*([\d\u00b0'"\s.dms]+?)\s*([EW])$/i);
+    var bm = raw.trim().toUpperCase().match(/^([NS])\s*([\d\u00b0\u2032\u2033'"\s.dms]+?)\s*([EW])$/i);
     if(!bm) return 0;
     var angStr = bm[2].trim();
     // Full DMS inside bearing → recurse as 'dms'
