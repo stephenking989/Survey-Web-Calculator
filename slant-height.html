@@ -47,6 +47,17 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
 .work-check{color:#ffb74d}
 .legend{font-size:11px;color:#666;margin-top:10px;line-height:1.5}
 .tag-k{color:#4fc3f7}.tag-c{color:#66bb6a}
+.meas-sets{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.meas-cols{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
+.meas-col{display:flex;flex-direction:column;gap:5px}
+.meas-col .opt-lbl{margin:0}
+.meas-avg{font-size:12px;color:#888;margin-top:6px;min-height:15px;line-height:1.5}
+.meas-avg b{color:#66bb6a;font-weight:700}
+.meas-avg.err{color:#ff5252}
+.res-tbl{width:100%;border-collapse:collapse;margin-top:4px}
+.res-tbl th{font-size:11px;font-weight:500;color:#666;text-align:right;padding:4px 6px}
+.res-tbl td{font-family:'Courier New',monospace;font-size:14px;font-weight:600;color:#66bb6a;text-align:right;padding:8px 6px;border-top:1px solid #1e3a5f}
+.res-tbl th:first-child,.res-tbl td:first-child{font-family:inherit;font-size:13px;font-weight:400;color:#888;text-align:left}
 </style>
 </head>
 <body>
@@ -70,13 +81,62 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
           <div class="opt-lbl">Precision</div>
           <select id="prec" class="prec-sel"><option value="2">2 dp</option><option value="3">3 dp</option><option value="4" selected>4 dp</option><option value="5">5 dp</option></select>
         </div>
+        <div>
+          <div class="opt-lbl">Antenna values</div>
+          <button class="tog-btn" id="btn_f90" style="border-radius:6px">Load F90</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Measurements</div>
+      <div style="font-size:12px;color:#666;margin-bottom:12px">Optional. 3 measurements equally spaced around the antenna, at the start of the session and again at the end. Everything you enter is averaged.</div>
+      <div class="meas-sets">
+        <div>
+          <div class="sh-label"><span class="sh-key" style="color:#4fc3f7;border:1px solid #4fc3f7">S</span>Slant height <span class="u">(m)</span></div>
+          <div class="sh-sub">mark to SHMP (white line); fills S below</div>
+          <div class="meas-cols">
+            <div class="meas-col">
+              <div class="opt-lbl">Before</div>
+              <input class="sh-input" id="m_sb1" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off" aria-label="Slant height before 1">
+              <input class="sh-input" id="m_sb2" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off" aria-label="Slant height before 2">
+              <input class="sh-input" id="m_sb3" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off" aria-label="Slant height before 3">
+            </div>
+            <div class="meas-col">
+              <div class="opt-lbl">After</div>
+              <input class="sh-input" id="m_sa1" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off" aria-label="Slant height after 1">
+              <input class="sh-input" id="m_sa2" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off" aria-label="Slant height after 2">
+              <input class="sh-input" id="m_sa3" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off" aria-label="Slant height after 3">
+            </div>
+          </div>
+          <div class="meas-avg" id="avg_s"></div>
+        </div>
+        <div>
+          <div class="sh-label">Vertical height <span class="u">(m)</span></div>
+          <div class="sh-sub">mark straight up to ARP</div>
+          <div class="meas-cols">
+            <div class="meas-col">
+              <div class="opt-lbl">Before</div>
+              <input class="sh-input" id="m_vb1" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off" aria-label="Vertical height before 1">
+              <input class="sh-input" id="m_vb2" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off" aria-label="Vertical height before 2">
+              <input class="sh-input" id="m_vb3" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off" aria-label="Vertical height before 3">
+            </div>
+            <div class="meas-col">
+              <div class="opt-lbl">After</div>
+              <input class="sh-input" id="m_va1" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off" aria-label="Vertical height after 1">
+              <input class="sh-input" id="m_va2" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off" aria-label="Vertical height after 2">
+              <input class="sh-input" id="m_va3" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off" aria-label="Vertical height after 3">
+            </div>
+          </div>
+          <div class="meas-avg" id="avg_v"></div>
+        </div>
       </div>
     </div>
 
     <div class="card">
       <div class="solver">
         <div class="diagram">
-          <svg viewBox="0 0 200 330" xmlns="http://www.w3.org/2000/svg" aria-label="Antenna on tripod over a ground mark, showing slant height S, radius R, vertical height V, offset d and ARP height H">
+          <svg viewBox="0 0 200 330" xmlns="http://www.w3.org/2000/svg" aria-label="Antenna on tripod over a ground mark, showing slant height S, radius R, vertical height V, offset d, ARP height H and the L1 and L2 phase centres">
             <!-- ground -->
             <line x1="5" y1="300" x2="195" y2="300" stroke="#1e5a3a" stroke-width="2"/>
             <!-- tripod legs -->
@@ -99,10 +159,15 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
             <circle cx="112" cy="78" r="3" fill="#f48fb1"/>
             <text x="116" y="74" fill="#f48fb1" font-size="9">SHMP</text>
             <!-- R: centre to SHMP -->
-            <line x1="70" y1="66" x2="112" y2="66" stroke="#ce93d8" stroke-width="1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
-            <line x1="70" y1="62" x2="70" y2="78" stroke="#ce93d8" stroke-width=".8" stroke-dasharray="2,2"/>
-            <line x1="112" y1="62" x2="112" y2="78" stroke="#ce93d8" stroke-width=".8" stroke-dasharray="2,2"/>
-            <text x="91" y="60" fill="#ce93d8" font-size="13" font-style="italic" font-weight="700" text-anchor="middle">R</text>
+            <line x1="70" y1="50" x2="112" y2="50" stroke="#ce93d8" stroke-width="1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+            <line x1="70" y1="46" x2="70" y2="78" stroke="#ce93d8" stroke-width=".8" stroke-dasharray="2,2"/>
+            <line x1="112" y1="46" x2="112" y2="78" stroke="#ce93d8" stroke-width=".8" stroke-dasharray="2,2"/>
+            <text x="91" y="44" fill="#ce93d8" font-size="13" font-style="italic" font-weight="700" text-anchor="middle">R</text>
+            <!-- L1 / L2 phase centres: on the antenna axis, above the ARP -->
+            <circle cx="70" cy="66" r="2.5" fill="#dce775"/>
+            <text x="65" y="69" fill="#dce775" font-size="8" text-anchor="end">L1</text>
+            <circle cx="70" cy="73" r="2.5" fill="#9fa8da"/>
+            <text x="75" y="76" fill="#9fa8da" font-size="8">L2</text>
             <!-- S: mark to SHMP -->
             <line x1="70" y1="300" x2="112" y2="78" stroke="#4fc3f7" stroke-width="2"/>
             <text x="104" y="200" fill="#4fc3f7" font-size="13" font-style="italic" font-weight="700">S</text>
@@ -139,7 +204,7 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
           </div>
           <div class="sh-field">
             <label class="sh-label" for="f_S"><span class="sh-key" style="color:#4fc3f7;border:1px solid #4fc3f7">S</span>Slant height <span class="u">(m)</span></label>
-            <div class="sh-sub">taped, mark to SHMP</div>
+            <div class="sh-sub" id="sub_S">taped, mark to SHMP</div>
             <input class="sh-input" id="f_S" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off">
             <div class="sh-err" id="e_S"></div>
           </div>
@@ -158,17 +223,32 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
       </div>
 
       <div class="msg info" id="msg">Enter R and S to get V. Add d to get H.</div>
+      <div class="legend"><span class="tag-k">Blue border</span> = you entered it. <span class="tag-c">Green</span> = calculated. Type over a green value to make it a known.</div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Phase centre</div>
+      <div class="sh-field">
+        <label class="sh-label" for="f_o1"><span class="sh-key" style="color:#dce775;border:1px solid #dce775">L1</span><span>Correction from Antenna Reference Point (ARP) to L1 Phase Centre <span class="u">(m)</span></span></label>
+        <input class="sh-input" id="f_o1" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off">
+        <div class="sh-err" id="e_o1"></div>
+      </div>
+      <div class="sh-field">
+        <label class="sh-label" for="f_o2"><span class="sh-key" style="color:#9fa8da;border:1px solid #9fa8da">L2</span><span>Correction from Antenna Reference Point (ARP) to L2 Phase Centre <span class="u">(m)</span></span></label>
+        <input class="sh-input" id="f_o2" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off">
+        <div class="sh-err" id="e_o2"></div>
+      </div>
+      <div id="res"></div>
       <div class="btn-row">
         <button class="sh-btn-sec" id="btn_reset">Reset</button>
         <button class="sh-btn-sec" id="btn_copy">Copy All</button>
       </div>
-      <div class="legend"><span class="tag-k">Blue border</span> = you entered it. <span class="tag-c">Green</span> = calculated. Type over a green value to make it a known.</div>
     </div>
 
     <div class="card" id="work_card" style="display:none">
       <div class="section-title">Working</div>
       <div id="work"></div>
-      <div class="legend">S² = R² + V² (right triangle: radius across, vertical up, slant along the tape). &nbsp;H = V − d. &nbsp;Tilt of the tape from vertical: θ = atan(R / V).<br>Use the R and d values from your antenna's spec sheet (NGS antenna calibrations or the manufacturer). H is to the ARP; the phase-centre offset is applied by the receiver or office software.</div>
+      <div class="legend">S² = R² + V² (right triangle: radius across, vertical up, slant along the tape). &nbsp;H = V − d. &nbsp;Phase centre height = H + correction. &nbsp;Tilt of the tape from vertical: θ = atan(R / V).<br>Use the R, d and phase centre values from your antenna's spec sheet (NGS antenna calibrations or the manufacturer). Software that knows the antenna model normally wants the ARP height and applies the phase centre correction itself, so check which height it expects.</div>
     </div>
   </div>
 </div>
@@ -178,9 +258,17 @@ body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-heigh
 (function(){
 'use strict';
 var KEYS=['R','d','S','V','H'];
+var OFFS=['o1','o2'];                 // ARP to L1 / L2 phase centre corrections
+var BAND={o1:'L1',o2:'L2'};
+var SETS={s:['sb1','sb2','sb3','sa1','sa2','sa3'],v:['vb1','vb2','vb3','va1','va2','va3']};
+// Antenna constants in metres. F90 values are from the COGS static observation form.
+var PRESETS={f90:{R:0.0785,d:0.0437,o1:0.0689,o2:0.0623}};
 var unit='metric';
 var known={};      // values the user entered (parsed)
 var calc={};       // values the solver produced
+var off={};        // phase centre corrections the user entered
+var meas={s:null,v:null};   // averaged slant / vertical measurements
+var cols=[];       // result columns, one per method that reaches an ARP height
 var steps=[];
 
 function $(id){return document.getElementById(id)}
@@ -188,6 +276,66 @@ function dp(){return parseInt($('prec').value,10)}
 function u(){return unit==='metric'?'m':'ft'}
 function f(v){return v.toFixed(dp())}
 function fu(v){return f(v)+' '+u()}
+function mean(a){return a.reduce(function(x,y){return x+y},0)/a.length}
+
+// Before / after measurements: everything entered in a set is averaged.
+function readMeas(){
+  ['s','v'].forEach(function(set){
+    var b=[],a=[],bad=false;
+    SETS[set].forEach(function(id){
+      var el=$('m_'+id), raw=el.value.trim();
+      el.classList.remove('field-known','field-error');
+      if(!raw) return;
+      var n=Number(raw);
+      if(!isFinite(n)||n<=0){ el.classList.add('field-error'); bad=true; return; }
+      el.classList.add('field-known');
+      (id.charAt(1)==='b'?b:a).push(n);
+    });
+    var out=$('avg_'+set), vals=b.concat(a);
+    meas[set]=null;
+    if(bad){ out.className='meas-avg err'; out.textContent='Measurements must be positive numbers.'; return; }
+    out.className='meas-avg';
+    if(!vals.length){ out.textContent=''; return; }
+    var m=meas[set]={vals:vals,b:b,a:a,n:vals.length,avg:mean(vals)};
+    var txt='Avg of '+m.n+' = <b>'+fu(m.avg)+'</b>';
+    if(m.n>1) txt+=' &nbsp;range '+f(Math.max.apply(null,vals)-Math.min.apply(null,vals));
+    if(b.length&&a.length) txt+='<br>before '+f(mean(b))+' &nbsp;after '+f(mean(a));
+    out.innerHTML=txt;
+  });
+}
+function avgEq(sym,m){
+  return sym+' = '+(m.n>1?'('+m.vals.map(f).join(' + ')+') / '+m.n+' = ':'')+'<b>'+fu(m.avg)+'</b>';
+}
+
+// Slant measurements, when there are any, take over the S field with their average.
+function syncAvgS(el){
+  var m=meas.s;
+  $('sub_S').textContent=m?'average of '+m.n+' measurement'+(m.n>1?'s':''):'taped, mark to SHMP';
+  if(!m){
+    if(el.dataset.avg==='1'){ el.value=''; el.dataset.avg=''; el.readOnly=false; }
+    return false;
+  }
+  el.dataset.avg='1'; el.dataset.calc=''; el.readOnly=true;
+  el.classList.remove('field-calc'); el.classList.add('field-known');
+  el.value=f(m.avg); known.S=m.avg;
+  return true;
+}
+
+function readOffsets(){
+  off={};
+  OFFS.forEach(function(k){
+    var el=$('f_'+k), raw=el.value.trim();
+    $('e_'+k).textContent='';
+    el.classList.remove('field-known','field-error');
+    if(!raw) return;
+    var n=Number(raw);
+    if(!isFinite(n)){ setErr(k,'Must be a number'); return; }
+    off[k]=n; el.classList.add('field-known');
+  });
+}
+function apcStep(k,h,pre){
+  return {t:pre+BAND[k]+' phase centre height',e:'APC = ARP + '+BAND[k]+' correction = '+f(h)+' + ('+f(off[k])+') = <b>'+fu(h+off[k])+'</b>'};
+}
 
 function readKnown(){
   known={};
@@ -195,6 +343,7 @@ function readKnown(){
     var el=$('f_'+k);
     $('e_'+k).textContent='';
     el.classList.remove('field-error');
+    if(k==='S' && syncAvgS(el)) return;
     if(el.dataset.calc==='1') return;           // a filled-in result, not a known
     var raw=el.value.trim();
     el.classList.remove('field-known');
@@ -211,6 +360,7 @@ function setErr(k,m){$('e_'+k).textContent=m;$('f_'+k).classList.add('field-erro
 //   (1) S^2 = R^2 + V^2      (2) H = V - d
 function solve(){
   var v={},err=null; steps=[];
+  if(meas.s && meas.s.n>1) steps.push({t:'Slant height (average of '+meas.s.n+')',e:avgEq('S',meas.s)});
   KEYS.forEach(function(k){ if(k in known) v[k]=known[k]; });
   var has=function(k){return v[k]!==undefined};
   var progress=true, guard=0;
@@ -259,6 +409,7 @@ function solve(){
     var r2=known.H-(known.V-known.d);
     checks.push('Check H: entered '+f(known.H)+', from V − d '+f(known.V-known.d)+' (diff '+f(r2)+' '+u()+')');
   }
+  if(!err && has('H')) OFFS.forEach(function(k){ if(k in off) steps.push(apcStep(k,v.H,'')); });
   if(!err && has('V') && has('R')){
     var th=Math.atan2(v.R,v.V)*180/Math.PI;
     var ts=Math.round(th*3600*10)/10;
@@ -267,7 +418,38 @@ function solve(){
   return {v:v,err:err,checks:checks};
 }
 
+// One result column per method: the solver's ARP height (slant) and the averaged vertical measurements.
+function results(r){
+  cols=[];
+  if(!r.err && r.v.H!==undefined) cols.push({name:'Slant',meas:known.S,Z:r.v.V,H:r.v.H});
+  if(meas.v) cols.push({name:'Vertical',meas:meas.v.avg,H:meas.v.avg});
+  cols.forEach(function(c){ OFFS.forEach(function(k){ if(k in off) c[k]=c.H+off[k]; }); });
+}
+// Rows in the order of the field form; only the ones some column has a value for.
+function resultRows(){
+  var rows=[['Measurement','meas'],['Vertical to SHMP (Z)','Z'],['ARP height','H']];
+  OFFS.forEach(function(k){ rows.push([BAND[k]+' phase centre',k]); });
+  return rows.filter(function(row){ return cols.some(function(c){return c[row[1]]!==undefined}); });
+}
+function renderResults(){
+  var html='';
+  if(cols.length){
+    html='<table class="res-tbl"><tr><th>Heights ('+u()+')</th>'+cols.map(function(c){return '<th>'+c.name+'</th>'}).join('')+'</tr>';
+    resultRows().forEach(function(row){
+      html+='<tr><td>'+row[0]+'</td>'+cols.map(function(c){return '<td>'+(c[row[1]]!==undefined?f(c[row[1]]):'—')+'</td>'}).join('')+'</tr>';
+    });
+    html+='</table>';
+    if(cols.length===2) html+='<div class="legend">Slant − vertical ARP height: '+f(cols[0].H-cols[1].H).replace(/^-(0\.?0*)$/,'$1')+' '+u()+'</div>';
+    if(!Object.keys(off).length) html+='<div class="legend">Enter a correction to get the phase centre height.</div>';
+  }else if(Object.keys(off).length){
+    html='<div class="legend">Needs an ARP height: solve H above or enter vertical measurements.</div>';
+  }
+  $('res').innerHTML=html;
+}
+
 function render(){
+  readMeas();
+  readOffsets();
   readKnown();
   var r=solve();
   calc={};
@@ -286,8 +468,15 @@ function render(){
   else if(r.err){ m.className='msg err'; m.textContent=r.err; }
   else if(r.v.H!==undefined && r.v.S!==undefined){ m.className='msg ok'; m.textContent='Solved. ARP height H = '+fu(r.v.H); }
   else { m.className='msg info'; m.textContent=hint(r.v); }
+  if(r.err) steps=[];
+  if(meas.v){
+    steps.push({t:'Vertical method: ARP height'+(meas.v.n>1?' (average of '+meas.v.n+')':''),e:avgEq('H',meas.v)});
+    OFFS.forEach(function(k){ if(k in off) steps.push(apcStep(k,meas.v.avg,'Vertical method: ')); });
+  }
+  results(r);
+  renderResults();
   var w=$('work'), html='';
-  if(!r.err){ steps.forEach(function(s){ html+='<div class="work-step"><div class="work-title">'+s.t+'</div><div class="work-eq">'+s.e+'</div></div>'; }); }
+  steps.forEach(function(s){ html+='<div class="work-step"><div class="work-title">'+s.t+'</div><div class="work-eq">'+s.e+'</div></div>'; });
   r.checks.forEach(function(c){ html+='<div class="work-step"><div class="work-eq work-check">'+c+'</div></div>'; });
   w.innerHTML=html;
   $('work_card').style.display=html?'block':'none';
@@ -307,6 +496,17 @@ KEYS.forEach(function(k){
   el.addEventListener('input',function(){ el.dataset.calc=''; el.classList.remove('field-calc'); render(); });
   el.addEventListener('focus',function(){ if(el.dataset.calc==='1') el.select(); });
 });
+OFFS.forEach(function(k){ $('f_'+k).addEventListener('input',render); });
+SETS.s.concat(SETS.v).forEach(function(id){ $('m_'+id).addEventListener('input',render); });
+
+$('btn_f90').addEventListener('click',function(){
+  var p=PRESETS.f90, m=unit==='metric'?1:0.3048;
+  Object.keys(p).forEach(function(k){
+    var el=$('f_'+k);
+    el.value=(p[k]/m).toFixed(Math.max(dp(),4)); el.dataset.calc=''; el.classList.remove('field-calc');
+  });
+  render();
+});
 
 function setUnit(x){
   unit=x;
@@ -320,7 +520,8 @@ $('tog_imperial').addEventListener('click',function(){setUnit('imperial')});
 $('prec').addEventListener('change',render);
 
 $('btn_reset').addEventListener('click',function(){
-  KEYS.forEach(function(k){var el=$('f_'+k);el.value='';el.dataset.calc='';el.classList.remove('field-calc','field-known','field-error');});
+  KEYS.concat(OFFS).forEach(function(k){var el=$('f_'+k);el.value='';el.dataset.calc='';el.classList.remove('field-calc','field-known','field-error');});
+  SETS.s.concat(SETS.v).forEach(function(id){$('m_'+id).value='';});
   render();
 });
 
@@ -337,6 +538,24 @@ $('btn_copy').addEventListener('click',function(){
     if(val===undefined) return;
     lines.push(names[k]+'\t'+f(val)+' '+u()+'\t'+((k in known)?'known':'calc'));
   });
+  OFFS.forEach(function(k){ if(k in off) lines.push('ARP to '+BAND[k]+' phase centre\t'+f(off[k])+' '+u()+'\tknown'); });
+  if(meas.s||meas.v){
+    lines.push('--- MEASUREMENTS ---');
+    [['s','Slant'],['v','Vertical']].forEach(function(x){
+      var m=meas[x[0]];
+      if(!m) return;
+      if(m.b.length) lines.push(x[1]+' before\t'+m.b.map(f).join('\t'));
+      if(m.a.length) lines.push(x[1]+' after\t'+m.a.map(f).join('\t'));
+      lines.push(x[1]+' average\t'+f(m.avg)+' '+u()+'\tn='+m.n);
+    });
+  }
+  if(cols.length){
+    lines.push('--- RESULTS ---');
+    lines.push('Heights ('+u()+')\t'+cols.map(function(c){return c.name}).join('\t'));
+    resultRows().forEach(function(row){
+      lines.push(row[0]+'\t'+cols.map(function(c){return c[row[1]]!==undefined?f(c[row[1]]):''}).join('\t'));
+    });
+  }
   lines.push('--- WORKING ---');
   steps.forEach(function(s){ lines.push(s.t+'\t'+s.e.replace(/<[^>]+>/g,'')); });
   copyToClipboard(lines.join('\r\n'),$('btn_copy'));
