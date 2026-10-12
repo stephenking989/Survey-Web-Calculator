@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GNSS Slant Height — SurveyCalc</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh}
+.top-bar{display:flex;align-items:center;gap:12px;background:#16213e;border-bottom:1px solid #0f3460;padding:10px 16px}
+.back-btn{display:flex;align-items:center;gap:6px;color:#4fc3f7;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid #1e3a5f;background:transparent;transition:all .2s}
+.back-btn:hover{border-color:#4fc3f7;background:rgba(79,195,247,.08)}
+.top-bar-title{font-size:15px;font-weight:600;color:#e0e0e0}
+.page{padding:16px;max-width:480px;margin:0 auto}
+.section-title{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#4fc3f7;margin:0 0 10px}
+.card{background:#16213e;border:1px solid #0f3460;border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.opt-lbl{font-size:11px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em}
+.tog-btn{padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid #1e3a5f;background:#0f1b35;color:#888;transition:all .2s}
+.tog-btn:first-child{border-radius:6px 0 0 6px}
+.tog-btn:last-child{border-radius:0 6px 6px 0}
+.tog-btn.active{background:#4fc3f7;border-color:#4fc3f7;color:#0a0a1a}
+.prec-sel{padding:6px 8px;background:#0f1b35;border:1px solid #1e3a5f;border-radius:6px;color:#e0e0e0;font-size:12px;outline:none}
+.solver{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:10px;align-items:stretch}
+.diagram svg{display:block;width:100%;height:auto}
+.fields{display:flex;flex-direction:column;justify-content:space-between;gap:6px}
+.sh-field{display:flex;flex-direction:column;gap:2px}
+.sh-label{font-size:12px;color:#aaa;display:flex;align-items:center;gap:6px}
+.sh-key{display:inline-block;min-width:18px;text-align:center;font-weight:700;font-style:italic;border-radius:4px;padding:0 4px;font-size:12px}
+.sh-sub{font-size:10px;color:#666}
+.sh-input{padding:8px 9px;background:#0f1b35;border:1px solid #1e3a5f;border-radius:8px;color:#e0e0e0;font-size:15px;outline:none;width:100%;font-family:'Courier New',monospace}
+.sh-input:focus{border-color:#4fc3f7}
+.sh-input.field-known{border-color:#4fc3f7}
+.sh-input.field-calc{border-color:#66bb6a;color:#66bb6a;background:#10241c}
+.sh-input.field-error{border-color:#ff5252}
+.sh-err{font-size:11px;color:#ff5252;min-height:13px}
+.msg{font-size:13px;margin-top:8px;min-height:16px}
+.msg.err{color:#ff5252}.msg.ok{color:#66bb6a}.msg.info{color:#888}
+.btn-row{display:flex;gap:10px;margin-top:12px}
+.sh-btn-pri{flex:1;padding:10px;background:#4fc3f7;border:2px solid;border-color:#81d4fa #0a1a30 #0a1a30 #81d4fa;border-radius:8px;color:#0a0a1a;font-size:14px;font-weight:600;cursor:pointer}
+.sh-btn-sec{flex:1;padding:10px;background:#0f1b35;border:2px solid;border-color:#2a4a70 #0a1a30 #0a1a30 #2a4a70;border-radius:8px;color:#aaa;font-size:14px;font-weight:500;cursor:pointer}
+.sh-btn-pri:active,.sh-btn-sec:active{transform:translateY(1px)}
+.sh-btn-sec.copied{border-color:#66bb6a;color:#66bb6a}
+.work-step{padding:8px 10px;border-radius:7px;background:#0f1b35;border:1px solid #1e3a5f;margin-bottom:6px}
+.work-title{font-size:12px;color:#888;margin-bottom:3px}
+.work-eq{font-family:'Courier New',monospace;font-size:13px;color:#e0e0e0;word-break:break-word;line-height:1.5}
+.work-eq b{color:#66bb6a;font-weight:700}
+.work-check{color:#ffb74d}
+.legend{font-size:11px;color:#666;margin-top:10px;line-height:1.5}
+.tag-k{color:#4fc3f7}.tag-c{color:#66bb6a}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="index.html" class="back-btn">&#8592; Home</a>
+  <div class="top-bar-title">GNSS Slant Height</div>
+</div>
+
+<div class="page">
+  <div style="margin-top:16px">
+    <div style="font-size:12px;color:#666;margin-bottom:14px">Fill in what you know. The rest solves as soon as there is enough. Clear a field to free it up again.</div>
+
+    <div class="card">
+      <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">
+        <div>
+          <div class="opt-lbl">Units</div>
+          <div style="display:flex"><button class="tog-btn active" id="tog_metric">Metric</button><button class="tog-btn" id="tog_imperial">Imperial</button></div>
+        </div>
+        <div>
+          <div class="opt-lbl">Precision</div>
+          <select id="prec" class="prec-sel"><option value="2">2 dp</option><option value="3">3 dp</option><option value="4" selected>4 dp</option><option value="5">5 dp</option></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="solver">
+        <div class="diagram">
+          <svg viewBox="0 0 200 330" xmlns="http://www.w3.org/2000/svg" aria-label="Antenna on tripod over a ground mark, showing slant height S, radius R, vertical height V, offset d and ARP height H">
+            <!-- ground -->
+            <line x1="5" y1="300" x2="195" y2="300" stroke="#1e5a3a" stroke-width="2"/>
+            <!-- tripod legs -->
+            <line x1="70" y1="120" x2="20" y2="300" stroke="#3a4a60" stroke-width="3"/>
+            <line x1="70" y1="120" x2="120" y2="300" stroke="#3a4a60" stroke-width="3"/>
+            <line x1="70" y1="120" x2="70" y2="298" stroke="#3a4a60" stroke-width="2" opacity=".5"/>
+            <!-- tribrach / mount -->
+            <rect x="58" y="108" width="24" height="12" rx="2" fill="#2a3a50"/>
+            <!-- antenna body: ARP at bottom of mount (y=96), ground plane edge / SHMP at y=78 -->
+            <rect x="66" y="88" width="8" height="20" fill="#2a3a50"/>
+            <path d="M28 78 L112 78 L104 88 L36 88 Z" fill="#26324a" stroke="#7a9ab5" stroke-width="1.2"/>
+            <path d="M40 78 Q70 46 100 78 Z" fill="#26324a" stroke="#7a9ab5" stroke-width="1.2"/>
+            <!-- mark -->
+            <circle cx="70" cy="300" r="3.5" fill="#ff8a65"/>
+            <text x="70" y="318" fill="#ff8a65" font-size="10" text-anchor="middle">mark</text>
+            <!-- ARP -->
+            <circle cx="70" cy="108" r="3" fill="#ffd54f"/>
+            <text x="56" y="112" fill="#ffd54f" font-size="9" text-anchor="end">ARP</text>
+            <!-- SHMP -->
+            <circle cx="112" cy="78" r="3" fill="#f48fb1"/>
+            <text x="116" y="74" fill="#f48fb1" font-size="9">SHMP</text>
+            <!-- R: centre to SHMP -->
+            <line x1="70" y1="66" x2="112" y2="66" stroke="#ce93d8" stroke-width="1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+            <line x1="70" y1="62" x2="70" y2="78" stroke="#ce93d8" stroke-width=".8" stroke-dasharray="2,2"/>
+            <line x1="112" y1="62" x2="112" y2="78" stroke="#ce93d8" stroke-width=".8" stroke-dasharray="2,2"/>
+            <text x="91" y="60" fill="#ce93d8" font-size="13" font-style="italic" font-weight="700" text-anchor="middle">R</text>
+            <!-- S: mark to SHMP -->
+            <line x1="70" y1="300" x2="112" y2="78" stroke="#4fc3f7" stroke-width="2"/>
+            <text x="104" y="200" fill="#4fc3f7" font-size="13" font-style="italic" font-weight="700">S</text>
+            <!-- V: vertical, mark to SHMP level -->
+            <line x1="150" y1="78" x2="150" y2="300" stroke="#80cbc4" stroke-width="1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+            <line x1="114" y1="78" x2="156" y2="78" stroke="#80cbc4" stroke-width=".8" stroke-dasharray="2,2"/>
+            <text x="156" y="195" fill="#80cbc4" font-size="13" font-style="italic" font-weight="700">V</text>
+            <!-- d: SHMP level to ARP level -->
+            <line x1="180" y1="78" x2="180" y2="108" stroke="#ffb74d" stroke-width="1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+            <line x1="74" y1="108" x2="186" y2="108" stroke="#ffb74d" stroke-width=".8" stroke-dasharray="2,2"/>
+            <line x1="156" y1="78" x2="186" y2="78" stroke="#ffb74d" stroke-width=".8" stroke-dasharray="2,2"/>
+            <text x="186" y="97" fill="#ffb74d" font-size="12" font-style="italic" font-weight="700">d</text>
+            <!-- H: mark to ARP -->
+            <line x1="40" y1="108" x2="40" y2="300" stroke="#ffd54f" stroke-width="1.5" marker-start="url(#ar)" marker-end="url(#ar)" opacity=".9"/>
+            <text x="30" y="215" fill="#ffd54f" font-size="13" font-style="italic" font-weight="700" text-anchor="end">H</text>
+            <defs>
+              <marker id="ar" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 1 L9 5 L0 9 Z" fill="#aaa"/></marker>
+            </defs>
+          </svg>
+        </div>
+
+        <div class="fields">
+          <div class="sh-field">
+            <label class="sh-label" for="f_R"><span class="sh-key" style="color:#ce93d8;border:1px solid #ce93d8">R</span>Radius <span class="u">(m)</span></label>
+            <div class="sh-sub">centre to slant mark (SHMP)</div>
+            <input class="sh-input" id="f_R" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off">
+            <div class="sh-err" id="e_R"></div>
+          </div>
+          <div class="sh-field">
+            <label class="sh-label" for="f_d"><span class="sh-key" style="color:#ffb74d;border:1px solid #ffb74d">d</span>SHMP above ARP <span class="u">(m)</span></label>
+            <div class="sh-sub">from antenna spec; negative if below</div>
+            <input class="sh-input" id="f_d" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off">
+            <div class="sh-err" id="e_d"></div>
+          </div>
+          <div class="sh-field">
+            <label class="sh-label" for="f_S"><span class="sh-key" style="color:#4fc3f7;border:1px solid #4fc3f7">S</span>Slant height <span class="u">(m)</span></label>
+            <div class="sh-sub">taped, mark to SHMP</div>
+            <input class="sh-input" id="f_S" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off">
+            <div class="sh-err" id="e_S"></div>
+          </div>
+          <div class="sh-field">
+            <label class="sh-label" for="f_V"><span class="sh-key" style="color:#80cbc4;border:1px solid #80cbc4">V</span>Vertical to SHMP <span class="u">(m)</span></label>
+            <input class="sh-input" id="f_V" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off">
+            <div class="sh-err" id="e_V"></div>
+          </div>
+          <div class="sh-field">
+            <label class="sh-label" for="f_H"><span class="sh-key" style="color:#ffd54f;border:1px solid #ffd54f">H</span>ARP height <span class="u">(m)</span></label>
+            <div class="sh-sub">vertical, mark to ARP</div>
+            <input class="sh-input" id="f_H" type="text" inputmode="decimal" placeholder="0.0000" autocomplete="off">
+            <div class="sh-err" id="e_H"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="msg info" id="msg">Enter R and S to get V. Add d to get H.</div>
+      <div class="btn-row">
+        <button class="sh-btn-sec" id="btn_reset">Reset</button>
+        <button class="sh-btn-sec" id="btn_copy">Copy All</button>
+      </div>
+      <div class="legend"><span class="tag-k">Blue border</span> = you entered it. <span class="tag-c">Green</span> = calculated. Type over a green value to make it a known.</div>
+    </div>
+
+    <div class="card" id="work_card" style="display:none">
+      <div class="section-title">Working</div>
+      <div id="work"></div>
+      <div class="legend">S² = R² + V² (right triangle: radius across, vertical up, slant along the tape). &nbsp;H = V − d. &nbsp;Tilt of the tape from vertical: θ = atan(R / V).<br>Use the R and d values from your antenna's spec sheet (NGS antenna calibrations or the manufacturer). H is to the ARP; the phase-centre offset is applied by the receiver or office software.</div>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+(function(){
+'use strict';
+var KEYS=['R','d','S','V','H'];
+var unit='metric';
+var known={};      // values the user entered (parsed)
+var calc={};       // values the solver produced
+var steps=[];
+
+function $(id){return document.getElementById(id)}
+function dp(){return parseInt($('prec').value,10)}
+function u(){return unit==='metric'?'m':'ft'}
+function f(v){return v.toFixed(dp())}
+function fu(v){return f(v)+' '+u()}
+
+function readKnown(){
+  known={};
+  KEYS.forEach(function(k){
+    var el=$('f_'+k);
+    $('e_'+k).textContent='';
+    el.classList.remove('field-error');
+    if(el.dataset.calc==='1') return;           // a filled-in result, not a known
+    var raw=el.value.trim();
+    el.classList.remove('field-known');
+    if(!raw) return;
+    var n=Number(raw);
+    if(!isFinite(n)){ setErr(k,'Must be a number'); return; }
+    if(k!=='d' && n<=0){ setErr(k,'Must be positive'); return; }
+    known[k]=n; el.classList.add('field-known');
+  });
+}
+function setErr(k,m){$('e_'+k).textContent=m;$('f_'+k).classList.add('field-error')}
+
+// Solve the two linked relations until nothing new can be found:
+//   (1) S^2 = R^2 + V^2      (2) H = V - d
+function solve(){
+  var v={},err=null; steps=[];
+  KEYS.forEach(function(k){ if(k in known) v[k]=known[k]; });
+  var has=function(k){return v[k]!==undefined};
+  var progress=true, guard=0;
+  while(progress && guard++<6 && !err){
+    progress=false;
+    // relation 1
+    if(has('S')&&has('R')&&!has('V')){
+      if(v.S<=v.R){err='Slant height S must be longer than radius R.';break;}
+      v.V=Math.sqrt(v.S*v.S-v.R*v.R);
+      steps.push({t:'Vertical to SHMP',e:'V = √(S² − R²) = √('+f(v.S)+'² − '+f(v.R)+'²) = √'+(v.S*v.S-v.R*v.R).toFixed(dp()+2)+' = <b>'+fu(v.V)+'</b>'});
+      progress=true;
+    }else if(has('V')&&has('R')&&!has('S')){
+      v.S=Math.sqrt(v.V*v.V+v.R*v.R);
+      steps.push({t:'Slant height',e:'S = √(V² + R²) = √('+f(v.V)+'² + '+f(v.R)+'²) = √'+(v.V*v.V+v.R*v.R).toFixed(dp()+2)+' = <b>'+fu(v.S)+'</b>'});
+      progress=true;
+    }else if(has('S')&&has('V')&&!has('R')){
+      if(v.S<=v.V){err='Slant height S must be longer than vertical V.';break;}
+      v.R=Math.sqrt(v.S*v.S-v.V*v.V);
+      steps.push({t:'Radius',e:'R = √(S² − V²) = √('+f(v.S)+'² − '+f(v.V)+'²) = √'+(v.S*v.S-v.V*v.V).toFixed(dp()+2)+' = <b>'+fu(v.R)+'</b>'});
+      progress=true;
+    }
+    // relation 2
+    if(has('V')&&has('d')&&!has('H')){
+      v.H=v.V-v.d;
+      steps.push({t:'ARP height',e:'H = V − d = '+f(v.V)+' − ('+f(v.d)+') = <b>'+fu(v.H)+'</b>'});
+      progress=true;
+    }else if(has('H')&&has('d')&&!has('V')){
+      v.V=v.H+v.d;
+      steps.push({t:'Vertical to SHMP',e:'V = H + d = '+f(v.H)+' + ('+f(v.d)+') = <b>'+fu(v.V)+'</b>'});
+      progress=true;
+    }else if(has('H')&&has('V')&&!has('d')){
+      v.d=v.V-v.H;
+      steps.push({t:'SHMP above ARP',e:'d = V − H = '+f(v.V)+' − '+f(v.H)+' = <b>'+fu(v.d)+'</b>'});
+      progress=true;
+    }
+  }
+  if(!err && has('V') && v.V<=0) err='Vertical V comes out zero or negative. Check the inputs.';
+  if(!err && has('H') && v.H<=0) err='ARP height H comes out zero or negative. Check d (sign) and the other inputs.';
+  // over-determined checks (user entered all of a relation)
+  var checks=[];
+  if(['S','R','V'].every(function(k){return k in known})){
+    var res=known.S-Math.sqrt(known.R*known.R+known.V*known.V);
+    checks.push('Check S: entered '+f(known.S)+', from R and V '+f(Math.sqrt(known.R*known.R+known.V*known.V))+' (diff '+f(res)+' '+u()+')');
+  }
+  if(['H','V','d'].every(function(k){return k in known})){
+    var r2=known.H-(known.V-known.d);
+    checks.push('Check H: entered '+f(known.H)+', from V − d '+f(known.V-known.d)+' (diff '+f(r2)+' '+u()+')');
+  }
+  if(!err && has('V') && has('R')){
+    var th=Math.atan2(v.R,v.V)*180/Math.PI;
+    var ts=Math.round(th*3600*10)/10;
+    steps.push({t:'Tape tilt from vertical (info)',e:'θ = atan(R / V) = atan('+f(v.R)+' / '+f(v.V)+') = '+(SurveyCalc.formatDMS?SurveyCalc.formatDMS(ts,0):th.toFixed(4)+'°')});
+  }
+  return {v:v,err:err,checks:checks};
+}
+
+function render(){
+  readKnown();
+  var r=solve();
+  calc={};
+  KEYS.forEach(function(k){
+    var el=$('f_'+k);
+    if(k in known) return;
+    if(!r.err && r.v[k]!==undefined){
+      calc[k]=r.v[k]; el.value=f(r.v[k]); el.dataset.calc='1'; el.classList.add('field-calc');
+    }else{
+      if(el.dataset.calc==='1'){ el.value=''; }
+      el.dataset.calc=''; el.classList.remove('field-calc');
+    }
+  });
+  var m=$('msg');
+  if(Object.keys(known).length===0){ m.className='msg info'; m.textContent='Enter R and S to get V. Add d to get H.'; }
+  else if(r.err){ m.className='msg err'; m.textContent=r.err; }
+  else if(r.v.H!==undefined && r.v.S!==undefined){ m.className='msg ok'; m.textContent='Solved. ARP height H = '+fu(r.v.H); }
+  else { m.className='msg info'; m.textContent=hint(r.v); }
+  var w=$('work'), html='';
+  if(!r.err){ steps.forEach(function(s){ html+='<div class="work-step"><div class="work-title">'+s.t+'</div><div class="work-eq">'+s.e+'</div></div>'; }); }
+  r.checks.forEach(function(c){ html+='<div class="work-step"><div class="work-eq work-check">'+c+'</div></div>'; });
+  w.innerHTML=html;
+  $('work_card').style.display=html?'block':'none';
+}
+function hint(v){
+  var need=[];
+  var g1=['S','R','V'].filter(function(k){return v[k]!==undefined}).length;
+  var g2=['H','V','d'].filter(function(k){return v[k]!==undefined}).length;
+  if(g1<2) need.push('two of S, R, V');
+  if(g2<2) need.push('two of H, V, d');
+  return 'Need '+need.join(' and ')+'.';
+}
+
+// Typing into a field makes it a known value.
+KEYS.forEach(function(k){
+  var el=$('f_'+k);
+  el.addEventListener('input',function(){ el.dataset.calc=''; el.classList.remove('field-calc'); render(); });
+  el.addEventListener('focus',function(){ if(el.dataset.calc==='1') el.select(); });
+});
+
+function setUnit(x){
+  unit=x;
+  $('tog_metric').classList.toggle('active',x==='metric');
+  $('tog_imperial').classList.toggle('active',x==='imperial');
+  document.querySelectorAll('.u').forEach(function(e){e.textContent='('+u()+')'});
+  render();
+}
+$('tog_metric').addEventListener('click',function(){setUnit('metric')});
+$('tog_imperial').addEventListener('click',function(){setUnit('imperial')});
+$('prec').addEventListener('change',render);
+
+$('btn_reset').addEventListener('click',function(){
+  KEYS.forEach(function(k){var el=$('f_'+k);el.value='';el.dataset.calc='';el.classList.remove('field-calc','field-known','field-error');});
+  render();
+});
+
+function copyToClipboard(text,btn){
+  function fb(){var t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.focus();t.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(t)}
+  function flash(){if(!btn)return;var o=btn.textContent;btn.textContent='Copied!';btn.classList.add('copied');setTimeout(function(){btn.textContent=o;btn.classList.remove('copied')},1500)}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(flash,function(){fb();flash()})}else{fb();flash()}
+}
+$('btn_copy').addEventListener('click',function(){
+  var names={R:'Radius R',d:'SHMP above ARP d',S:'Slant height S',V:'Vertical V',H:'ARP height H'};
+  var lines=['--- GNSS SLANT HEIGHT ---'];
+  KEYS.forEach(function(k){
+    var val=(k in known)?known[k]:calc[k];
+    if(val===undefined) return;
+    lines.push(names[k]+'\t'+f(val)+' '+u()+'\t'+((k in known)?'known':'calc'));
+  });
+  lines.push('--- WORKING ---');
+  steps.forEach(function(s){ lines.push(s.t+'\t'+s.e.replace(/<[^>]+>/g,'')); });
+  copyToClipboard(lines.join('\r\n'),$('btn_copy'));
+});
+
+render();
+})();
+</script>
+</body>
+</html>
